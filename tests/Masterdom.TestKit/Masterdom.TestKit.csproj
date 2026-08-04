@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Masterdom.Core\Masterdom.Core.csproj" />
+        <ProjectReference Include="..\..\src\Masterdom.Platform\Masterdom.Platform.csproj" />
+        <ProjectReference Include="..\..\src\Masterdom.Abstractions\Masterdom.Abstractions.csproj" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+</Project>

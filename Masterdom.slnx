@@ -1,0 +1,42 @@
+<Solution>
+    <Folder Name="/src/">
+        <Project Path="src/Masterdom.Abstractions/Masterdom.Abstractions.csproj" />
+        <Project Path="src/Masterdom.Core/Masterdom.Core.csproj" />
+        <Project Path="src/Masterdom.Host/Masterdom.Host.csproj" />
+        <Project Path="src/Masterdom.Infrastructure/Masterdom.Infrastructure.csproj" />
+        <Project Path="src/Masterdom.Modules.Billing/Masterdom.Modules.Billing.csproj" />
+        <Project Path="src/Masterdom.Modules.CRM/Masterdom.Modules.CRM.csproj" />
+        <Project Path="src/Masterdom.Modules.Documents/Masterdom.Modules.Documents.csproj" />
+        <Project Path="src/Masterdom.Modules.Finance/Masterdom.Modules.Finance.csproj" />
+        <Project
+            Path="src/Masterdom.Modules.FinancialLedger/Masterdom.Modules.FinancialLedger.csproj" />
+        <Project Path="src/Masterdom.Modules.Intelligence/Masterdom.Modules.Intelligence.csproj" />
+        <Project Path="src/Masterdom.Modules.Inventory/Masterdom.Modules.Inventory.csproj" />
+        <Project Path="src/Masterdom.Modules.Lease/Masterdom.Modules.Lease.csproj" />
+        <Project Path="src/Masterdom.Modules.Maintenance/Masterdom.Modules.Maintenance.csproj" />
+        <Project Path="src/Masterdom.Modules.Metering/Masterdom.Modules.Metering.csproj" />
+        <Project Path="src/Masterdom.Modules.Notifications/Masterdom.Modules.Notifications.csproj" />
+        <Project Path="src/Masterdom.Modules.Payment/Masterdom.Modules.Payment.csproj" />
+        <Project Path="src/Masterdom.Modules.People/Masterdom.Modules.People.csproj" />
+        <Project
+            Path="src/Masterdom.Modules.PolicyFramework/Masterdom.Modules.PolicyFramework.csproj" />
+        <Project Path="src/Masterdom.Modules.Properties/Masterdom.Modules.Properties.csproj" />
+        <Project
+            Path="src/Masterdom.Modules.SubsidyOptimization/Masterdom.Modules.SubsidyOptimization.csproj" />
+        <Project Path="src/Masterdom.Modules.Tenancy/Masterdom.Modules.Tenancy.csproj" />
+        <Project Path="src/Masterdom.Modules.Reporting/Masterdom.Modules.Reporting.csproj" />
+        <Project Path="src/Masterdom.Modules.Security/Masterdom.Modules.Security.csproj" />
+        <Project Path="src/Masterdom.Modules.Settings/Masterdom.Modules.Settings.csproj" />
+        <Project Path="src/Masterdom.Modules.UtilityRating/Masterdom.Modules.UtilityRating.csproj" />
+    </Folder>
+    <Folder Name="/tests/">
+        <Project Path="tests/Masterdom.Architecture.Tests/Masterdom.Architecture.Tests.csproj" />
+        <Project Path="tests/Masterdom.Core.Tests/Masterdom.Core.Tests.csproj" />
+        <Project
+            Path="tests/Masterdom.Platform.BusinessIntegration.Tests/Masterdom.Platform.BusinessIntegration.Tests.csproj" />
+        <Project
+            Path="tests/Masterdom.Platform.Infrastructure.Tests/Masterdom.Platform.Infrastructure.Tests.csproj" />
+        <Project Path="tests/Masterdom.Platform.Tests/Masterdom.Platform.Tests.csproj" />
+        <Project Path="tests/Masterdom.TestKit/Masterdom.TestKit.csproj" />
+    </Folder>
+</Solution>

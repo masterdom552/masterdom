@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Masterdom.Core\Masterdom.Core.csproj" />
+        <ProjectReference Include="..\Masterdom.Platform\Masterdom.Platform.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.Properties\Masterdom.Modules.Properties.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.People\Masterdom.Modules.People.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.Lease\Masterdom.Modules.Lease.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.Tenancy\Masterdom.Modules.Tenancy.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.Metering\Masterdom.Modules.Metering.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.UtilityRating\Masterdom.Modules.UtilityRating.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.SubsidyOptimization\Masterdom.Modules.SubsidyOptimization.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.PolicyFramework\Masterdom.Modules.PolicyFramework.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.Payment\Masterdom.Modules.Payment.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.FinancialLedger\Masterdom.Modules.FinancialLedger.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.Billing\Masterdom.Modules.Billing.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.Reporting\Masterdom.Modules.Reporting.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.Notifications\Masterdom.Modules.Notifications.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.Documents\Masterdom.Modules.Documents.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    </ItemGroup>
+
+</Project>

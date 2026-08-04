@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Masterdom.Platform\Masterdom.Platform.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Infrastructure\Masterdom.Infrastructure.csproj" />
+        <ProjectReference Include="..\..\src\Masterdom.Host\Masterdom.Host.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.Reporting\Masterdom.Modules.Reporting.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.Notifications\Masterdom.Modules.Notifications.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.Documents\Masterdom.Modules.Documents.csproj" />
+        <ProjectReference Include="..\Masterdom.TestKit\Masterdom.TestKit.csproj" />
+    </ItemGroup>
+
+</Project>

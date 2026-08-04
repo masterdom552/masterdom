@@ -1,0 +1,36 @@
+name: Testing Topology Enforcement
+
+on:
+    pull_request:
+        paths:
+            - "tests/**"
+            - ".github/workflows/testing-topology-enforcement.yml"
+            - "Directory.Packages.props"
+            - "Masterdom.slnx"
+    push:
+        branches:
+            - main
+        paths:
+            - "tests/**"
+            - ".github/workflows/testing-topology-enforcement.yml"
+            - "Directory.Packages.props"
+            - "Masterdom.slnx"
+
+jobs:
+    topology-architecture-tests:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v4
+              with:
+                  global-json-file: global.json
+
+            - name: Restore
+              run: dotnet restore Masterdom.slnx
+
+            - name: Run Architecture Topology Tests
+              run: dotnet test tests/Masterdom.Architecture.Tests/Masterdom.Architecture.Tests.csproj --filter "FullyQualifiedName~TestingTopologyArchitectureTests"

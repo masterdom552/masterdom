@@ -1,0 +1,23 @@
+# ==========================
+# Masterdom
+# Git Attributes
+# ==========================
+
+* text=auto eol=lf
+
+*.cs text
+*.csproj text
+*.props text
+*.targets text
+*.json text
+*.xml text
+*.yml text
+*.yaml text
+*.md text
+*.sql text
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary

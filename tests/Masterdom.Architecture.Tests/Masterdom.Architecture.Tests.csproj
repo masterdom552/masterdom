@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Masterdom.Core\Masterdom.Core.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.Properties\Masterdom.Modules.Properties.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.People\Masterdom.Modules.People.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.Lease\Masterdom.Modules.Lease.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.Tenancy\Masterdom.Modules.Tenancy.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.Billing\Masterdom.Modules.Billing.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.Metering\Masterdom.Modules.Metering.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.UtilityRating\Masterdom.Modules.UtilityRating.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.SubsidyOptimization\Masterdom.Modules.SubsidyOptimization.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.PolicyFramework\Masterdom.Modules.PolicyFramework.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.Payment\Masterdom.Modules.Payment.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.FinancialLedger\Masterdom.Modules.FinancialLedger.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.Reporting\Masterdom.Modules.Reporting.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.Notifications\Masterdom.Modules.Notifications.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.Documents\Masterdom.Modules.Documents.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Infrastructure\Masterdom.Infrastructure.csproj" />
+    </ItemGroup>
+
+</Project>

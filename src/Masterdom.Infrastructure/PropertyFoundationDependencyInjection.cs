@@ -1,0 +1,742 @@
+using Masterdom.Modules.Properties.Application.Commands;
+using Masterdom.Modules.Properties.Application.Handlers.Commands;
+using Masterdom.Modules.Properties.Application.Handlers.Queries;
+using Masterdom.Modules.Properties.Application.Queries;
+using Masterdom.Modules.Properties.Application.Services;
+using Masterdom.Modules.Properties.Application.Support;
+using Masterdom.Modules.Properties.Domain.Entities.Property;
+using Masterdom.Modules.Properties.Domain.Repositories;
+using Masterdom.Infrastructure.Persistence.Property;
+using Masterdom.Infrastructure.Persistence.Lease;
+using Masterdom.Infrastructure.Persistence.People;
+using Masterdom.Infrastructure.Persistence.Tenancy;
+using Masterdom.Infrastructure.Security;
+using Masterdom.Modules.Lease.Application.Commands;
+using Masterdom.Modules.Lease.Application.Handlers.Commands;
+using Masterdom.Modules.Lease.Application.Handlers.Queries;
+using Masterdom.Modules.Lease.Application.Queries;
+using Masterdom.Modules.Lease.Application.Services;
+using Masterdom.Modules.Lease.Domain.Entities.Lease;
+using Masterdom.Modules.Lease.Domain.Repositories;
+using Masterdom.Modules.People.Application.Commands;
+using Masterdom.Modules.People.Application.Handlers.Commands;
+using Masterdom.Modules.People.Application.Handlers.Queries;
+using Masterdom.Modules.People.Application.Queries;
+using Masterdom.Modules.People.Application.Services;
+using Masterdom.Modules.People.Domain.Entities.Person;
+using Masterdom.Modules.People.Domain.Repositories;
+using Masterdom.Modules.Tenancy.Application.Commands;
+using Masterdom.Modules.Tenancy.Application.Handlers.Commands;
+using Masterdom.Modules.Tenancy.Application.Handlers.Queries;
+using Masterdom.Modules.Tenancy.Application.Queries;
+using Masterdom.Modules.Tenancy.Application.Services;
+using Masterdom.Modules.Tenancy.Domain.Entities.Tenancy;
+using Masterdom.Modules.Tenancy.Domain.Repositories;
+using Masterdom.Infrastructure.Persistence.Metering;
+using Masterdom.Modules.Metering.Application.Commands;
+using Masterdom.Modules.Metering.Application.Handlers.Commands;
+using Masterdom.Modules.Metering.Application.Handlers.Queries;
+using Masterdom.Modules.Metering.Application.Queries;
+using Masterdom.Modules.Metering.Application.Services;
+using Masterdom.Modules.Metering.Domain.Entities.Metering;
+using Masterdom.Modules.Metering.Domain.Repositories;
+using Masterdom.Infrastructure.Persistence.Billing;
+using Masterdom.Modules.Billing.Application.Commands;
+using Masterdom.Modules.Billing.Application.Handlers.Commands;
+using Masterdom.Modules.Billing.Application.Handlers.Queries;
+using Masterdom.Modules.Billing.Application.Queries;
+using Masterdom.Modules.Billing.Application.Services;
+using Masterdom.Modules.Billing.Domain.Entities.Billing;
+using Masterdom.Modules.Billing.Domain.Repositories;
+using Masterdom.Modules.Billing.Application.Capabilities.ChargeComposition.ReadModels;
+using Masterdom.Modules.Billing.Application.Capabilities.ChargeComposition.Pipeline;
+using Masterdom.Modules.Billing.Application.Capabilities.Billability;
+using Masterdom.Modules.Billing.Application.Capabilities.BillPersistence;
+using Masterdom.Modules.Billing.Application.Publication;
+using Masterdom.Infrastructure.Persistence.FinancialLedger;
+using Masterdom.Modules.FinancialLedger.Application.Commands;
+using Masterdom.Modules.FinancialLedger.Application.Handlers.Commands;
+using Masterdom.Modules.FinancialLedger.Application.Handlers.Queries;
+using Masterdom.Modules.FinancialLedger.Application.Posting;
+using Masterdom.Modules.FinancialLedger.Application.Queries;
+using Masterdom.Modules.FinancialLedger.Application.Services;
+using Masterdom.Modules.FinancialLedger.Application.Translation;
+using Masterdom.Modules.FinancialLedger.Domain.Entities.FinancialLedger;
+using Masterdom.Modules.FinancialLedger.Domain.Repositories;
+using Masterdom.Infrastructure.Persistence.Payment;
+using Masterdom.Infrastructure.Persistence.Documents;
+using Masterdom.Infrastructure.Persistence.ReadModels;
+using Masterdom.Infrastructure.Persistence.ReadModels.Providers;
+using Masterdom.Infrastructure.Persistence.Reporting;
+using Masterdom.Modules.Payment.Application.Commands;
+using Masterdom.Modules.Payment.Application.Handlers.Commands;
+using Masterdom.Modules.Payment.Application.Handlers.Queries;
+using Masterdom.Modules.Payment.Application.Queries;
+using Masterdom.Modules.Payment.Application.Services;
+using Masterdom.Modules.Payment.Domain.Entities.Payment;
+using Masterdom.Modules.Payment.Domain.Repositories;
+using Masterdom.Modules.Reporting.Application.Handlers.Queries;
+using Masterdom.Modules.Reporting.Application.Models;
+using Masterdom.Modules.Reporting.Application.Queries;
+using Masterdom.Modules.Reporting.Application.Services;
+using Masterdom.Modules.Notifications.Application.Commands;
+using Masterdom.Modules.Notifications.Application.Handlers.Commands;
+using Masterdom.Modules.Notifications.Application.Handlers.Queries;
+using Masterdom.Modules.Notifications.Application.Models;
+using Masterdom.Modules.Notifications.Application.Queries;
+using Masterdom.Modules.Notifications.Application.Services;
+using Masterdom.Modules.Documents.Application.Commands;
+using Masterdom.Modules.Documents.Application.Handlers.Commands;
+using Masterdom.Modules.Documents.Application.Handlers.Queries;
+using Masterdom.Modules.Documents.Application.Models;
+using Masterdom.Modules.Documents.Application.Queries;
+using Masterdom.Modules.Documents.Application.Services;
+using Masterdom.Modules.SubsidyOptimization.Application.Maximizer;
+using Masterdom.Platform.CalculationEngine;
+using Masterdom.Platform.CalculationEngine.Contracts;
+using Masterdom.Platform.Notifications;
+using Masterdom.Platform.Configuration;
+using Masterdom.Platform.BusinessContext;
+using Masterdom.Platform.Events;
+using Masterdom.Platform.LanguageSupport;
+using Masterdom.Platform.Metadata;
+using Masterdom.Platform.Recommendation;
+using Masterdom.Platform.ReadModels;
+using Masterdom.Platform.Rules;
+using Masterdom.Platform.Workflow;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using LeaseAggregate = Masterdom.Modules.Lease.Domain.Entities.Lease.Lease;
+using PropertyAggregate = Masterdom.Modules.Properties.Domain.Entities.Property.Property;
+using TenancyAggregate = Masterdom.Modules.Tenancy.Domain.Entities.Tenancy.Tenancy;
+using MeterAggregate = Masterdom.Modules.Metering.Domain.Entities.Metering.Meter;
+using BillAggregate = Masterdom.Modules.Billing.Domain.Entities.Billing.Bill;
+using LedgerAggregate = Masterdom.Modules.FinancialLedger.Domain.Entities.FinancialLedger.Ledger;
+using PaymentAggregate = Masterdom.Modules.Payment.Domain.Entities.Payment.Payment;
+
+namespace Masterdom.Infrastructure;
+
+/// <summary>
+/// Registers Property Foundation runtime dependencies.
+/// </summary>
+public static class PropertyFoundationDependencyInjection
+{
+    /// <summary>
+    /// Adds Property runtime composition with platform baseline adapters.
+    /// </summary>
+    public static IServiceCollection AddPropertyFoundationRuntime(this IServiceCollection services)
+    {
+        return services.AddPropertyBusinessCapabilityRuntime();
+    }
+
+    /// <summary>
+    /// Adds Property capability runtime composition across Property, People, Lease, and Tenancy.
+    /// </summary>
+    public static IServiceCollection AddPropertyBusinessCapabilityRuntime(this IServiceCollection services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+
+        AddPlatformFoundation(services);
+        AddPropertyRuntime(services);
+        AddPeopleRuntime(services);
+        AddLeaseRuntime(services);
+        AddTenancyRuntime(services);
+        AddMeteringRuntime(services);
+        AddBillingRuntime(services);
+        AddFinancialLedgerRuntime(services);
+        AddPaymentRuntime(services);
+        AddReportingRuntime(services);
+        AddNotificationsRuntime(services);
+        AddDocumentsRuntime(services);
+        AddSubsidyOptimizationRuntime(services);
+
+        return services;
+    }
+
+    private static void AddPlatformFoundation(IServiceCollection services)
+    {
+        services.TryAddScoped<Masterdom.Core.Security.ICurrentUserAccessor, AnonymousCurrentUserAccessor>();
+        services.AddScoped<Masterdom.Core.Security.ICapabilityAuthorizationPolicyProvider, DefaultCapabilityAuthorizationPolicyProvider>();
+        services.AddScoped<Masterdom.Core.Security.IPropertyCapabilityAuthorizationService, PropertyCapabilityAuthorizationService>();
+        services.AddScoped<IRequestAuthorizationService, RequestAuthorizationService>();
+
+        services.AddScoped<ITenancyReadModelProvider, TenancyReadModelProvider>();
+        services.AddScoped<IPropertyReadModelProvider, PropertyReadModelProvider>();
+        services.AddScoped<IMeteringReadModelProvider, MeteringReadModelProvider>();
+        services.AddScoped<IBillingReadModelProvider, BillingReadModelProvider>();
+        services.AddScoped<IPaymentReadModelProvider, PaymentReadModelProvider>();
+        services.AddScoped<IFinancialLedgerReadModelProvider, FinancialLedgerReadModelProvider>();
+        services.AddScoped<IReadModelProvider>(sp => sp.GetRequiredService<ITenancyReadModelProvider>());
+        services.AddScoped<IReadModelProvider>(sp => sp.GetRequiredService<IPropertyReadModelProvider>());
+        services.AddScoped<IReadModelProvider>(sp => sp.GetRequiredService<IMeteringReadModelProvider>());
+        services.AddScoped<IReadModelProvider>(sp => sp.GetRequiredService<IBillingReadModelProvider>());
+        services.AddScoped<IReadModelProvider>(sp => sp.GetRequiredService<IPaymentReadModelProvider>());
+        services.AddScoped<IReadModelProvider>(sp => sp.GetRequiredService<IFinancialLedgerReadModelProvider>());
+        services.AddScoped<IReadModelRegistry, ReadModelRegistry>();
+        services.AddScoped<IReadModelProjectionOrchestrator, ReadModelProjectionOrchestrator>();
+
+        // Platform baseline in-memory dependencies required by orchestrators.
+        services.AddSingleton<IConfigurationRepository, InMemoryConfigurationRepository>();
+        services.AddSingleton<IConfigurationDefaults, DefaultConfigurationDefaults>();
+        services.AddSingleton<IConfigurationResolver, ConfigurationResolver>();
+        services.AddSingleton<IBusinessConfigurationCatalog, BusinessConfigurationCatalog>();
+
+        services.AddSingleton(BusinessContextOptions.Default);
+        services.AddScoped<BusinessContextBuilderRegistry>();
+        services.AddScoped<IBusinessContextBuilder, BusinessContextBuilder>();
+
+        services.AddSingleton<IRecommendationRepository, InMemoryRecommendationRepository>();
+        services.AddSingleton<IDecisionRepository, InMemoryDecisionRepository>();
+        services.AddSingleton<IOptimizationSessionRepository, InMemoryOptimizationSessionRepository>();
+        services.AddScoped<RecommendationProviderRegistry>();
+        services.AddScoped<RecommendationConsumerRegistry>();
+        services.AddScoped(_ => CreateDefaultRecommendationConsumerExecutionContext());
+        services.AddScoped(_ => RecommendationConsumerExecutionSummary.Empty);
+        services.AddScoped<RecommendationPipeline>();
+
+        services.AddSingleton<ILanguageContextAccessor, AsyncLocalLanguageContextAccessor>();
+        services.AddScoped<ILanguageSettingsResolver, ConfigurationLanguageSettingsResolver>();
+        services.AddSingleton<ILanguageResourceProvider>(sp =>
+            new DefaultLanguageResourceProvider(
+                embeddedResources: null,
+                businessConfigurationCatalog: sp.GetRequiredService<IBusinessConfigurationCatalog>(),
+                contextAccessor: sp.GetRequiredService<ILanguageContextAccessor>(),
+                name: "default"));
+        services.AddSingleton<ILanguageFormatterProvider, DefaultLanguageFormatterProvider>();
+        services.AddScoped<ILanguageSupportService, DefaultLanguageSupportService>();
+
+        services.AddSingleton<IMetadataRepository, InMemoryMetadataRepository>();
+        services.AddSingleton<IMetadataResolver, MetadataResolver>();
+
+        services.AddSingleton<IRuleRepository, InMemoryRuleRepository>();
+        services.AddSingleton<IRuleResolver, RuleResolver>();
+
+        services.AddSingleton<IWorkflowRepository, InMemoryWorkflowRepository>();
+        services.AddSingleton<IWorkflowStateStore, InMemoryWorkflowStateStore>();
+        services.AddSingleton<IWorkflowResolver, WorkflowResolver>();
+
+        services.AddSingleton<IEventRepository, InMemoryEventRepository>();
+        services.AddSingleton<IEventRegistry, EventRegistry>();
+        services.AddSingleton<IEventHandlerResolver, EventHandlerResolver>();
+        services.AddSingleton<IEventDispatcher, EventDispatcher>();
+        services.AddSingleton<IEventStore, EventStore>();
+        services.AddSingleton<IEventPublisher, EventPublisher>();
+        services.AddSingleton<IDomainEventAdapter, DomainEventAdapter>();
+        services.AddSingleton<IDomainEventPublisher, DomainEventPublisher>();
+    }
+
+    private static void AddPropertyRuntime(IServiceCollection services)
+    {
+        services.AddScoped<IPropertyRepository, PropertyRepository>();
+        services.AddScoped<IPropertyUnitOfWork, PropertyUnitOfWork>();
+        services.AddScoped<IPropertyPlatformOrchestrator, PropertyPlatformOrchestrator>();
+        services.AddScoped<IPropertyApplicationService, PropertyApplicationService>();
+
+        AddPropertyCommandHandler<CreatePropertyCommand, ExecutionResult<PropertyAggregate>, CreatePropertyCommandHandler>(services);
+        AddPropertyCommandHandler<RenamePropertyCommand, ExecutionResult<PropertyAggregate>, RenamePropertyCommandHandler>(services);
+        AddPropertyCommandHandler<ChangePropertyStatusCommand, ExecutionResult<PropertyAggregate>, ChangePropertyStatusCommandHandler>(services);
+        AddPropertyCommandHandler<CreateUnitCommand, ExecutionResult<Unit>, CreateUnitCommandHandler>(services);
+        AddPropertyCommandHandler<RemoveUnitCommand, ExecutionResult<bool>, RemoveUnitCommandHandler>(services);
+
+        AddPropertyQueryHandler<GetPropertyByIdQuery, ExecutionResult<PropertyAggregate>, GetPropertyByIdQueryHandler>(services);
+        AddPropertyQueryHandler<GetPropertyByCodeQuery, ExecutionResult<PropertyAggregate>, GetPropertyByCodeQueryHandler>(services);
+        AddPropertyQueryHandler<ListUnitsQuery, ExecutionResult<IReadOnlyCollection<Unit>>, ListUnitsQueryHandler>(services);
+        AddPropertyQueryHandler<SearchPropertiesQuery, ExecutionResult<IReadOnlyCollection<PropertyAggregate>>, SearchPropertiesQueryHandler>(services);
+    }
+
+    private static void AddPeopleRuntime(IServiceCollection services)
+    {
+        services.AddScoped<IPersonRepository, PersonRepository>();
+        services.AddScoped<Masterdom.Modules.People.Application.Support.IPersonUnitOfWork, PersonUnitOfWork>();
+        services.AddScoped<Masterdom.Modules.People.Application.Support.IPersonPlatformOrchestrator, PersonPlatformOrchestrator>();
+        services.AddScoped<IPersonApplicationService, PersonApplicationService>();
+
+        AddPeopleCommandHandler<CreatePersonCommand, Masterdom.Modules.People.Application.Support.ExecutionResult<Person>, CreatePersonCommandHandler>(services);
+        AddPeopleCommandHandler<RenamePersonCommand, Masterdom.Modules.People.Application.Support.ExecutionResult<Person>, RenamePersonCommandHandler>(services);
+        AddPeopleCommandHandler<ChangePersonStatusCommand, Masterdom.Modules.People.Application.Support.ExecutionResult<Person>, ChangePersonStatusCommandHandler>(services);
+        AddPeopleCommandHandler<AddContactCommand, Masterdom.Modules.People.Application.Support.ExecutionResult<Person>, AddContactCommandHandler>(services);
+        AddPeopleCommandHandler<RemoveContactCommand, Masterdom.Modules.People.Application.Support.ExecutionResult<bool>, RemoveContactCommandHandler>(services);
+        AddPeopleCommandHandler<AddIdentityDocumentCommand, Masterdom.Modules.People.Application.Support.ExecutionResult<Person>, AddIdentityDocumentCommandHandler>(services);
+        AddPeopleCommandHandler<AddRelationshipCommand, Masterdom.Modules.People.Application.Support.ExecutionResult<Person>, AddRelationshipCommandHandler>(services);
+
+        AddPeopleQueryHandler<GetPersonByIdQuery, Masterdom.Modules.People.Application.Support.ExecutionResult<Person>, GetPersonByIdQueryHandler>(services);
+        AddPeopleQueryHandler<GetPersonByNumberQuery, Masterdom.Modules.People.Application.Support.ExecutionResult<Person>, GetPersonByNumberQueryHandler>(services);
+        AddPeopleQueryHandler<SearchPeopleQuery, Masterdom.Modules.People.Application.Support.ExecutionResult<IReadOnlyCollection<Person>>, SearchPeopleQueryHandler>(services);
+    }
+
+    private static void AddLeaseRuntime(IServiceCollection services)
+    {
+        services.AddScoped<ILeaseRepository, LeaseRepository>();
+        services.AddScoped<Masterdom.Modules.Lease.Application.Support.ILeaseUnitOfWork, LeaseUnitOfWork>();
+        services.AddScoped<Masterdom.Modules.Lease.Application.Support.ILeasePlatformOrchestrator, LeasePlatformOrchestrator>();
+        services.AddScoped<ILeaseApplicationService, LeaseApplicationService>();
+
+        AddLeaseCommandHandler<CreateLeaseCommand, Masterdom.Modules.Lease.Application.Support.ExecutionResult<LeaseAggregate>, CreateLeaseCommandHandler>(services);
+        AddLeaseCommandHandler<ActivateLeaseCommand, Masterdom.Modules.Lease.Application.Support.ExecutionResult<LeaseAggregate>, ActivateLeaseCommandHandler>(services);
+        AddLeaseCommandHandler<RenewLeaseCommand, Masterdom.Modules.Lease.Application.Support.ExecutionResult<LeaseAggregate>, RenewLeaseCommandHandler>(services);
+        AddLeaseCommandHandler<TerminateLeaseCommand, Masterdom.Modules.Lease.Application.Support.ExecutionResult<LeaseAggregate>, TerminateLeaseCommandHandler>(services);
+        AddLeaseCommandHandler<ExpireLeaseCommand, Masterdom.Modules.Lease.Application.Support.ExecutionResult<LeaseAggregate>, ExpireLeaseCommandHandler>(services);
+        AddLeaseCommandHandler<CloseLeaseCommand, Masterdom.Modules.Lease.Application.Support.ExecutionResult<LeaseAggregate>, CloseLeaseCommandHandler>(services);
+        AddLeaseCommandHandler<ChangeCommercialTermsCommand, Masterdom.Modules.Lease.Application.Support.ExecutionResult<LeaseAggregate>, ChangeCommercialTermsCommandHandler>(services);
+
+        AddLeaseQueryHandler<GetLeaseByIdQuery, Masterdom.Modules.Lease.Application.Support.ExecutionResult<LeaseAggregate>, GetLeaseByIdQueryHandler>(services);
+        AddLeaseQueryHandler<GetLeaseByNumberQuery, Masterdom.Modules.Lease.Application.Support.ExecutionResult<LeaseAggregate>, GetLeaseByNumberQueryHandler>(services);
+    }
+
+    private static void AddTenancyRuntime(IServiceCollection services)
+    {
+        services.AddScoped<ITenancyRepository, TenancyRepository>();
+        services.AddScoped<Masterdom.Modules.Tenancy.Application.Support.ITenancyUnitOfWork, TenancyUnitOfWork>();
+        services.AddScoped<Masterdom.Modules.Tenancy.Application.Support.ITenancyPlatformOrchestrator, TenancyPlatformOrchestrator>();
+        services.AddScoped<ITenancyApplicationService, TenancyApplicationService>();
+
+        AddTenancyCommandHandler<CreateTenancyCommand, Masterdom.Modules.Tenancy.Application.Support.ExecutionResult<TenancyAggregate>, CreateTenancyCommandHandler>(services);
+        AddTenancyCommandHandler<AddOccupantCommand, Masterdom.Modules.Tenancy.Application.Support.ExecutionResult<TenancyAggregate>, AddOccupantCommandHandler>(services);
+        AddTenancyCommandHandler<RemoveOccupantCommand, Masterdom.Modules.Tenancy.Application.Support.ExecutionResult<bool>, RemoveOccupantCommandHandler>(services);
+        AddTenancyCommandHandler<RecordMoveInCommand, Masterdom.Modules.Tenancy.Application.Support.ExecutionResult<TenancyAggregate>, RecordMoveInCommandHandler>(services);
+        AddTenancyCommandHandler<RecordMoveOutCommand, Masterdom.Modules.Tenancy.Application.Support.ExecutionResult<TenancyAggregate>, RecordMoveOutCommandHandler>(services);
+        AddTenancyCommandHandler<CloseTenancyCommand, Masterdom.Modules.Tenancy.Application.Support.ExecutionResult<TenancyAggregate>, CloseTenancyCommandHandler>(services);
+        AddTenancyCommandHandler<ArchiveTenancyCommand, Masterdom.Modules.Tenancy.Application.Support.ExecutionResult<TenancyAggregate>, ArchiveTenancyCommandHandler>(services);
+
+        AddTenancyQueryHandler<GetTenancyByIdQuery, Masterdom.Modules.Tenancy.Application.Support.ExecutionResult<TenancyAggregate>, GetTenancyByIdQueryHandler>(services);
+    }
+
+    private static void AddMeteringRuntime(IServiceCollection services)
+    {
+        services.AddScoped<IMeterRepository, MeterRepository>();
+        services.AddScoped<Masterdom.Modules.Metering.Application.Support.IMeteringUnitOfWork, MeteringUnitOfWork>();
+        services.AddScoped<Masterdom.Modules.Metering.Application.Support.IMeteringPlatformOrchestrator, MeteringPlatformOrchestrator>();
+        services.AddScoped<IMeteringApplicationService, MeteringApplicationService>();
+
+        AddMeteringCommandHandler<InstallMeterCommand, Masterdom.Modules.Metering.Application.Support.ExecutionResult<MeterAggregate>, InstallMeterCommandHandler>(services);
+        AddMeteringCommandHandler<SubmitReadingCommand, Masterdom.Modules.Metering.Application.Support.ExecutionResult<MeterAggregate>, SubmitReadingCommandHandler>(services);
+        AddMeteringCommandHandler<ApproveReadingCommand, Masterdom.Modules.Metering.Application.Support.ExecutionResult<MeterAggregate>, ApproveReadingCommandHandler>(services);
+        AddMeteringCommandHandler<CorrectReadingCommand, Masterdom.Modules.Metering.Application.Support.ExecutionResult<MeterAggregate>, CorrectReadingCommandHandler>(services);
+        AddMeteringCommandHandler<RetireMeterCommand, Masterdom.Modules.Metering.Application.Support.ExecutionResult<MeterAggregate>, RetireMeterCommandHandler>(services);
+
+        AddMeteringQueryHandler<GetMeterByIdQuery, Masterdom.Modules.Metering.Application.Support.ExecutionResult<MeterAggregate>, GetMeterByIdQueryHandler>(services);
+        AddMeteringQueryHandler<GetMeterByNumberQuery, Masterdom.Modules.Metering.Application.Support.ExecutionResult<MeterAggregate>, GetMeterByNumberQueryHandler>(services);
+    }
+
+    private static void AddBillingRuntime(IServiceCollection services)
+    {
+        services.AddScoped<IBillRepository, BillRepository>();
+        services.AddScoped<Masterdom.Modules.Billing.Application.Support.IBillingUnitOfWork, BillingUnitOfWork>();
+        services.AddScoped<Masterdom.Modules.Billing.Application.Support.IBillingPlatformOrchestrator, BillingPlatformOrchestrator>();
+        services.AddScoped<IBillingApplicationService, BillingApplicationService>();
+
+        services.AddScoped<IChargeCompositionReadService, BillingChargeCompositionReadService>();
+        services.AddScoped<ChargeCompositionPipeline>(serviceProvider =>
+            new ChargeCompositionPipeline(serviceProvider.GetRequiredService<IChargeCompositionReadService>()));
+        services.AddScoped<BillabilityDeterminationService>();
+        services.AddScoped<BillPersistenceOperation>();
+        services.AddScoped<BillingNotificationProjector>();
+        services.AddScoped<IBillPersistenceService, BillPersistenceService>();
+        services.AddScoped<BillPersistenceCapability>();
+
+        AddBillingCommandHandler<GenerateBillCommand, Masterdom.Modules.Billing.Application.Support.ExecutionResult<BillAggregate>, GenerateBillCommandHandler>(services);
+        AddBillingCommandHandler<FinalizeBillCommand, Masterdom.Modules.Billing.Application.Support.ExecutionResult<BillAggregate>, FinalizeBillCommandHandler>(services);
+        AddBillingCommandHandler<AddAdjustmentCommand, Masterdom.Modules.Billing.Application.Support.ExecutionResult<BillAggregate>, AddAdjustmentCommandHandler>(services);
+        AddBillingCommandHandler<ApplyCreditCommand, Masterdom.Modules.Billing.Application.Support.ExecutionResult<BillAggregate>, ApplyCreditCommandHandler>(services);
+        AddBillingCommandHandler<VoidBillCommand, Masterdom.Modules.Billing.Application.Support.ExecutionResult<BillAggregate>, VoidBillCommandHandler>(services);
+
+        AddBillingQueryHandler<GetBillByIdQuery, Masterdom.Modules.Billing.Application.Support.ExecutionResult<BillAggregate>, GetBillByIdQueryHandler>(services);
+        AddBillingQueryHandler<GetBillByNumberQuery, Masterdom.Modules.Billing.Application.Support.ExecutionResult<BillAggregate>, GetBillByNumberQueryHandler>(services);
+    }
+
+    private static void AddFinancialLedgerRuntime(IServiceCollection services)
+    {
+        services.AddScoped<ILedgerRepository, LedgerRepository>();
+        services.AddScoped<Masterdom.Modules.FinancialLedger.Application.Support.ILedgerUnitOfWork, LedgerUnitOfWork>();
+        services.AddScoped<Masterdom.Modules.FinancialLedger.Application.Support.ILedgerPlatformOrchestrator, LedgerPlatformOrchestrator>();
+        services.AddScoped<ILedgerApplicationService, LedgerApplicationService>();
+
+        services.AddSingleton(new ChartOfAccountsOptions());
+        services.AddSingleton(new BillingPostingRuleEngineOptions());
+        services.AddScoped<IChartOfAccounts, InMemoryChartOfAccounts>();
+        services.AddScoped<IPostingRuleProvider, BillingPostingRuleEngine>();
+        services.AddScoped<IJournalNumberGenerator, BusinessJournalNumberGenerator>();
+        services.AddScoped<BillingPostingPolicy>();
+        services.AddScoped<PostingLineGenerator>();
+        services.AddScoped<JournalPreparationService>();
+        services.AddScoped<BillingSnapshotTranslator>();
+        services.AddScoped<BillingNotificationTranslator>();
+        services.AddScoped<BillingSnapshotPostingValidator>();
+        services.AddScoped<BillingFinancialPostingRequestFactory>();
+        services.AddScoped<LegacyPostingAdapter>();
+        services.AddScoped<BillingSnapshotPostingPreparationService>();
+        services.AddScoped<IPersistedPreparedJournalRepository, PersistedPreparedJournalRepository>();
+        services.AddScoped<PreparedJournalPersistenceService>();
+
+        AddFinancialLedgerCommandHandler<OpenLedgerCommand, Masterdom.Modules.FinancialLedger.Application.Support.ExecutionResult<LedgerAggregate>, OpenLedgerCommandHandler>(services);
+        AddFinancialLedgerCommandHandler<PostBillingJournalCommand, Masterdom.Modules.FinancialLedger.Application.Support.ExecutionResult<LedgerAggregate>, PostBillingJournalCommandHandler>(services);
+        AddFinancialLedgerCommandHandler<PostPaymentJournalCommand, Masterdom.Modules.FinancialLedger.Application.Support.ExecutionResult<LedgerAggregate>, PostPaymentJournalCommandHandler>(services);
+        AddFinancialLedgerCommandHandler<ReverseJournalCommand, Masterdom.Modules.FinancialLedger.Application.Support.ExecutionResult<LedgerAggregate>, ReverseJournalCommandHandler>(services);
+        AddFinancialLedgerCommandHandler<CompletePostingBatchCommand, Masterdom.Modules.FinancialLedger.Application.Support.ExecutionResult<LedgerAggregate>, CompletePostingBatchCommandHandler>(services);
+
+        AddFinancialLedgerQueryHandler<GetLedgerByIdQuery, Masterdom.Modules.FinancialLedger.Application.Support.ExecutionResult<LedgerAggregate>, GetLedgerByIdQueryHandler>(services);
+        AddFinancialLedgerQueryHandler<GetLedgerByCodeQuery, Masterdom.Modules.FinancialLedger.Application.Support.ExecutionResult<LedgerAggregate>, GetLedgerByCodeQueryHandler>(services);
+    }
+
+    private static void AddPaymentRuntime(IServiceCollection services)
+    {
+        services.AddScoped<IPaymentRepository, PaymentRepository>();
+        services.AddScoped<Masterdom.Modules.Payment.Application.Support.IPaymentUnitOfWork, PaymentUnitOfWork>();
+        services.AddScoped<Masterdom.Modules.Payment.Application.Support.IPaymentPlatformOrchestrator, PaymentPlatformOrchestrator>();
+        services.AddScoped<IPaymentApplicationService, PaymentApplicationService>();
+
+        AddPaymentCommandHandler<ReceivePaymentCommand, Masterdom.Modules.Payment.Application.Support.ExecutionResult<PaymentAggregate>, ReceivePaymentCommandHandler>(services);
+        AddPaymentCommandHandler<AllocatePaymentCommand, Masterdom.Modules.Payment.Application.Support.ExecutionResult<PaymentAggregate>, AllocatePaymentCommandHandler>(services);
+        AddPaymentCommandHandler<ReversePaymentCommand, Masterdom.Modules.Payment.Application.Support.ExecutionResult<PaymentAggregate>, ReversePaymentCommandHandler>(services);
+        AddPaymentCommandHandler<VoidPaymentCommand, Masterdom.Modules.Payment.Application.Support.ExecutionResult<PaymentAggregate>, VoidPaymentCommandHandler>(services);
+
+        AddPaymentQueryHandler<GetPaymentByIdQuery, Masterdom.Modules.Payment.Application.Support.ExecutionResult<PaymentAggregate>, GetPaymentByIdQueryHandler>(services);
+        AddPaymentQueryHandler<GetPaymentByReferenceQuery, Masterdom.Modules.Payment.Application.Support.ExecutionResult<PaymentAggregate>, GetPaymentByReferenceQueryHandler>(services);
+    }
+
+    private static void AddReportingRuntime(IServiceCollection services)
+    {
+        services.AddSingleton<Masterdom.Platform.ReadModels.IReportReadModelRegistry, ReportReadModelRegistry>();
+        services.AddSingleton<IReportTemplateStore, InMemoryReportTemplateStore>();
+        services.AddSingleton<IReportSnapshotStore, InMemoryReportSnapshotStore>();
+        services.AddScoped<IReportPermissionService, ReportPermissionService>();
+        services.AddScoped<IReportExportService, ReportExportService>();
+        services.AddScoped<Masterdom.Modules.Reporting.Application.Support.IReportPlatformOrchestrator, ReportingPlatformOrchestrator>();
+        services.AddScoped<IReportApplicationService, ReportApplicationService>();
+
+        AddReportingQueryHandler<GenerateReportQuery, Masterdom.Modules.Reporting.Application.Support.ExecutionResult<GeneratedReport>, GenerateReportQueryHandler>(services);
+    }
+
+    private static void AddNotificationsRuntime(IServiceCollection services)
+    {
+        services.AddSingleton<INotificationRegistry, MetadataDrivenNotificationRegistry>();
+        services.AddSingleton<INotificationTemplateRegistry, NotificationTemplateRegistry>();
+        services.AddSingleton<INotificationPreferenceStore, InMemoryNotificationPreferenceStore>();
+        services.AddSingleton<INotificationHistoryStore, InMemoryNotificationHistoryStore>();
+        services.AddSingleton<INotificationDeliveryQueue, InMemoryNotificationDeliveryQueue>();
+
+        services.AddScoped<INotificationTemplateRenderer, DefaultNotificationTemplateRenderer>();
+        services.AddScoped<INotificationRecipientResolver, DirectRecipientResolver>();
+        services.AddScoped<INotificationChannelResolver, PreferenceNotificationChannelResolver>();
+        services.AddScoped<INotificationAuthorizationService, NotificationAuthorizationService>();
+
+        services.AddScoped<IDeliveryProvider, EmailDeliveryProvider>();
+        services.AddScoped<IDeliveryProvider, SmsDeliveryProvider>();
+        services.AddScoped<IDeliveryProvider, PushDeliveryProvider>();
+        services.AddScoped<IDeliveryProvider, WhatsAppDeliveryProvider>();
+
+        services.AddScoped<INotificationGenerationEngine, NotificationGenerationEngine>();
+        services.AddScoped<INotificationDeliveryProcessor, NotificationDeliveryProcessor>();
+        services.AddScoped<INotificationApplicationService, NotificationApplicationService>();
+
+        AddNotificationsCommandHandler<GenerateNotificationCommand, Masterdom.Modules.Notifications.Application.Support.ExecutionResult<GeneratedNotification>, GenerateNotificationCommandHandler>(services);
+        AddNotificationsQueryHandler<GetNotificationHistoryQuery, Masterdom.Modules.Notifications.Application.Support.ExecutionResult<IReadOnlyCollection<NotificationHistoryEntry>>, GetNotificationHistoryQueryHandler>(services);
+    }
+
+    private static void AddDocumentsRuntime(IServiceCollection services)
+    {
+        services.AddSingleton<IDocumentReadModelRegistry, MetadataDrivenDocumentReadModelRegistry>();
+        services.AddSingleton<IDocumentTemplateStore, PersistentDocumentTemplateStore>();
+        services.AddSingleton<IDocumentHistoryStore, PersistentDocumentHistoryStore>();
+        services.AddScoped<IDocumentPermissionService, DocumentPermissionService>();
+        services.AddScoped<IDocumentRenderer, TextDocumentRenderer>();
+        services.AddScoped<IDocumentPlatformOrchestrator, DocumentPlatformOrchestrator>();
+        services.AddScoped<IDocumentApplicationService, DocumentApplicationService>();
+
+        AddDocumentsCommandHandler<GenerateDocumentCommand, Masterdom.Modules.Documents.Application.Support.ExecutionResult<GeneratedDocument>, GenerateDocumentCommandHandler>(services);
+        AddDocumentsCommandHandler<RegenerateDocumentCommand, Masterdom.Modules.Documents.Application.Support.ExecutionResult<GeneratedDocument>, RegenerateDocumentCommandHandler>(services);
+        AddDocumentsQueryHandler<PreviewDocumentQuery, Masterdom.Modules.Documents.Application.Support.ExecutionResult<GeneratedDocument>, PreviewDocumentQueryHandler>(services);
+        AddDocumentsQueryHandler<DownloadDocumentQuery, Masterdom.Modules.Documents.Application.Support.ExecutionResult<GeneratedDocument>, DownloadDocumentQueryHandler>(services);
+        AddDocumentsQueryHandler<GetDocumentHistoryQuery, Masterdom.Modules.Documents.Application.Support.ExecutionResult<IReadOnlyCollection<DocumentHistoryEntry>>, GetDocumentHistoryQueryHandler>(services);
+    }
+
+    private static void AddSubsidyOptimizationRuntime(IServiceCollection services)
+    {
+        services.AddCalculationEngine();
+        services.AddScoped<ConsumptionEstimator>();
+        services.AddScoped<ForecastEngine>();
+        services.AddScoped<ScenarioGenerator>();
+        services.AddScoped<ScenarioEvaluator>();
+        services.AddScoped<ConfidenceScorer>();
+        services.AddScoped<SubsidyCalculationRuntimeInvoker>();
+        services.AddScoped<RecommendationExplanationBuilder>();
+        services.AddScoped<RecommendationEvidenceBuilder>();
+        services.AddScoped<RecommendationGenerator>();
+        services.AddScoped<OptimizationSessionBuilder>();
+        services.AddScoped<ISubsidyMaximizerService, SubsidyMaximizerService>();
+    }
+
+    private static void AddPropertyCommandHandler<TCommand, TResult, THandler>(IServiceCollection services)
+        where THandler : class, ICommandHandler<TCommand, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<ICommandHandler<TCommand, TResult>>(serviceProvider =>
+            new PropertyCommandAuthorizationDecorator<TCommand, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddPropertyQueryHandler<TQuery, TResult, THandler>(IServiceCollection services)
+        where THandler : class, IQueryHandler<TQuery, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<IQueryHandler<TQuery, TResult>>(serviceProvider =>
+            new PropertyQueryAuthorizationDecorator<TQuery, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddPeopleCommandHandler<TCommand, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.People.Application.Support.ICommandHandler<TCommand, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.People.Application.Support.ICommandHandler<TCommand, TResult>>(serviceProvider =>
+            new PeopleCommandAuthorizationDecorator<TCommand, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddPeopleQueryHandler<TQuery, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.People.Application.Support.IQueryHandler<TQuery, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.People.Application.Support.IQueryHandler<TQuery, TResult>>(serviceProvider =>
+            new PeopleQueryAuthorizationDecorator<TQuery, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddLeaseCommandHandler<TCommand, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.Lease.Application.Support.ICommandHandler<TCommand, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.Lease.Application.Support.ICommandHandler<TCommand, TResult>>(serviceProvider =>
+            new LeaseCommandAuthorizationDecorator<TCommand, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddLeaseQueryHandler<TQuery, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.Lease.Application.Support.IQueryHandler<TQuery, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.Lease.Application.Support.IQueryHandler<TQuery, TResult>>(serviceProvider =>
+            new LeaseQueryAuthorizationDecorator<TQuery, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddTenancyCommandHandler<TCommand, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.Tenancy.Application.Support.ICommandHandler<TCommand, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.Tenancy.Application.Support.ICommandHandler<TCommand, TResult>>(serviceProvider =>
+            new TenancyCommandAuthorizationDecorator<TCommand, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddTenancyQueryHandler<TQuery, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.Tenancy.Application.Support.IQueryHandler<TQuery, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.Tenancy.Application.Support.IQueryHandler<TQuery, TResult>>(serviceProvider =>
+            new TenancyQueryAuthorizationDecorator<TQuery, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddMeteringCommandHandler<TCommand, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.Metering.Application.Support.ICommandHandler<TCommand, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.Metering.Application.Support.ICommandHandler<TCommand, TResult>>(serviceProvider =>
+            new MeteringCommandAuthorizationDecorator<TCommand, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddMeteringQueryHandler<TQuery, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.Metering.Application.Support.IQueryHandler<TQuery, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.Metering.Application.Support.IQueryHandler<TQuery, TResult>>(serviceProvider =>
+            new MeteringQueryAuthorizationDecorator<TQuery, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddBillingCommandHandler<TCommand, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.Billing.Application.Support.ICommandHandler<TCommand, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.Billing.Application.Support.ICommandHandler<TCommand, TResult>>(serviceProvider =>
+            new BillingCommandAuthorizationDecorator<TCommand, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddBillingQueryHandler<TQuery, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.Billing.Application.Support.IQueryHandler<TQuery, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.Billing.Application.Support.IQueryHandler<TQuery, TResult>>(serviceProvider =>
+            new BillingQueryAuthorizationDecorator<TQuery, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddFinancialLedgerCommandHandler<TCommand, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.FinancialLedger.Application.Support.ICommandHandler<TCommand, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.FinancialLedger.Application.Support.ICommandHandler<TCommand, TResult>>(serviceProvider =>
+            new FinancialLedgerCommandAuthorizationDecorator<TCommand, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddFinancialLedgerQueryHandler<TQuery, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.FinancialLedger.Application.Support.IQueryHandler<TQuery, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.FinancialLedger.Application.Support.IQueryHandler<TQuery, TResult>>(serviceProvider =>
+            new FinancialLedgerQueryAuthorizationDecorator<TQuery, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddPaymentCommandHandler<TCommand, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.Payment.Application.Support.ICommandHandler<TCommand, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.Payment.Application.Support.ICommandHandler<TCommand, TResult>>(serviceProvider =>
+            new PaymentCommandAuthorizationDecorator<TCommand, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddPaymentQueryHandler<TQuery, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.Payment.Application.Support.IQueryHandler<TQuery, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.Payment.Application.Support.IQueryHandler<TQuery, TResult>>(serviceProvider =>
+            new PaymentQueryAuthorizationDecorator<TQuery, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddReportingQueryHandler<TQuery, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.Reporting.Application.Support.IQueryHandler<TQuery, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.Reporting.Application.Support.IQueryHandler<TQuery, TResult>>(serviceProvider =>
+            new ReportingQueryAuthorizationDecorator<TQuery, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddNotificationsCommandHandler<TCommand, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.Notifications.Application.Support.ICommandHandler<TCommand, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.Notifications.Application.Support.ICommandHandler<TCommand, TResult>>(serviceProvider =>
+            new NotificationsCommandAuthorizationDecorator<TCommand, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddNotificationsQueryHandler<TQuery, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.Notifications.Application.Support.IQueryHandler<TQuery, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.Notifications.Application.Support.IQueryHandler<TQuery, TResult>>(serviceProvider =>
+            new NotificationsQueryAuthorizationDecorator<TQuery, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddDocumentsCommandHandler<TCommand, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.Documents.Application.Support.ICommandHandler<TCommand, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.Documents.Application.Support.ICommandHandler<TCommand, TResult>>(serviceProvider =>
+            new DocumentsCommandAuthorizationDecorator<TCommand, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddDocumentsQueryHandler<TQuery, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.Documents.Application.Support.IQueryHandler<TQuery, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.Documents.Application.Support.IQueryHandler<TQuery, TResult>>(serviceProvider =>
+            new DocumentsQueryAuthorizationDecorator<TQuery, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static RecommendationConsumerExecutionContext CreateDefaultRecommendationConsumerExecutionContext()
+    {
+        var effectiveDateUtc = DateTime.SpecifyKind(new DateTime(2026, 8, 4), DateTimeKind.Utc);
+        var createdAtUtc = DateTime.UtcNow;
+
+        var recommendation = Recommendation.CreateDraft(
+            RecommendationId.New(),
+            RecommendationType.Create("generic"),
+            RecommendationPriority.Create(10),
+            RecommendationConfidence.Create(0.5m),
+            new RecommendationEvidence("placeholder", "Default execution context"),
+            new RecommendationExplanation("Placeholder context"),
+            new RecommendationMetadata(
+                createdAtUtc,
+                effectiveDateUtc,
+                version: "v1",
+                source: "platform"));
+
+        var bundle = RecommendationBundle
+            .CreateDraft(
+                RecommendationBundleId.New(),
+                [recommendation],
+                createdAtUtc,
+                effectiveDateUtc,
+                version: "v1")
+            .Open()
+            .FinalizeBundle();
+
+        var businessContext = new BusinessContext(
+            BusinessContextVersion.BaselineV1,
+            new BusinessContextMetadata(
+                createdAtUtc,
+                effectiveDateUtc,
+                configurationVersion: "cfg-v1",
+                language: "en-US",
+                securityContext: "system",
+                userId: "system",
+                portfolioId: "default",
+                providerExecutionOrder: Array.Empty<string>(),
+                warnings: Array.Empty<string>()),
+            snapshots: new Dictionary<string, BusinessContextSnapshot>(),
+            references: Array.Empty<BusinessContextReference>());
+
+        var session = OptimizationSession
+            .Create(
+                OptimizationSessionId.New(),
+                new OptimizationSessionMetadata(
+                    createdAtUtc,
+                    effectiveDateUtc,
+                    contextVersion: businessContext.Version.ToString(),
+                    recommendationVersion: "v1"))
+            .Start(createdAtUtc);
+
+        return new RecommendationConsumerExecutionContext(
+            recommendation,
+            bundle,
+            session,
+            businessContext,
+            correlationId: Guid.CreateVersion7(),
+            executionTimestampUtc: createdAtUtc,
+            effectiveDateUtc: effectiveDateUtc,
+            configurationVersion: businessContext.Metadata.ConfigurationVersion);
+    }
+}

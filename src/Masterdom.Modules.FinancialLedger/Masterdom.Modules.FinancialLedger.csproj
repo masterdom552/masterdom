@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\Masterdom.Core\Masterdom.Core.csproj" />
+        <ProjectReference Include="..\Masterdom.Abstractions\Masterdom.Abstractions.csproj" />
+        <ProjectReference Include="..\Masterdom.Modules.Billing\Masterdom.Modules.Billing.csproj" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+</Project>

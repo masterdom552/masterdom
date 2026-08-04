@@ -1,0 +1,36 @@
+# Build
+bin/
+obj/
+artifacts/
+
+# Test
+TestResults/
+
+# IDE
+.vs/
+.idea/
+.vscode/
+
+# Rider
+*.sln.iml
+
+# User
+*.user
+*.suo
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Coverage
+coverage/
+
+# NuGet
+*.nupkg
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3

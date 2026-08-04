@@ -1,0 +1,12 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[branch "main"]
+	vscode-merge-base = origin/main
+[branch "feature/property-aggregate"]
+	vscode-merge-base = origin/main
+[remote "origin"]
+	url = https://github.com/masterdom552/Masterdom.git
+	fetch = +refs/heads/*:refs/remotes/origin/*

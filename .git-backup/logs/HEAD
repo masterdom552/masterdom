@@ -1,0 +1,54 @@
+0000000000000000000000000000000000000000 b473ff0b0abd0769e602c85c8e592f08177b1a45 Kapil Yadav <kady@kady.local> 1784630222 +0530	commit (initial): Stabilize platform kernel baseline
+b473ff0b0abd0769e602c85c8e592f08177b1a45 0afaafdcfed399772b598a758620bbce4601980f Kapil Yadav <kady@kady.local> 1784630499 +0530	commit: Establish platform kernel baseline and RFC-0001
+0afaafdcfed399772b598a758620bbce4601980f 49d191bb24e9fd44bc44d47a1cc8dabfdd829093 Kapil Yadav <kady@kady.local> 1784630818 +0530	commit: Establish platform testing infrastructure
+49d191bb24e9fd44bc44d47a1cc8dabfdd829093 d4189710edd74f6d9b9ca0e368c2456492039668 Kapil Yadav <kady@kady.local> 1784630986 +0530	commit: Complete ModuleRegistry package
+d4189710edd74f6d9b9ca0e368c2456492039668 49a8274ba01bf468374522d63dac7da5ad062579 Kapil Yadav <kady@kady.local> 1784631037 +0530	commit: Complete ModuleLoader package
+49a8274ba01bf468374522d63dac7da5ad062579 72260b4d85278e3ac78c6411a5fa65a4a032f71b Kapil Yadav <kady@kady.local> 1784631375 +0530	commit: Implement Masterdom.Core foundation
+72260b4d85278e3ac78c6411a5fa65a4a032f71b 61168821fde30e3c07b476f17e16681eceeccf84 Kapil Yadav <masterdom551@outlook.com> 1784632566 +0530	commit: Clean repository and ignore build artifacts
+61168821fde30e3c07b476f17e16681eceeccf84 a4720aeda4dab8ab5e425dc533fe410f6f0918b6 Kapil Yadav <masterdom551@outlook.com> 1784632614 +0530	commit: Implement Core error and result foundation
+a4720aeda4dab8ab5e425dc533fe410f6f0918b6 789864c7289675242c1c15827a2197c250813c10 Kapil Yadav <masterdom551@outlook.com> 1784632842 +0530	commit: Reorganize repository structure
+789864c7289675242c1c15827a2197c250813c10 0000000000000000000000000000000000000000 Kapil Yadav <masterdom551@outlook.com> 1784641101 +0530	Branch: renamed refs/heads/master to refs/heads/main
+0000000000000000000000000000000000000000 789864c7289675242c1c15827a2197c250813c10 Kapil Yadav <masterdom551@outlook.com> 1784641101 +0530	Branch: renamed refs/heads/master to refs/heads/main
+789864c7289675242c1c15827a2197c250813c10 0000000000000000000000000000000000000000 Kapil Yadav <masterdom551@outlook.com> 1784641144 +0530	Branch: renamed refs/heads/main to refs/heads/main
+789864c7289675242c1c15827a2197c250813c10 789864c7289675242c1c15827a2197c250813c10 Kapil Yadav <masterdom551@outlook.com> 1784641144 +0530	Branch: renamed refs/heads/main to refs/heads/main
+789864c7289675242c1c15827a2197c250813c10 0000000000000000000000000000000000000000 Kapil Yadav <masterdom551@outlook.com> 1784641150 +0530	Branch: renamed refs/heads/main to refs/heads/main
+789864c7289675242c1c15827a2197c250813c10 789864c7289675242c1c15827a2197c250813c10 Kapil Yadav <masterdom551@outlook.com> 1784641150 +0530	Branch: renamed refs/heads/main to refs/heads/main
+789864c7289675242c1c15827a2197c250813c10 0000000000000000000000000000000000000000 Kapil Yadav <masterdom551@outlook.com> 1784641191 +0530	Branch: renamed refs/heads/main to refs/heads/main
+789864c7289675242c1c15827a2197c250813c10 789864c7289675242c1c15827a2197c250813c10 Kapil Yadav <masterdom551@outlook.com> 1784641191 +0530	Branch: renamed refs/heads/main to refs/heads/main
+789864c7289675242c1c15827a2197c250813c10 0000000000000000000000000000000000000000 Kapil Yadav <masterdom551@outlook.com> 1784641452 +0530	Branch: renamed refs/heads/main to refs/heads/main
+789864c7289675242c1c15827a2197c250813c10 789864c7289675242c1c15827a2197c250813c10 Kapil Yadav <masterdom551@outlook.com> 1784641452 +0530	Branch: renamed refs/heads/main to refs/heads/main
+789864c7289675242c1c15827a2197c250813c10 0000000000000000000000000000000000000000 Kapil Yadav <masterdom551@outlook.com> 1784641650 +0530	Branch: renamed refs/heads/main to refs/heads/main
+789864c7289675242c1c15827a2197c250813c10 789864c7289675242c1c15827a2197c250813c10 Kapil Yadav <masterdom551@outlook.com> 1784641650 +0530	Branch: renamed refs/heads/main to refs/heads/main
+789864c7289675242c1c15827a2197c250813c10 0000000000000000000000000000000000000000 Kapil Yadav <masterdom551@outlook.com> 1784641911 +0530	Branch: renamed refs/heads/main to refs/heads/main
+789864c7289675242c1c15827a2197c250813c10 789864c7289675242c1c15827a2197c250813c10 Kapil Yadav <masterdom551@outlook.com> 1784641911 +0530	Branch: renamed refs/heads/main to refs/heads/main
+789864c7289675242c1c15827a2197c250813c10 0000000000000000000000000000000000000000 Kapil Yadav <masterdom551@outlook.com> 1784641956 +0530	Branch: renamed refs/heads/main to refs/heads/main
+789864c7289675242c1c15827a2197c250813c10 789864c7289675242c1c15827a2197c250813c10 Kapil Yadav <masterdom551@outlook.com> 1784641956 +0530	Branch: renamed refs/heads/main to refs/heads/main
+789864c7289675242c1c15827a2197c250813c10 fb4bc67ea110479ab0b63253d29d85f8aac418c7 Kapil Yadav <masterdom551@outlook.com> 1784661700 +0530	commit: Restore platform build and establish Property foundation
+fb4bc67ea110479ab0b63253d29d85f8aac418c7 e7e078a8b12cc23c36a0626f6ce843beb9c9ab1e Kapil Yadav <masterdom551@outlook.com> 1784663565 +0530	commit: Refactor property domain to unit-centric model
+e7e078a8b12cc23c36a0626f6ce843beb9c9ab1e e7e078a8b12cc23c36a0626f6ce843beb9c9ab1e Kapil Yadav <masterdom551@outlook.com> 1784708131 +0530	checkout: moving from main to feature/property-aggregate
+e7e078a8b12cc23c36a0626f6ce843beb9c9ab1e b514558600483a334916283f26c3b8247f0d9eb8 Kapil Yadav <masterdom551@outlook.com> 1784708131 +0530	commit: feat(property): introduce Property-Unit aggregate
+b514558600483a334916283f26c3b8247f0d9eb8 f7d4f30b256f98becdedf17356915ebffc043935 Kapil Yadav <masterdom551@outlook.com> 1784843407 +0530	commit: refactor(core): reorganize identity and common domain model
+f7d4f30b256f98becdedf17356915ebffc043935 cd4684b472cd95c7ca0ed19168ab857fe6037153 Kapil Yadav <masterdom551@outlook.com> 1784886263 +0530	commit: refactor(property): replace primitive name with PropertyName value object
+cd4684b472cd95c7ca0ed19168ab857fe6037153 b9b22c95c165ba0925e5c02b0e76a9810e8aef02 Kapil Yadav <masterdom551@outlook.com> 1784886720 +0530	commit: feat(property): add description and remarks
+b9b22c95c165ba0925e5c02b0e76a9810e8aef02 36c4382303aa5236d41216e52001927daea68723 Kapil Yadav <masterdom551@outlook.com> 1784912640 +0530	commit: feat(property): add owner and hierarchy support
+36c4382303aa5236d41216e52001927daea68723 232c70b3e7dfaa827dfd1e4675721e3130e80de7 Kapil Yadav <masterdom551@outlook.com> 1784913323 +0530	commit: feat(property): add lifecycle and display metadata
+232c70b3e7dfaa827dfd1e4675721e3130e80de7 a466b512369f219aab8ccf4e9de6b0e9799fdfda Kapil Yadav <masterdom551@outlook.com> 1784914162 +0530	commit: feat(property): enforce aggregate invariants
+a466b512369f219aab8ccf4e9de6b0e9799fdfda 9be8484c8a47cca28d0327eda3101f67eb0ac755 Kapil Yadav <masterdom551@outlook.com> 1784917157 +0530	commit: refactor(unit): introduce UnitName value object
+9be8484c8a47cca28d0327eda3101f67eb0ac755 36691f4d79dea4ec0fab2b7e83a76523cea5d7d0 Kapil Yadav <masterdom551@outlook.com> 1784917494 +0530	commit: feat(infrastructure): add EF Core infrastructure project
+36691f4d79dea4ec0fab2b7e83a76523cea5d7d0 7744d838539c11a1581b57bb4797e2222567e195 Kapil Yadav <masterdom551@outlook.com> 1784948840 +0530	commit: feat(infrastructure): initial PostgreSQL schema and EF Core migration
+7744d838539c11a1581b57bb4797e2222567e195 5f2786fe36c34ae8d0da5d9bf381bde811330ed1 Kapil Yadav <masterdom551@outlook.com> 1785086578 +0530	commit: Align Identity EF configurations with current domain model
+5f2786fe36c34ae8d0da5d9bf381bde811330ed1 5e4514fe67b345d139df52eb1e79e3d7fb1a580c Kapil Yadav <masterdom551@outlook.com> 1785087207 +0530	commit: Align Identity and Property aggregates with EF mappings and tests
+5e4514fe67b345d139df52eb1e79e3d7fb1a580c 23c5992a118a4fdbdb7f1a5b944438439418fe9b Kapil Yadav <masterdom551@outlook.com> 1785091542 +0530	commit: docs(architecture): add Phase 1B standard and index
+23c5992a118a4fdbdb7f1a5b944438439418fe9b e52dc1b70f9b71a4c6817c01333a3071fd601b82 Kapil Yadav <masterdom551@outlook.com> 1785091625 +0530	commit: chore(repo): repository cleanup for standards and instruction links
+e52dc1b70f9b71a4c6817c01333a3071fd601b82 7870deee492caae4555fce2b82d14fa45b0a88c3 Kapil Yadav <masterdom551@outlook.com> 1785091733 +0530	commit: refactor(identity): begin PKG-001 aggregate and entity audit
+7870deee492caae4555fce2b82d14fa45b0a88c3 57ea348ec007e6b55f37c3d265d3e020ee5e2cad Kapil Yadav <masterdom551@outlook.com> 1785092222 +0530	commit: docs(governance): standardize repository governance and initialize PKG framework
+57ea348ec007e6b55f37c3d265d3e020ee5e2cad 72d0d8113d98e710edce27bf490a44c0cabdc3e5 Kapil Yadav <masterdom551@outlook.com> 1785092453 +0530	commit: refactor(identity): normalize role assignment aggregate structure
+72d0d8113d98e710edce27bf490a44c0cabdc3e5 a923d1eca5535b2b643236b6a89915f0bf10d174 Kapil Yadav <masterdom551@outlook.com> 1785093180 +0530	commit: refactor(person): stabilize person aggregate
+a923d1eca5535b2b643236b6a89915f0bf10d174 d1d22bfa2dfadebd716d32e1b3f7ec66899a4d5f Kapil Yadav <masterdom551@outlook.com> 1785093345 +0530	commit (amend): refactor(person): stabilize person aggregate
+d1d22bfa2dfadebd716d32e1b3f7ec66899a4d5f 3beb7c42813bcfab88479654d021575cafafb8c3 Kapil Yadav <masterdom551@outlook.com> 1785093722 +0530	commit: refactor(organization): stabilize organization aggregate
+3beb7c42813bcfab88479654d021575cafafb8c3 6474b7d8c57585b45d32ae35f0f34e99a0474c9a Kapil Yadav <masterdom551@outlook.com> 1785095211 +0530	commit: refactor(identityprofile): stabilize identity profile aggregate
+6474b7d8c57585b45d32ae35f0f34e99a0474c9a eeaedc1201ba1c98328011f23bd33899c8c70e0b Kapil Yadav <masterdom551@outlook.com> 1785096406 +0530	commit: refactor(identity): consolidate bounded context
+eeaedc1201ba1c98328011f23bd33899c8c70e0b ff233f3a76b6422df8ece75be90685ec4c6d4be9 Kapil Yadav <masterdom551@outlook.com> 1785096735 +0530	commit: refactor(identity): align persistence
+ff233f3a76b6422df8ece75be90685ec4c6d4be9 a2a5b4f2e1352a1c9a769896ed76ba5d92e1888e Kapil Yadav <masterdom551@outlook.com> 1785608195 +0530	commit: feat(financial-ledger): complete Package 3E foundation
+a2a5b4f2e1352a1c9a769896ed76ba5d92e1888e 1a4a7c383d58ec3c3049f5483b541820cbbda4ba Kapil Yadav <masterdom551@outlook.com> 1785778332 +0530	commit: feat(architecture): freeze MASTERDOM BASELINE v1 architecture
+1a4a7c383d58ec3c3049f5483b541820cbbda4ba ef31d07bd4066d063c5ab1eec2040568a6565813 Kapil Yadav <masterdom551@outlook.com> 1785842517 +0530	commit: MASTERDOM BASELINE v1 - Platform Freeze

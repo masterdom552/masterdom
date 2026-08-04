@@ -1,0 +1,277 @@
+.
+├── .DS_Store
+├── .editorconfig
+├── .gitattributes
+├── .gitignore
+├── .vscode
+│   ├── extensions.json
+│   ├── launch.json
+│   ├── settings.json
+│   └── tasks.json
+├── assets
+├── deploy
+├── Directory.Build.props
+├── Directory.Packages.props
+├── docker
+├── docs
+│   ├── ADR
+│   ├── API
+│   ├── Architecture
+│   ├── Business
+│   ├── Database
+│   ├── ReleaseNotes
+│   ├── rfc
+│   │   └── RFC-0001-Platform-Kernel.md
+│   └── UI
+├── global.json
+├── Masterdom.slnx
+├── README.md
+├── repository-tree.txt
+├── scripts
+│   ├── build
+│   │   └── new-module.sh
+│   ├── ci
+│   ├── database
+│   ├── macos
+│   ├── ubuntu
+│   └── windows
+├── src
+│   ├── .DS_Store
+│   ├── Masterdom.Abstractions
+│   │   ├── .DS_Store
+│   │   ├── Masterdom.Abstractions.csproj
+│   │   └── Modules
+│   │       ├── IModule.cs
+│   │       ├── IModuleCatalog.cs
+│   │       ├── IModuleLoader.cs
+│   │       └── IPlatformContext.cs
+│   ├── Masterdom.Core
+│   │   ├── Common
+│   │   ├── Entities
+│   │   ├── Errors
+│   │   │   ├── Error.cs
+│   │   │   ├── ErrorType.cs
+│   │   │   ├── Result.cs
+│   │   │   └── ResultOfT.cs
+│   │   ├── Events
+│   │   ├── Exceptions
+│   │   ├── Extensions
+│   │   ├── Guards
+│   │   ├── Identifiers
+│   │   ├── Identity
+│   │   │   └── StronglyTypedId.cs
+│   │   ├── Masterdom.Core.csproj
+│   │   ├── Primitives
+│   │   │   ├── AggregateRoot.cs
+│   │   │   ├── Entity.cs
+│   │   │   └── ValueObject.cs
+│   │   ├── Results
+│   │   ├── Time
+│   │   │   └── IClock.cs
+│   │   ├── Validation
+│   │   │   └── Guard.cs
+│   │   └── ValueObjects
+│   ├── Masterdom.Host
+│   │   ├── Bootstrapper.cs
+│   │   ├── Masterdom.Host.csproj
+│   │   ├── Modules
+│   │   │   └── TestModule.cs
+│   │   └── Program.cs
+│   ├── Masterdom.Modules.Billing
+│   │   ├── Api
+│   │   ├── Application
+│   │   ├── Configuration
+│   │   ├── Contracts
+│   │   ├── Domain
+│   │   ├── Infrastructure
+│   │   ├── Masterdom.Modules.Billing.csproj
+│   │   ├── Reports
+│   │   └── Resources
+│   ├── Masterdom.Modules.CRM
+│   │   ├── Api
+│   │   ├── Application
+│   │   ├── Configuration
+│   │   ├── Contracts
+│   │   ├── Domain
+│   │   ├── Infrastructure
+│   │   ├── Masterdom.Modules.CRM.csproj
+│   │   ├── Reports
+│   │   └── Resources
+│   ├── Masterdom.Modules.Documents
+│   │   ├── Api
+│   │   ├── Application
+│   │   ├── Configuration
+│   │   ├── Contracts
+│   │   ├── Domain
+│   │   ├── Infrastructure
+│   │   ├── Masterdom.Modules.Documents.csproj
+│   │   ├── Reports
+│   │   └── Resources
+│   ├── Masterdom.Modules.Finance
+│   │   ├── Api
+│   │   ├── Application
+│   │   ├── Configuration
+│   │   ├── Contracts
+│   │   ├── Domain
+│   │   ├── Infrastructure
+│   │   ├── Masterdom.Modules.Finance.csproj
+│   │   ├── Reports
+│   │   └── Resources
+│   ├── Masterdom.Modules.Intelligence
+│   │   ├── Api
+│   │   ├── Application
+│   │   ├── Configuration
+│   │   ├── Contracts
+│   │   ├── Domain
+│   │   ├── Infrastructure
+│   │   ├── Masterdom.Modules.Intelligence.csproj
+│   │   ├── Reports
+│   │   └── Resources
+│   ├── Masterdom.Modules.Inventory
+│   │   ├── Api
+│   │   ├── Application
+│   │   ├── Configuration
+│   │   ├── Contracts
+│   │   ├── Domain
+│   │   ├── Infrastructure
+│   │   ├── Masterdom.Modules.Inventory.csproj
+│   │   ├── Reports
+│   │   └── Resources
+│   ├── Masterdom.Modules.Maintenance
+│   │   ├── Api
+│   │   ├── Application
+│   │   ├── Configuration
+│   │   ├── Contracts
+│   │   ├── Domain
+│   │   ├── Infrastructure
+│   │   ├── Masterdom.Modules.Maintenance.csproj
+│   │   ├── Reports
+│   │   └── Resources
+│   ├── Masterdom.Modules.Notifications
+│   │   ├── Api
+│   │   ├── Application
+│   │   ├── Configuration
+│   │   ├── Contracts
+│   │   ├── Domain
+│   │   ├── Infrastructure
+│   │   ├── Masterdom.Modules.Notifications.csproj
+│   │   ├── Reports
+│   │   └── Resources
+│   ├── Masterdom.Modules.People
+│   │   ├── Api
+│   │   ├── Application
+│   │   ├── Configuration
+│   │   ├── Contracts
+│   │   ├── Domain
+│   │   ├── Infrastructure
+│   │   ├── Masterdom.Modules.People.csproj
+│   │   ├── Reports
+│   │   └── Resources
+│   ├── Masterdom.Modules.Properties
+│   │   ├── Api
+│   │   ├── Application
+│   │   ├── Configuration
+│   │   ├── Contracts
+│   │   ├── Domain
+│   │   ├── Infrastructure
+│   │   ├── Masterdom.Modules.Properties.csproj
+│   │   ├── Reports
+│   │   └── Resources
+│   ├── Masterdom.Modules.Reporting
+│   │   ├── Api
+│   │   ├── Application
+│   │   ├── Configuration
+│   │   ├── Contracts
+│   │   ├── Domain
+│   │   ├── Infrastructure
+│   │   ├── Masterdom.Modules.Reporting.csproj
+│   │   ├── Reports
+│   │   └── Resources
+│   ├── Masterdom.Modules.Security
+│   │   ├── Api
+│   │   ├── Application
+│   │   ├── Configuration
+│   │   ├── Contracts
+│   │   ├── Domain
+│   │   ├── Infrastructure
+│   │   ├── Masterdom.Modules.Security.csproj
+│   │   ├── Reports
+│   │   └── Resources
+│   ├── Masterdom.Modules.Settings
+│   │   ├── Api
+│   │   ├── Application
+│   │   ├── Configuration
+│   │   ├── Contracts
+│   │   ├── Domain
+│   │   ├── Infrastructure
+│   │   ├── Masterdom.Modules.Settings.csproj
+│   │   ├── Reports
+│   │   └── Resources
+│   └── Masterdom.Platform
+│       ├── .DS_Store
+│       ├── Audit
+│       ├── Caching
+│       ├── Configuration
+│       ├── Core
+│       │   ├── IPlatformContext.cs
+│       │   ├── Kernel.cs
+│       │   ├── KernelState.cs
+│       │   ├── PlatformContext.cs
+│       │   └── PlatformVersion.cs
+│       ├── Diagnostics
+│       │   ├── ConsoleDiagnostics.cs
+│       │   ├── DiagnosticEntry.cs
+│       │   ├── DiagnosticSeverity.cs
+│       │   └── IDiagnostics.cs
+│       ├── Events
+│       ├── Forecasting
+│       ├── FormulaEngine
+│       ├── Licensing
+│       ├── Masterdom.Platform.csproj
+│       ├── Metadata
+│       ├── Modules
+│       │   ├── IModule.cs
+│       │   ├── IModuleCatalog.cs
+│       │   ├── IModuleLoader.cs
+│       │   ├── IModuleMetadata.cs
+│       │   ├── IModuleRegistry.cs
+│       │   ├── ModuleBase.cs
+│       │   ├── ModuleDescriptor.cs
+│       │   ├── ModuleLoader.cs
+│       │   ├── ModuleRegistry.cs
+│       │   └── PlatformModule.cs
+│       ├── Policies
+│       ├── Rules
+│       ├── Scheduling
+│       ├── Security
+│       └── Workflow
+├── temp
+├── tests
+│   ├── Masterdom.Architecture.Tests
+│   │   └── Masterdom.Architecture.Tests.csproj
+│   ├── Masterdom.Core.Tests
+│   │   ├── ErrorTests.cs
+│   │   ├── GuardTests.cs
+│   │   ├── Masterdom.Core.Tests.csproj
+│   │   └── ResultTests.cs
+│   ├── Masterdom.Platform.Tests
+│   │   ├── Kernel
+│   │   │   ├── KernelTests.cs
+│   │   │   ├── ModuleLoaderTests.cs
+│   │   │   └── ModuleRegistryTests.cs
+│   │   ├── Masterdom.Platform.Tests.csproj
+│   │   └── Modules
+│   └── Masterdom.TestKit
+│       ├── Assertions
+│       ├── Builders
+│       ├── Core
+│       ├── Masterdom.TestKit.csproj
+│       ├── Platform
+│       │   ├── FakePlatformContext.cs
+│       │   ├── RecordingModule.cs
+│       │   ├── TestModule.cs
+│       │   └── ThrowingModule.cs
+│       └── Utilities
+└── tools
+
+189 directories, 86 files
