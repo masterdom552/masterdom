@@ -28,9 +28,9 @@ Business capability status:
 - Billing: Complete (Stage 2 scope; domain/application/infrastructure/tests present, automatic Financial Ledger activation intentionally deferred to future Platform Integration).
 - Financial Ledger: Complete (Stage 2 scope; posting capabilities implemented, automatic Billing and Payment activation intentionally deferred to future Platform Integration).
 - Documents: Complete (Stage 2 scope; platform document-generation capability).
-- Inventory: In Progress (first vertical slice implemented: create inventory item).
+- Inventory: Complete (first vertical slice closed after developer validation).
 - CRM: Not Started (project shell only).
-- Maintenance: In Progress (vertical slices implemented: create ticket, get by id, assign ticket).
+- Maintenance: Complete (create ticket, get by id, and assign ticket slices closed after developer validation).
 - Notifications: Complete (Stage 2 scope; platform notification capability).
 - Intelligence: Not Started (project shell only).
 - Policy Framework: In Progress (domain/application/handlers/tests present).
@@ -52,7 +52,7 @@ Current package:
 
 Current repository state:
 
-- Developer Validation Pending (INV-2.0, MT-2.1, ID-2.1).
+- No Active Package. INV-2.0, MT-2.1, and ID-2.1 are Closed.
 
 ## Canonical Implementation Sequence
 

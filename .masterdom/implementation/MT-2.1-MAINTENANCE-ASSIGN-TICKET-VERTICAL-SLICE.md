@@ -37,7 +37,7 @@ Implement a complete Maintenance assignment vertical slice using existing reposi
 - Implementation completeness verified in repository source.
 - Runtime wiring and endpoint mapping verified across Host and DI composition.
 - Ownership boundaries verified and preserved.
-- Closure readiness determination: Ready pending developer Build/Test evidence.
+- Closure readiness determination: Closed after developer Build/Test evidence.
 
 ## Package Closure
 
