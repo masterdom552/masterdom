@@ -8,6 +8,8 @@ using Masterdom.Core.Identity.Entities.Organization;
 using Masterdom.Core.Identity.Entities.PasswordReset;
 using Masterdom.Core.Identity.Entities.Permission;
 using Masterdom.Modules.FinancialLedger.Domain.Entities.FinancialLedger;
+using Masterdom.Modules.Inventory.Domain.Entities.Inventory;
+using Masterdom.Modules.Maintenance.Domain.Entities.Maintenance;
 using Masterdom.Modules.Metering.Domain.Entities.Metering;
 using Masterdom.Modules.Payment.Domain.Entities.Payment;
 using Masterdom.Modules.PolicyFramework.Domain.Entities.PolicyFramework;
@@ -35,6 +37,8 @@ using BillAggregate = Masterdom.Modules.Billing.Domain.Entities.Billing.Bill;
 using LeaseAggregate = Masterdom.Modules.Lease.Domain.Entities.Lease.Lease;
 using PropertyAggregate = Masterdom.Modules.Properties.Domain.Entities.Property.Property;
 using TenancyAggregate = Masterdom.Modules.Tenancy.Domain.Entities.Tenancy.Tenancy;
+using InventoryItemAggregate = Masterdom.Modules.Inventory.Domain.Entities.Inventory.InventoryItem;
+using MaintenanceTicketAggregate = Masterdom.Modules.Maintenance.Domain.Entities.Maintenance.MaintenanceTicket;
 using MeterAggregate = Masterdom.Modules.Metering.Domain.Entities.Metering.Meter;
 using LedgerAggregate = Masterdom.Modules.FinancialLedger.Domain.Entities.FinancialLedger.Ledger;
 using PaymentAggregate = Masterdom.Modules.Payment.Domain.Entities.Payment.Payment;
@@ -74,6 +78,16 @@ public sealed class MasterdomDbContext : DbContext
     /// Gets the tenancies.
     /// </summary>
     public DbSet<TenancyAggregate> Tenancies => Set<TenancyAggregate>();
+
+    /// <summary>
+    /// Gets the inventory items.
+    /// </summary>
+    public DbSet<InventoryItemAggregate> InventoryItems => Set<InventoryItemAggregate>();
+
+    /// <summary>
+    /// Gets the maintenance tickets.
+    /// </summary>
+    public DbSet<MaintenanceTicketAggregate> MaintenanceTickets => Set<MaintenanceTicketAggregate>();
 
     /// <summary>
     /// Gets the meters.

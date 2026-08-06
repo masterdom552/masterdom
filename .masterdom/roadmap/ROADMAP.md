@@ -4,13 +4,14 @@
 
 This is the canonical execution roadmap for implementation package sequencing.
 
-It is synchronized to repository evidence as of 2026-08-02.
+It is synchronized to repository evidence as of 2026-08-06.
 
 ## Current Package State
 
 - Property Business Capability package (4B): Complete.
-- Current package: PKG-4B.1 Repository Snapshot and Progress Synchronization.
-- Package mode: Documentation-only synchronization.
+- Current package: None.
+- Current repository state: No Active Package. INV-2.0, MT-2.1, and ID-2.1 are Closed.
+- Package mode: Implementation.
 
 ## Verified Implementation Baseline
 
@@ -19,9 +20,12 @@ It is synchronized to repository evidence as of 2026-08-02.
 	- People
 	- Lease
 	- Tenancy
+- Host APIs currently also include Documents capability endpoints under `/api/documents` for generation, preview, download, regenerate, and history.
+- Host APIs currently also include Notifications capability endpoints under `/api/notifications` for generation and history.
 - Platform runtime foundation implemented:
 	- configuration, metadata, rules, workflows, events baseline runtime services
 - Infrastructure persistence implemented across multiple business modules.
+- Identity Integration architecture is resolved and closed as a Platform Capability; Security module bootstrap is now implemented and remaining work is identity functionality implementation.
 - Repository builds successfully.
 
 ## Business Capability Status Model
@@ -34,26 +38,34 @@ The roadmap tracks capability execution state using:
 - Substantially Complete
 - Complete
 
+## Repository Capability Status
+
+- Billing: Complete (Stage 2 scope; automatic Financial Ledger activation intentionally deferred to future Platform Integration).
+- Payment: Complete (Stage 2 scope; payment lifecycle complete, automatic Financial Ledger activation intentionally deferred to future Platform Integration).
+- Financial Ledger: Complete (Stage 2 scope; posting capabilities implemented, automatic Billing and Payment activation intentionally deferred to future Platform Integration).
+- Reporting: Complete (Stage 2 scope; projection-centric platform capability).
+
 ## Canonical Next Implementation Sequence
 
 1. Property Capability (Complete)
 2. People (Complete in Property capability vertical slice)
 3. Lease (Complete in Property capability vertical slice)
 4. Tenancy (Complete in Property capability vertical slice)
-5. Identity Integration
-6. Authorization
-7. Property Security
-8. Billing
-9. Financial Ledger
+5. ID-1.x Identity Integration Investigation Series (Complete)
+6. Identity Architecture Closure (Complete)
+7. ID-2.0 Security Module Bootstrap (In Progress)
+8. ID-2.1 Identity Administration Foundation
+9. Authorization
+10. Property Security
 
 ## Deferred Work Policy
 
-The following tracks are intentionally deferred until Identity/Security integration sequence begins:
+The following implementation tracks remain deferred until later Identity Integration packages begin:
 
 - Cross-capability authorization rollout
 - Platform-wide approval workflow rollout
 - Property capability security hardening rollout
-- Billing and Financial Ledger integration progression under secured boundaries
+- Automatic Billing and Payment activation into Financial Ledger under future Platform Integration
 
 ## Completion Gate
 

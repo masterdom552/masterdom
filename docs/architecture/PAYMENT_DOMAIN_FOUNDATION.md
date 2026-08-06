@@ -15,11 +15,15 @@
 
 Establish the Payment bounded context as the owner of payment lifecycle, settlement allocation, reversal history, receipt generation, and immutable payment versions.
 
-This foundation does not implement ledger posting, accounting, refunds, gateways, reconciliation, or reporting.
+This foundation is the Stage 2 completion baseline for Payment.
+
+This foundation intentionally excludes ledger posting, accounting, refunds, gateways, reconciliation, and reporting.
 
 ## Read-Only Findings
 
 Billing owns immutable bill versions and outstanding balance state but explicitly excludes payment settlement.
+
+Repository evidence confirms the Payment core is implemented across domain, application, infrastructure, host, and tests.
 
 Policy Framework now provides reusable policy scope and versioning patterns that Payment can consume by reference only.
 

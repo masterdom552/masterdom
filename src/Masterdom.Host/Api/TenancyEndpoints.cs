@@ -22,6 +22,7 @@ internal static class TenancyEndpoints
         group.MapPut("/{tenancyId:guid}/move-out", RecordMoveOut);
         group.MapPut("/{tenancyId:guid}/close", CloseTenancy);
         group.MapPut("/{tenancyId:guid}/archive", ArchiveTenancy);
+        group.MapPut("/{tenancyId:guid}/notes", UpdateNotes);
         group.MapGet("/{tenancyId:guid}", GetTenancyById);
         group.MapGet("/{tenancyId:guid}/occupancy", GetOccupancy);
 
@@ -147,6 +148,21 @@ internal static class TenancyEndpoints
             : ApiExecutionResults.ToErrorResult(result.ErrorCode, result.ErrorMessage);
     }
 
+    internal static IResult UpdateNotes(
+        Guid tenancyId,
+        UpdateNotesRequest request,
+        TenancySupport.ICommandHandler<UpdateTenancyNotesCommand, TenancySupport.ExecutionResult<TenancyAggregate>> handler)
+    {
+        var command = new UpdateTenancyNotesCommand(
+            TenancyId.From(tenancyId),
+            Notes.Create(request.Notes));
+
+        var result = handler.Handle(command);
+        return result.IsSuccess && result.Value is not null
+            ? TypedResults.Ok(TenancyResponse.From(result.Value))
+            : ApiExecutionResults.ToErrorResult(result.ErrorCode, result.ErrorMessage);
+    }
+
     internal static IResult GetOccupancy(
         Guid tenancyId,
         TenancySupport.IQueryHandler<GetTenancyByIdQuery, TenancySupport.ExecutionResult<TenancyAggregate>> handler)
@@ -181,6 +197,8 @@ internal static class TenancyEndpoints
     internal sealed record RemoveOccupantRequest(Guid PersonId);
 
     internal sealed record CloseTenancyRequest(DateOnly ClosedOn, string Reason);
+
+    internal sealed record UpdateNotesRequest(string? Notes);
 
     internal sealed record OccupancyResponse(
         Guid TenancyId,

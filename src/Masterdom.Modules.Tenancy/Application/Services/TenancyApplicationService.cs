@@ -121,6 +121,17 @@ public sealed class TenancyApplicationService : ITenancyApplicationService
         return tenancy;
     }
 
+    public TenancyAggregate UpdateNotes(UpdateTenancyNotesCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        var tenancy = GetRequiredTenancy(command.TenancyId);
+        tenancy.UpdateNotes(command.Notes);
+
+        PersistAndCoordinate(tenancy, "UpdateNotes");
+        return tenancy;
+    }
+
     public TenancyAggregate? GetTenancy(GetTenancyByIdQuery query)
     {
         ArgumentNullException.ThrowIfNull(query);

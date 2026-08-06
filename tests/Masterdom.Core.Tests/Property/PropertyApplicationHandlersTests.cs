@@ -82,6 +82,156 @@ public sealed class PropertyApplicationHandlersTests
         Assert.Equal(1, orchestrator.MutationCount);
     }
 
+    [Fact]
+    public void ChangeDescriptionHandler_ShouldUpdateDescriptionThroughAggregateBehavior()
+    {
+        var aggregate = PropertyAggregate.Create(
+            new PropertyCode("APP-DESC-01"),
+            new PropertyName("Initial Name"),
+            PropertyType.Commercial);
+
+        var repository = new InMemoryPropertyRepository(aggregate);
+        var service = new PropertyApplicationService(repository, new SpyUnitOfWork(), new SpyPlatformOrchestrator(), new StubCurrentUserAccessor());
+        var handler = new ChangeDescriptionCommandHandler(service);
+
+        var result = handler.Handle(new ChangeDescriptionCommand(aggregate.Id, "Updated Description"));
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("Updated Description", aggregate.Description);
+    }
+
+    [Fact]
+    public void ChangeRemarksHandler_ShouldUpdateRemarksThroughAggregateBehavior()
+    {
+        var aggregate = PropertyAggregate.Create(
+            new PropertyCode("APP-REM-01"),
+            new PropertyName("Test Property"),
+            PropertyType.Commercial);
+
+        var repository = new InMemoryPropertyRepository(aggregate);
+        var service = new PropertyApplicationService(repository, new SpyUnitOfWork(), new SpyPlatformOrchestrator(), new StubCurrentUserAccessor());
+        var handler = new ChangeRemarksCommandHandler(service);
+
+        var result = handler.Handle(new ChangeRemarksCommand(aggregate.Id, "Internal notes"));
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("Internal notes", aggregate.Remarks);
+    }
+
+    [Fact]
+    public void HidePropertyHandler_ShouldHidePropertyThroughAggregateBehavior()
+    {
+        var aggregate = PropertyAggregate.Create(
+            new PropertyCode("APP-HIDE-01"),
+            new PropertyName("Hidden Property"),
+            PropertyType.Commercial);
+
+        var repository = new InMemoryPropertyRepository(aggregate);
+        var service = new PropertyApplicationService(repository, new SpyUnitOfWork(), new SpyPlatformOrchestrator(), new StubCurrentUserAccessor());
+        var handler = new HidePropertyCommandHandler(service);
+
+        var result = handler.Handle(new HidePropertyCommand(aggregate.Id));
+
+        Assert.True(result.IsSuccess);
+        Assert.True(aggregate.IsHidden);
+    }
+
+    [Fact]
+    public void ShowPropertyHandler_ShouldShowPropertyThroughAggregateBehavior()
+    {
+        var aggregate = PropertyAggregate.Create(
+            new PropertyCode("APP-SHOW-01"),
+            new PropertyName("Visible Property"),
+            PropertyType.Commercial);
+        aggregate.Hide();
+
+        var repository = new InMemoryPropertyRepository(aggregate);
+        var service = new PropertyApplicationService(repository, new SpyUnitOfWork(), new SpyPlatformOrchestrator(), new StubCurrentUserAccessor());
+        var handler = new ShowPropertyCommandHandler(service);
+
+        var result = handler.Handle(new ShowPropertyCommand(aggregate.Id));
+
+        Assert.True(result.IsSuccess);
+        Assert.False(aggregate.IsHidden);
+    }
+
+    [Fact]
+    public void UpsertMetadataHandler_ShouldAddMetadataToProperty()
+    {
+        var aggregate = PropertyAggregate.Create(
+            new PropertyCode("APP-META-01"),
+            new PropertyName("Metadata Property"),
+            PropertyType.Commercial);
+
+        var repository = new InMemoryPropertyRepository(aggregate);
+        var service = new PropertyApplicationService(repository, new SpyUnitOfWork(), new SpyPlatformOrchestrator(), new StubCurrentUserAccessor());
+        var handler = new UpsertMetadataCommandHandler(service);
+
+        var result = handler.Handle(new UpsertMetadataCommand(aggregate.Id, "Environment", "Production"));
+
+        Assert.True(result.IsSuccess);
+        Assert.Contains(aggregate.Metadata, m => m.Key == "environment" && m.Value == "Production");
+    }
+
+    [Fact]
+    public void RemoveMetadataHandler_ShouldRemoveMetadataFromProperty()
+    {
+        var aggregate = PropertyAggregate.Create(
+            new PropertyCode("APP-RMETA-01"),
+            new PropertyName("Metadata Property"),
+            PropertyType.Commercial);
+        aggregate.UpsertMetadata(new PropertyMetadata("Environment", "Production"));
+
+        var repository = new InMemoryPropertyRepository(aggregate);
+        var service = new PropertyApplicationService(repository, new SpyUnitOfWork(), new SpyPlatformOrchestrator(), new StubCurrentUserAccessor());
+        var handler = new RemoveMetadataCommandHandler(service);
+
+        var result = handler.Handle(new RemoveMetadataCommand(aggregate.Id, "Environment"));
+
+        Assert.True(result.IsSuccess);
+        Assert.True(result.Value);
+        Assert.Empty(aggregate.Metadata);
+    }
+
+    [Fact]
+    public void AddRelationshipHandler_ShouldAddRelationshipToProperty()
+    {
+        var aggregate = PropertyAggregate.Create(
+            new PropertyCode("APP-REL-01"),
+            new PropertyName("Relationship Property"),
+            PropertyType.Commercial);
+
+        var targetId = PropertyId.New();
+
+        var repository = new InMemoryPropertyRepository(aggregate);
+        var service = new PropertyApplicationService(repository, new SpyUnitOfWork(), new SpyPlatformOrchestrator(), new StubCurrentUserAccessor());
+        var handler = new AddRelationshipCommandHandler(service);
+
+        var result = handler.Handle(new AddRelationshipCommand(aggregate.Id, targetId, PropertyRelationshipType.ParentChild));
+
+        Assert.True(result.IsSuccess);
+        Assert.Contains(aggregate.Relationships, r => r.TargetPropertyId == targetId);
+    }
+
+    [Fact]
+    public void ChangeTypeHandler_ShouldReturnFailure_WhenPropertyHasUnits()
+    {
+        var aggregate = PropertyAggregate.Create(
+            new PropertyCode("APP-TYPE-01"),
+            new PropertyName("Type Property"),
+            PropertyType.Commercial);
+        aggregate.CreateUnit(new UnitCode("U-1"), "Unit 1", UnitType.Office);
+
+        var repository = new InMemoryPropertyRepository(aggregate);
+        var service = new PropertyApplicationService(repository, new SpyUnitOfWork(), new SpyPlatformOrchestrator(), new StubCurrentUserAccessor());
+        var handler = new ChangeTypeCommandHandler(service);
+
+        var result = handler.Handle(new ChangeTypeCommand(aggregate.Id, PropertyType.Residential));
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal("domain_rule_violation", result.ErrorCode);
+    }
+
     private sealed class InMemoryPropertyRepository : IPropertyRepository
     {
         private readonly Dictionary<Guid, PropertyAggregate> _properties;

@@ -128,7 +128,8 @@ Provide a Billing-owned read abstraction for charge sources so capability logic 
 ### Current Limitations
 
 - Boundary currently exposes only the projection required by Rent source behavior.
-- Read boundary contract is Billing-owned but still requires an adapter implementation in a later workstream.
+- Read boundary contract is Billing-owned but currently uses a temporary persistence-backed adapter because the repository does not yet define the published Lease/Tenancy read surface required by the documented architecture.
+- This is a repository architecture dependency, not a Billing backlog item.
 
 ### Explicit Boundary Rules
 

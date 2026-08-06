@@ -1,7 +1,8 @@
 using System.Security.Claims;
 using Masterdom.Core.Security;
+using Microsoft.AspNetCore.Http;
 
-namespace Masterdom.Host.Security;
+namespace Masterdom.Modules.Security;
 
 internal sealed class HttpContextCurrentUserAccessor : ICurrentUserAccessor
 {

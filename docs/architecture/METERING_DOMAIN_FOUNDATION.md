@@ -5,7 +5,7 @@
 - Version: 1.0
 - Status: Active
 - Owner: Domain Engineering
-- Last Updated: 2026-07-27
+- Last Updated: 2026-08-04
 - Next Review: [TBD]
 - Related ADRs: [docs/adr/ADR-0004_Domain_Boundaries.md](../adr/ADR-0004_Domain_Boundaries.md)
 - Related Standards: [docs/standards/ENG-001_Engineering_Standards.md](../standards/ENG-001_Engineering_Standards.md)
@@ -21,6 +21,7 @@ This document covers:
 
 - Meter aggregate boundary and lifecycle
 - Reading submission, approval, correction, and retirement lifecycle
+- Implemented command/query surface and API exposure
 - Consumption calculation invariants
 - Application-layer orchestration and repository boundary
 - Platform abstraction consumption through metering orchestrator
@@ -62,6 +63,28 @@ classDiagram
 
     Meter "1" --> "*" MeterReading : owns
 ```
+
+## Implemented Surface
+
+Metering currently exposes the following business operations through complete vertical slices:
+
+- Commands: Install, SubmitReading, ApproveReading, CorrectReading, Retire
+- Queries: GetMeterById, GetMeterByNumber
+- API endpoints: POST /api/meters/, PUT /api/meters/{meterId}/readings, PUT /api/meters/{meterId}/readings/{readingId}/approve, PUT /api/meters/{meterId}/readings/{readingId}/correct, PUT /api/meters/{meterId}/retire, GET /api/meters/{meterId}, GET /api/meters/by-number/{meterNumber}
+
+Infrastructure supporting that surface includes:
+
+- Meter repository and EF Core persistence mappings
+- Unit of Work boundary for command execution
+- Platform orchestrator integration for configuration, metadata, rules, workflow, and domain event publishing
+- Dependency injection and authorization wiring for the Metering command/query surface
+
+Test coverage currently includes:
+
+- Domain tests for Meter aggregate behavior
+- Handler tests for command execution
+- Runtime composition tests for DI and handler registration
+- Integration tests for endpoint and runtime wiring
 
 ## Reading Lifecycle
 
@@ -119,3 +142,11 @@ Metering operations consume platform abstractions through orchestrator:
 - Rules
 - Workflow
 - Domain event publishing
+
+## Domain Event Lifecycle
+
+ClearDomainEvents exists solely to satisfy the aggregate domain-event lifecycle required by the platform publisher.
+
+- It is invoked by platform infrastructure after domain events are published.
+- It is intentionally not a business capability.
+- It must not be exposed through commands, handlers, services, or APIs.

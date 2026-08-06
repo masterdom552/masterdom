@@ -5,10 +5,17 @@ using Masterdom.Infrastructure;
 using Masterdom.Infrastructure.Persistence;
 using Masterdom.Modules.Lease.Application.Commands;
 using Masterdom.Modules.Lease.Application.Queries;
-using Masterdom.Modules.People.Application.Commands;
 using Masterdom.Modules.People.Application.Queries;
 using Masterdom.Modules.Properties.Application.Commands;
 using Masterdom.Modules.Properties.Application.Queries;
+using PeopleCommands = Masterdom.Modules.People.Application.Commands;
+using CreatePersonCommand = Masterdom.Modules.People.Application.Commands.CreatePersonCommand;
+using RenamePersonCommand = Masterdom.Modules.People.Application.Commands.RenamePersonCommand;
+using ChangePersonStatusCommand = Masterdom.Modules.People.Application.Commands.ChangePersonStatusCommand;
+using AddContactCommand = Masterdom.Modules.People.Application.Commands.AddContactCommand;
+using RemoveContactCommand = Masterdom.Modules.People.Application.Commands.RemoveContactCommand;
+using AddIdentityDocumentCommand = Masterdom.Modules.People.Application.Commands.AddIdentityDocumentCommand;
+using PeopleAddRelationshipCommand = Masterdom.Modules.People.Application.Commands.AddRelationshipCommand;
 using Masterdom.Modules.Properties.Domain.Entities.Property;
 using Masterdom.Modules.Tenancy.Application.Commands;
 using Masterdom.Modules.Tenancy.Application.Queries;
@@ -81,7 +88,7 @@ public sealed class PropertyCapabilityRuntimeCompositionTests
         var addIdentityDocumentHandler = scope.ServiceProvider
             .GetRequiredService<PeopleSupport.ICommandHandler<AddIdentityDocumentCommand, PeopleSupport.ExecutionResult<PersonAggregate>>>();
         var addRelationshipHandler = scope.ServiceProvider
-            .GetRequiredService<PeopleSupport.ICommandHandler<AddRelationshipCommand, PeopleSupport.ExecutionResult<PersonAggregate>>>();
+            .GetRequiredService<PeopleSupport.ICommandHandler<PeopleAddRelationshipCommand, PeopleSupport.ExecutionResult<PersonAggregate>>>();
 
         var createTenancyHandler = scope.ServiceProvider
             .GetRequiredService<TenancySupport.ICommandHandler<CreateTenancyCommand, TenancySupport.ExecutionResult<TenancyAggregate>>>();

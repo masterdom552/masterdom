@@ -40,6 +40,7 @@ internal static class PropertyCapabilityOperationNames
     public const string RecordMoveOut = "tenancies.move-out.record";
     public const string CloseTenancy = "tenancies.close";
     public const string ArchiveTenancy = "tenancies.archive";
+    public const string UpdateTenancyNotes = "tenancies.notes.update";
     public const string GetTenancyById = "tenancies.read.by-id";
 
     public const string InstallMeter = "metering.install";
@@ -49,6 +50,14 @@ internal static class PropertyCapabilityOperationNames
     public const string RetireMeter = "metering.retire";
     public const string GetMeterById = "metering.read.by-id";
     public const string GetMeterByNumber = "metering.read.by-number";
+
+    public const string CreateMaintenanceTicket = "maintenance.tickets.create";
+    public const string AssignMaintenanceTicket = "maintenance.tickets.assign";
+    public const string GetMaintenanceTicketById = "maintenance.tickets.read.by-id";
+
+    public const string CreateInventoryItem = "inventory.items.create";
+
+    public const string CreateIdentityRole = "identity.roles.create";
 
     public const string GenerateBill = "billing.generate";
     public const string FinalizeBill = "billing.finalize";

@@ -18,13 +18,21 @@ public sealed class PropertyCapabilitySecurityArchitectureTests
     {
         AssertContains(RepositoryPath("src/Masterdom.Host/Program.cs"), "app.UseAuthentication();");
         AssertContains(RepositoryPath("src/Masterdom.Host/Program.cs"), "app.UseAuthorization();");
+        AssertContains(RepositoryPath("src/Masterdom.Host/Program.cs"), "AddSecurityModule(builder.Configuration)");
     }
 
     [Fact]
     public void PropertyCapabilityRuntime_ShouldRegisterAuthorizationDecorators()
     {
         AssertContains(RepositoryPath("src/Masterdom.Infrastructure/PropertyFoundationDependencyInjection.cs"), "AuthorizationDecorator");
-        AssertContains(RepositoryPath("src/Masterdom.Infrastructure/PropertyFoundationDependencyInjection.cs"), "RequestAuthorizationService");
+        AssertContains(RepositoryPath("src/Masterdom.Infrastructure/PropertyFoundationDependencyInjection.cs"), "AddSecurityInfrastructureRuntime");
+    }
+
+    [Fact]
+    public void SecurityModule_ShouldOwnSecurityCompositionEntryPoint()
+    {
+        AssertContains(RepositoryPath("src/Masterdom.Modules.Security/SecurityModuleServiceCollectionExtensions.cs"), "AddSecurityModule");
+        AssertContains(RepositoryPath("src/Masterdom.Modules.Security/SecurityModuleServiceCollectionExtensions.cs"), "AddSecurityInfrastructureRuntime");
     }
 
     private static void AssertContains(string path, string expectedText)

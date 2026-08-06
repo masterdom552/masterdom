@@ -27,6 +27,8 @@ This document covers:
 
 This document does not define payment settlement, receipts, collections workflows, meter ingestion, taxation engines, or financial-ledger posting.
 
+Billing charge composition currently depends on a temporary persistence-backed read adapter for rent facts. That dependency is a repository architecture concern, not a Billing core-completion gap.
+
 ## Aggregate Model
 
 ```mermaid

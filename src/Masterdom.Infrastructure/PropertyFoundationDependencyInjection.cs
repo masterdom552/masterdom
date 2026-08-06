@@ -33,6 +33,8 @@ using Masterdom.Modules.Tenancy.Application.Services;
 using Masterdom.Modules.Tenancy.Domain.Entities.Tenancy;
 using Masterdom.Modules.Tenancy.Domain.Repositories;
 using Masterdom.Infrastructure.Persistence.Metering;
+using Masterdom.Infrastructure.Persistence.Maintenance;
+using Masterdom.Infrastructure.Persistence.Inventory;
 using Masterdom.Modules.Metering.Application.Commands;
 using Masterdom.Modules.Metering.Application.Handlers.Commands;
 using Masterdom.Modules.Metering.Application.Handlers.Queries;
@@ -40,6 +42,18 @@ using Masterdom.Modules.Metering.Application.Queries;
 using Masterdom.Modules.Metering.Application.Services;
 using Masterdom.Modules.Metering.Domain.Entities.Metering;
 using Masterdom.Modules.Metering.Domain.Repositories;
+using Masterdom.Modules.Maintenance.Application.Commands;
+using Masterdom.Modules.Maintenance.Application.Handlers.Commands;
+using Masterdom.Modules.Maintenance.Application.Handlers.Queries;
+using Masterdom.Modules.Maintenance.Application.Queries;
+using Masterdom.Modules.Maintenance.Application.Services;
+using Masterdom.Modules.Maintenance.Domain.Entities.Maintenance;
+using Masterdom.Modules.Maintenance.Domain.Repositories;
+using Masterdom.Modules.Inventory.Application.Commands;
+using Masterdom.Modules.Inventory.Application.Handlers.Commands;
+using Masterdom.Modules.Inventory.Application.Services;
+using Masterdom.Modules.Inventory.Domain.Entities.Inventory;
+using Masterdom.Modules.Inventory.Domain.Repositories;
 using Masterdom.Infrastructure.Persistence.Billing;
 using Masterdom.Modules.Billing.Application.Commands;
 using Masterdom.Modules.Billing.Application.Handlers.Commands;
@@ -110,6 +124,8 @@ using LeaseAggregate = Masterdom.Modules.Lease.Domain.Entities.Lease.Lease;
 using PropertyAggregate = Masterdom.Modules.Properties.Domain.Entities.Property.Property;
 using TenancyAggregate = Masterdom.Modules.Tenancy.Domain.Entities.Tenancy.Tenancy;
 using MeterAggregate = Masterdom.Modules.Metering.Domain.Entities.Metering.Meter;
+using InventoryItemAggregate = Masterdom.Modules.Inventory.Domain.Entities.Inventory.InventoryItem;
+using MaintenanceTicketAggregate = Masterdom.Modules.Maintenance.Domain.Entities.Maintenance.MaintenanceTicket;
 using BillAggregate = Masterdom.Modules.Billing.Domain.Entities.Billing.Bill;
 using LedgerAggregate = Masterdom.Modules.FinancialLedger.Domain.Entities.FinancialLedger.Ledger;
 using PaymentAggregate = Masterdom.Modules.Payment.Domain.Entities.Payment.Payment;
@@ -142,6 +158,8 @@ public static class PropertyFoundationDependencyInjection
         AddLeaseRuntime(services);
         AddTenancyRuntime(services);
         AddMeteringRuntime(services);
+        AddInventoryRuntime(services);
+        AddMaintenanceRuntime(services);
         AddBillingRuntime(services);
         AddFinancialLedgerRuntime(services);
         AddPaymentRuntime(services);
@@ -155,10 +173,7 @@ public static class PropertyFoundationDependencyInjection
 
     private static void AddPlatformFoundation(IServiceCollection services)
     {
-        services.TryAddScoped<Masterdom.Core.Security.ICurrentUserAccessor, AnonymousCurrentUserAccessor>();
-        services.AddScoped<Masterdom.Core.Security.ICapabilityAuthorizationPolicyProvider, DefaultCapabilityAuthorizationPolicyProvider>();
-        services.AddScoped<Masterdom.Core.Security.IPropertyCapabilityAuthorizationService, PropertyCapabilityAuthorizationService>();
-        services.AddScoped<IRequestAuthorizationService, RequestAuthorizationService>();
+        services.AddSecurityInfrastructureRuntime();
 
         services.AddScoped<ITenancyReadModelProvider, TenancyReadModelProvider>();
         services.AddScoped<IPropertyReadModelProvider, PropertyReadModelProvider>();
@@ -238,6 +253,23 @@ public static class PropertyFoundationDependencyInjection
         AddPropertyCommandHandler<CreateUnitCommand, ExecutionResult<Unit>, CreateUnitCommandHandler>(services);
         AddPropertyCommandHandler<RemoveUnitCommand, ExecutionResult<bool>, RemoveUnitCommandHandler>(services);
 
+        AddPropertyCommandHandler<ChangeDescriptionCommand, ExecutionResult<PropertyAggregate>, ChangeDescriptionCommandHandler>(services);
+        AddPropertyCommandHandler<ChangeRemarksCommand, ExecutionResult<PropertyAggregate>, ChangeRemarksCommandHandler>(services);
+        AddPropertyCommandHandler<ChangeOwnerCommand, ExecutionResult<PropertyAggregate>, ChangeOwnerCommandHandler>(services);
+        AddPropertyCommandHandler<ChangeAddressCommand, ExecutionResult<PropertyAggregate>, ChangeAddressCommandHandler>(services);
+        AddPropertyCommandHandler<ConfigureSettingsCommand, ExecutionResult<PropertyAggregate>, ConfigureSettingsCommandHandler>(services);
+        AddPropertyCommandHandler<ChangeParentPropertyCommand, ExecutionResult<PropertyAggregate>, ChangeParentPropertyCommandHandler>(services);
+        AddPropertyCommandHandler<SetEffectivePeriodCommand, ExecutionResult<PropertyAggregate>, SetEffectivePeriodCommandHandler>(services);
+        AddPropertyCommandHandler<SetDisplayOrderCommand, ExecutionResult<PropertyAggregate>, SetDisplayOrderCommandHandler>(services);
+        AddPropertyCommandHandler<HidePropertyCommand, ExecutionResult<PropertyAggregate>, HidePropertyCommandHandler>(services);
+        AddPropertyCommandHandler<ShowPropertyCommand, ExecutionResult<PropertyAggregate>, ShowPropertyCommandHandler>(services);
+        AddPropertyCommandHandler<ChangeTypeCommand, ExecutionResult<PropertyAggregate>, ChangeTypeCommandHandler>(services);
+        AddPropertyCommandHandler<AddExistingUnitCommand, ExecutionResult<Unit>, AddExistingUnitCommandHandler>(services);
+        AddPropertyCommandHandler<UpsertMetadataCommand, ExecutionResult<PropertyAggregate>, UpsertMetadataCommandHandler>(services);
+        AddPropertyCommandHandler<RemoveMetadataCommand, ExecutionResult<bool>, RemoveMetadataCommandHandler>(services);
+        AddPropertyCommandHandler<Masterdom.Modules.Properties.Application.Commands.AddRelationshipCommand, ExecutionResult<PropertyAggregate>, Masterdom.Modules.Properties.Application.Handlers.Commands.AddRelationshipCommandHandler>(services);
+        AddPropertyCommandHandler<RemoveRelationshipCommand, ExecutionResult<bool>, RemoveRelationshipCommandHandler>(services);
+
         AddPropertyQueryHandler<GetPropertyByIdQuery, ExecutionResult<PropertyAggregate>, GetPropertyByIdQueryHandler>(services);
         AddPropertyQueryHandler<GetPropertyByCodeQuery, ExecutionResult<PropertyAggregate>, GetPropertyByCodeQueryHandler>(services);
         AddPropertyQueryHandler<ListUnitsQuery, ExecutionResult<IReadOnlyCollection<Unit>>, ListUnitsQueryHandler>(services);
@@ -257,7 +289,7 @@ public static class PropertyFoundationDependencyInjection
         AddPeopleCommandHandler<AddContactCommand, Masterdom.Modules.People.Application.Support.ExecutionResult<Person>, AddContactCommandHandler>(services);
         AddPeopleCommandHandler<RemoveContactCommand, Masterdom.Modules.People.Application.Support.ExecutionResult<bool>, RemoveContactCommandHandler>(services);
         AddPeopleCommandHandler<AddIdentityDocumentCommand, Masterdom.Modules.People.Application.Support.ExecutionResult<Person>, AddIdentityDocumentCommandHandler>(services);
-        AddPeopleCommandHandler<AddRelationshipCommand, Masterdom.Modules.People.Application.Support.ExecutionResult<Person>, AddRelationshipCommandHandler>(services);
+        AddPeopleCommandHandler<Masterdom.Modules.People.Application.Commands.AddRelationshipCommand, Masterdom.Modules.People.Application.Support.ExecutionResult<Person>, Masterdom.Modules.People.Application.Handlers.Commands.AddRelationshipCommandHandler>(services);
 
         AddPeopleQueryHandler<GetPersonByIdQuery, Masterdom.Modules.People.Application.Support.ExecutionResult<Person>, GetPersonByIdQueryHandler>(services);
         AddPeopleQueryHandler<GetPersonByNumberQuery, Masterdom.Modules.People.Application.Support.ExecutionResult<Person>, GetPersonByNumberQueryHandler>(services);
@@ -297,6 +329,7 @@ public static class PropertyFoundationDependencyInjection
         AddTenancyCommandHandler<RecordMoveOutCommand, Masterdom.Modules.Tenancy.Application.Support.ExecutionResult<TenancyAggregate>, RecordMoveOutCommandHandler>(services);
         AddTenancyCommandHandler<CloseTenancyCommand, Masterdom.Modules.Tenancy.Application.Support.ExecutionResult<TenancyAggregate>, CloseTenancyCommandHandler>(services);
         AddTenancyCommandHandler<ArchiveTenancyCommand, Masterdom.Modules.Tenancy.Application.Support.ExecutionResult<TenancyAggregate>, ArchiveTenancyCommandHandler>(services);
+        AddTenancyCommandHandler<UpdateTenancyNotesCommand, Masterdom.Modules.Tenancy.Application.Support.ExecutionResult<TenancyAggregate>, UpdateTenancyNotesCommandHandler>(services);
 
         AddTenancyQueryHandler<GetTenancyByIdQuery, Masterdom.Modules.Tenancy.Application.Support.ExecutionResult<TenancyAggregate>, GetTenancyByIdQueryHandler>(services);
     }
@@ -342,6 +375,28 @@ public static class PropertyFoundationDependencyInjection
 
         AddBillingQueryHandler<GetBillByIdQuery, Masterdom.Modules.Billing.Application.Support.ExecutionResult<BillAggregate>, GetBillByIdQueryHandler>(services);
         AddBillingQueryHandler<GetBillByNumberQuery, Masterdom.Modules.Billing.Application.Support.ExecutionResult<BillAggregate>, GetBillByNumberQueryHandler>(services);
+    }
+
+    private static void AddMaintenanceRuntime(IServiceCollection services)
+    {
+        services.AddScoped<IMaintenanceTicketRepository, MaintenanceTicketRepository>();
+        services.AddScoped<Masterdom.Modules.Maintenance.Application.Support.IMaintenanceUnitOfWork, MaintenanceUnitOfWork>();
+        services.AddScoped<Masterdom.Modules.Maintenance.Application.Support.IMaintenancePlatformOrchestrator, MaintenancePlatformOrchestrator>();
+        services.AddScoped<IMaintenanceApplicationService, MaintenanceApplicationService>();
+
+        AddMaintenanceCommandHandler<CreateMaintenanceTicketCommand, Masterdom.Modules.Maintenance.Application.Support.ExecutionResult<MaintenanceTicketAggregate>, CreateMaintenanceTicketCommandHandler>(services);
+        AddMaintenanceCommandHandler<AssignMaintenanceTicketCommand, Masterdom.Modules.Maintenance.Application.Support.ExecutionResult<MaintenanceTicketAggregate>, AssignMaintenanceTicketCommandHandler>(services);
+        AddMaintenanceQueryHandler<GetMaintenanceTicketByIdQuery, Masterdom.Modules.Maintenance.Application.Support.ExecutionResult<MaintenanceTicketAggregate>, GetMaintenanceTicketByIdQueryHandler>(services);
+    }
+
+    private static void AddInventoryRuntime(IServiceCollection services)
+    {
+        services.AddScoped<IInventoryItemRepository, InventoryItemRepository>();
+        services.AddScoped<Masterdom.Modules.Inventory.Application.Support.IInventoryUnitOfWork, InventoryUnitOfWork>();
+        services.AddScoped<Masterdom.Modules.Inventory.Application.Support.IInventoryPlatformOrchestrator, InventoryPlatformOrchestrator>();
+        services.AddScoped<IInventoryApplicationService, InventoryApplicationService>();
+
+        AddInventoryCommandHandler<CreateInventoryItemCommand, Masterdom.Modules.Inventory.Application.Support.ExecutionResult<InventoryItemAggregate>, CreateInventoryItemCommandHandler>(services);
     }
 
     private static void AddFinancialLedgerRuntime(IServiceCollection services)
@@ -562,6 +617,36 @@ public static class PropertyFoundationDependencyInjection
         services.AddScoped<THandler>();
         services.AddScoped<Masterdom.Modules.Metering.Application.Support.IQueryHandler<TQuery, TResult>>(serviceProvider =>
             new MeteringQueryAuthorizationDecorator<TQuery, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddMaintenanceCommandHandler<TCommand, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.Maintenance.Application.Support.ICommandHandler<TCommand, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.Maintenance.Application.Support.ICommandHandler<TCommand, TResult>>(serviceProvider =>
+            new MaintenanceCommandAuthorizationDecorator<TCommand, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddMaintenanceQueryHandler<TQuery, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.Maintenance.Application.Support.IQueryHandler<TQuery, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.Maintenance.Application.Support.IQueryHandler<TQuery, TResult>>(serviceProvider =>
+            new MaintenanceQueryAuthorizationDecorator<TQuery, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddInventoryCommandHandler<TCommand, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.Inventory.Application.Support.ICommandHandler<TCommand, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.Inventory.Application.Support.ICommandHandler<TCommand, TResult>>(serviceProvider =>
+            new InventoryCommandAuthorizationDecorator<TCommand, TResult>(
                 serviceProvider.GetRequiredService<THandler>(),
                 serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
     }

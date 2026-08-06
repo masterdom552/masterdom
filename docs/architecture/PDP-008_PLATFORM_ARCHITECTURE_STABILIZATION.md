@@ -5,7 +5,7 @@
 - Version: 1.0
 - Status: Active
 - Owner: Platform Engineering
-- Last Updated: 2026-08-03
+- Last Updated: 2026-08-06
 - Next Review: [TBD]
 - Related Handbook: [docs/architecture/MASTERDOM_ARCHITECTURE_HANDBOOK.md](MASTERDOM_ARCHITECTURE_HANDBOOK.md)
 - Related Gap Register: [docs/architecture/ARCHITECTURE_GAP_REGISTER.md](ARCHITECTURE_GAP_REGISTER.md)
@@ -187,8 +187,8 @@ Additional stabilization gaps:
 Readiness summary:
 
 - Search: contracts not yet present.
-- Reporting: module scaffold exists, no framework implementation.
-- Notifications: module scaffold exists, no framework implementation.
+- Reporting: implemented as a Platform Capability with application-centric report orchestration, metadata-driven registry, export, snapshots, and history.
+- Notifications: implemented as a Platform Capability with application-centric orchestration, metadata-driven templates, delivery, retry, and history.
 - Messaging: not implemented; explicitly deferred.
 - Scheduling: not implemented.
 - Audit: partial via events, no dedicated audit framework.

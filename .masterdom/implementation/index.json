@@ -1,7 +1,8 @@
 {
-    "snapshotDateUtc": "2026-08-02",
+    "snapshotDateUtc": "2026-08-06",
     "sourceOfTruth": "repository-evidence",
-    "activePackage": "PKG-4B.1-REPOSITORY-SNAPSHOT-PROGRESS-SYNCHRONIZATION",
+    "activePackage": null,
+    "currentState": "No Active Package. INV-2.0, MT-2.1, and ID-2.1 are Closed.",
     "completedPackages": [
         {
             "id": "PKG-001",
@@ -101,6 +102,39 @@
             "acceptance": "Met",
             "remainingDebt": "Security integration intentionally deferred",
             "successor": "PKG-4B.1"
+        },
+        {
+            "id": "INV-2.0",
+            "title": "Inventory Foundation (First Vertical Slice)",
+            "status": "Closed",
+            "objective": "Implement the first complete end-to-end Inventory capability slice using repository conventions.",
+            "outcome": "Completed",
+            "validation": "dotnet build Masterdom.slnx and dotnet test Masterdom.slnx passed (664 passed, 0 failed, 0 skipped)",
+            "acceptance": "Met",
+            "remainingDebt": "No package-blocking debt",
+            "successor": "MT-2.1"
+        },
+        {
+            "id": "MT-2.1",
+            "title": "Maintenance Assignment (Vertical Slice)",
+            "status": "Closed",
+            "objective": "Implement a complete Maintenance assignment vertical slice using existing repository conventions.",
+            "outcome": "Completed",
+            "validation": "dotnet build Masterdom.slnx and dotnet test Masterdom.slnx passed (664 passed, 0 failed, 0 skipped)",
+            "acceptance": "Met",
+            "remainingDebt": "No package-blocking debt",
+            "successor": "ID-2.1"
+        },
+        {
+            "id": "ID-2.1",
+            "title": "Identity Administration Foundation",
+            "status": "Closed",
+            "objective": "Implement the first complete identity administration vertical slice using existing repository architecture and conventions.",
+            "outcome": "Completed",
+            "validation": "dotnet build Masterdom.slnx and dotnet test Masterdom.slnx passed (664 passed, 0 failed, 0 skipped)",
+            "acceptance": "Met",
+            "remainingDebt": "No package-blocking debt",
+            "successor": "Authorization"
         }
     ],
     "capabilityStatus": {
@@ -108,19 +142,19 @@
         "People": "Complete",
         "Lease": "Complete",
         "Tenancy": "Complete",
-        "Billing": "Substantially Complete",
-        "Financial Ledger": "Substantially Complete",
-        "Documents": "Not Started",
-        "Inventory": "Not Started",
+        "Billing": "Complete",
+        "Financial Ledger": "Complete",
+        "Documents": "Complete",
+        "Inventory": "Complete",
         "CRM": "Not Started",
-        "Maintenance": "Not Started",
-        "Notifications": "Not Started",
+        "Maintenance": "Complete",
+        "Notifications": "Complete",
         "Intelligence": "Not Started",
         "Policy Framework": "In Progress",
         "Utility Rating": "In Progress",
-        "Metering": "In Progress",
+        "Metering": "Complete",
         "Subsidy Optimization": "In Progress",
-        "Reporting": "Not Started",
+        "Reporting": "Complete",
         "Settings": "Not Started"
     },
     "architectureStatus": {
@@ -129,20 +163,16 @@
         "Infrastructure": "Substantially Complete",
         "Abstractions": "In Progress",
         "Identity": "Substantially Complete",
-        "Security": "Planning"
+        "Security": "In Progress"
     },
     "deferredWork": [
-        "Billing sequencing activation after Property capability and security sequence",
-        "Financial Ledger sequencing activation after Property capability and security sequence",
+        "Billing and Payment automatic activation into Financial Ledger deferred to future Platform Integration",
         "Cross-capability authorization rollout",
         "Platform-wide approval workflow rollout",
         "Security rollout beyond Property capability"
     ],
     "nextImplementationOrder": [
-        "Identity Integration",
         "Authorization",
-        "Property Security",
-        "Billing",
-        "Financial Ledger"
+        "Property Security"
     ]
 }

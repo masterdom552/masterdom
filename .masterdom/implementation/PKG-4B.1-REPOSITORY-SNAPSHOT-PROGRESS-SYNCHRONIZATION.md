@@ -1,5 +1,17 @@
 # PKG-4B.1 Repository Snapshot and Progress Synchronization
 
+## Supersession Note (2026-08-05)
+
+This package closure report remains historically accurate for PKG-4B.1.
+
+Subsequent package synchronization has advanced repository status, including Documents capability completion for Stage 2 scope.
+
+Subsequent package synchronization has also advanced repository status for Notifications capability completion for Stage 2 scope.
+
+Subsequent package synchronization has also advanced repository status for Reporting capability completion for Stage 2 scope.
+
+Subsequent investigation-based synchronization has also advanced repository classification for Billing and Financial Ledger: both are now classified as complete for Stage 2 scope, while automatic Billing/Payment to Financial Ledger activation is intentionally deferred to future Platform Integration.
+
 ## Metadata
 
 - PKG Number: PKG-4B.1
@@ -81,9 +93,9 @@ Updated records:
 - Intelligence: Not Started
 - Policy Framework: In Progress
 - Utility Rating: In Progress
-- Metering: In Progress
+- Metering: Complete
 - Subsidy Optimization: In Progress
-- Reporting: Not Started
+- Reporting: Complete
 - Settings: Not Started
 
 ## Deferred Work

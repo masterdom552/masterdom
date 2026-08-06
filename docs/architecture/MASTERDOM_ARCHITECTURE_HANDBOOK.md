@@ -5,7 +5,7 @@
 - Version: 1.0
 - Status: Active
 - Owner: Repository Governance
-- Last Updated: 2026-08-04
+- Last Updated: 2026-08-06
 - Next Review: [TBD]
 - Related ADRs: [docs/adr/README.md](../adr/README.md)
 - Related Standards: [docs/standards/README.md](../standards/README.md)
@@ -118,6 +118,11 @@ Future reusable calculations must be evaluated for inclusion in the Calculation 
 
 Constitution -> Standards -> Architecture Handbook -> ADR -> Implementation Package -> Source Code
 
+## Governance Entry Points
+
+- Module lifecycle standard: [docs/governance/MODULE_LIFECYCLE_STANDARD.md](../governance/MODULE_LIFECYCLE_STANDARD.md)
+- Governance index: [docs/governance/README.md](../governance/README.md)
+
 ## Architecture Assessment (Read-Only Baseline)
 
 ### Repository Structure
@@ -156,13 +161,13 @@ Constitution -> Standards -> Architecture Handbook -> ADR -> Implementation Pack
 
 - Intended bounded contexts exist as separate module projects (Properties, Billing, Finance, People, CRM, Documents, Maintenance, Notifications, Reporting, Intelligence, Settings, Security, Inventory).
 - Current implemented domain source is concentrated in Masterdom.Core for Identity, while Property domain is now extracted to `Masterdom.Modules.Properties.Domain`.
-- Module projects are still mostly scaffold-level, with Properties now containing active domain and application source.
+- Multiple module projects now contain active source, including Properties, People, Tenancy, Lease, Billing, Payment, Financial Ledger, Metering, Maintenance, Inventory, Utility Rating, Policy Framework, Subsidy Optimization, Documents, and Security.
 
 ### Infrastructure and Platform Services
 
 - Infrastructure is EF Core and PostgreSQL focused via MasterdomDbContext and configurations.
 - Platform provides kernel lifecycle, module registration, and diagnostics scaffolding.
-- Host currently boots a temporary test module.
+- Host composes active module APIs, including secured document-generation endpoints under `/api/documents`.
 
 ### Existing Architecture Assets
 
@@ -328,8 +333,8 @@ Implemented capabilities include:
 - People module command/query handlers, application service, repository contract, unit-of-work, and platform orchestrator pattern aligned with Properties.
 - Tenancy aggregate ownership model including primary occupant invariant, lifecycle status transitions, and move-in/move-out sequencing.
 - Tenancy module command/query handlers, application service, repository contract, unit-of-work, and platform orchestrator pattern aligned with Properties and People.
-- Metering aggregate ownership model including reading lifecycle, approval governance, correction history, and retirement lifecycle.
-- Metering module command/query handlers, application service, repository contract, unit-of-work, and platform orchestrator pattern aligned with existing domain modules.
+- Metering aggregate ownership model including reading lifecycle, approval governance, correction history, retirement lifecycle, and complete command/query surface.
+- Metering module command/query handlers, application service, repository contract, unit-of-work, platform orchestrator, authorization, DI, and tests aligned with existing domain modules.
 - Utility Rating aggregate ownership model including immutable rating versions, tariff application, and rated consumption snapshots.
 - Utility Rating module command/query handlers, application service, repository contract, unit-of-work, and platform orchestrator pattern aligned with existing domain modules.
 - Subsidy Optimization aggregate ownership model including immutable optimization runs, recommendation sets, and scenario versioning.
@@ -342,11 +347,11 @@ Implemented capabilities include:
 ### Weaknesses
 
 - Leasing economics and billing policy integration are not yet implemented for tenancy.
-- Cross-context read-model projections for tenancy analytics are not yet implemented.
+- Repository-wide executable provider-side read-model filtering is not implemented.
 
 ### Missing Capabilities
 
-- Tenancy projection contracts for reporting and lifecycle analytics.
+- Repository-wide executable provider-side read-model filtering when a proven consumer requirement exists.
 - Lease and billing policy composition over tenancy lifecycle.
 
 ### Target State
@@ -359,7 +364,7 @@ Tenancy bounded context implemented with ID-only cross-context references to Peo
 
 Lease bounded context implemented with versioned commercial terms and ID-only references to tenancy, property, unit, and person contexts.
 
-Billing bounded context implemented with immutable obligation snapshots and ID-only references to tenancy, lease, property, and person contexts.
+Billing bounded context implemented and complete for Stage 2 as the owner of immutable obligation snapshots and ID-only references to tenancy, lease, property, and person contexts.
 
 Metering bounded context implemented with ID-only references to property and unit identities, lifecycle-managed readings, approval policy, and correction history.
 
@@ -369,9 +374,9 @@ Subsidy Optimization bounded context implemented as an advisory, configuration-d
 
 Policy Framework bounded context implemented as a reusable policy-governance engine for policy selection, scope assignment, and versioned policy history without rule/workflow execution.
 
-Payment bounded context implemented as the owner of payment lifecycle, bill-settlement allocation, receipts, reversals, and immutable payment history through published billing contracts.
+Payment bounded context implemented and complete for Stage 2 as the owner of payment lifecycle, bill-settlement allocation, receipts, reversals, and immutable payment history through published billing contracts.
 
-Financial Ledger bounded context implemented as the owner of immutable accounting history, balanced journal posting, reversing entries, and posting-batch closure through published Billing and Payment contracts.
+Financial Ledger bounded context implemented and complete for Stage 2 as the owner of immutable accounting history, balanced journal posting, reversing entries, and posting-batch closure through published Billing and Payment contracts, with automatic Billing and Payment activation intentionally deferred to future Platform Integration.
 
 ### Gap
 
@@ -956,35 +961,41 @@ PKG-Search-Framework.
 
 ### Current State
 
-Reporting module project scaffold exists without active domain/application source in baseline.
+Reporting is a projection-centric Platform Capability rather than a Business Bounded Context.
+
+Reporting is implemented as an application-centric reporting capability with metadata-driven report generation, approved read-model projection consumption, export, snapshots, templates, and permission handling.
 
 ### Strengths
 
-- Dedicated reporting module boundary reserved.
+- Clear capability boundary for reporting orchestration.
+- Uses approved read-model projections rather than direct persistence coupling.
 
 ### Weaknesses
 
-- Reporting contract and data-projection architecture not documented.
+- Durable persistence adapters are still in-memory implementations.
+- Export renderers are Stage 2 implementations and remain lightweight.
 
 ### Missing Capabilities
 
-- Report model taxonomy, data mart/projection strategy, export contracts.
+- Durable persistence adapters for templates and snapshots.
+- Richer projection composition strategies.
+- Future Published API packaging if external consumers emerge.
 
 ### Target State
 
-Reporting framework with read model pipeline and bounded-context projections.
+Reporting capability with read model pipeline, bounded-context projections, and durable infrastructure where required.
 
 ### Gap
 
-Boundary exists; architecture and implementation are pending.
+Stage 2 reporting capability is implemented; durable infrastructure and richer projection composition remain deferred.
 
 ### Recommendation
 
-Define reporting architecture before report feature packages.
+Use the current reporting capability structure as the architectural reference for Reporting-related work.
 
 ### Future Work Packages
 
-PKG-Reporting-Framework.
+None currently identified.
 
 ## 18. Notification Framework
 
@@ -997,31 +1008,37 @@ PKG-Reporting-Framework.
 
 ### Current State
 
-Notification module scaffold exists with no active source baseline.
+Notifications is a Platform Capability rather than a Business Bounded Context.
+
+Notifications is implemented as an application-centric notification orchestration capability with metadata-driven generation, approved read-model projection consumption, delivery, retry, history, and preference handling.
 
 ### Strengths
 
-- Dedicated bounded context reserved.
+- Clear capability boundary for notification orchestration.
+- Uses approved read-model projections rather than direct persistence coupling.
 
 ### Weaknesses
 
-- Notification channels, templates, retries, and routing architecture undocumented.
+- Durable persistence adapters are still in-memory implementations.
+- Transport adapters are Stage 2 implementations and remain lightweight.
 
 ### Missing Capabilities
 
-- Channel abstraction, template versioning, delivery tracking.
+- Durable persistence adapters for queue, history, and preferences.
+- Explicit Published API packaging for cross-module notification consumption.
+- Future transport integrations beyond current abstraction implementations.
 
 ### Target State
 
-Notification framework supporting multi-channel, templated, auditable delivery.
+Notification capability supporting multi-channel, templated, auditable delivery with durable infrastructure when required.
 
 ### Gap
 
-Scaffold exists; architecture and contracts missing.
+Stage 2 platform capability is implemented; durable infrastructure and broader transport integrations remain deferred.
 
 ### Recommendation
 
-Create a notification architecture package before event-driven user features.
+Use the current capability structure as the architectural reference for Notifications-related work.
 
 ### Future Work Packages
 
@@ -1034,39 +1051,53 @@ PKG-Notification-Framework.
 - ADRs: ADR-0004
 - Standards: DDD_GUIDELINES
 - Playbooks: MODULE_DEVELOPMENT_GUIDE
-- Repository Structure: src/Masterdom.Core/Identity, src/Masterdom.Infrastructure/Persistence/Configurations/Identity
+- Repository Structure: src/Masterdom.Core/Identity, src/Masterdom.Infrastructure/Persistence/Configurations/Identity, src/Masterdom.Infrastructure/Security, src/Masterdom.Host/Security
 
 ### Current State
 
-Identity domain has the deepest implementation with multiple aggregates and persistence mappings.
+Core.Identity owns the identity domain model, including users, roles, permissions, identity profiles, and related identity lifecycle aggregates.
+
+Identity Integration is a Platform Capability delivered across Host authentication composition and Infrastructure.Security authorization runtime services.
 
 ### Strengths
 
 - Rich identity aggregate set and persistence model.
+- Authentication pipeline composition is implemented in Host.
+- Authorization runtime, policy provider, and request authorization adapters are implemented in Infrastructure.Security.
+- Masterdom.Modules.Security now owns the security module bootstrap and service-registration entry point.
 
 ### Weaknesses
 
-- Identity is currently a concentration point for concepts that may belong to other bounded contexts.
+- Published API status: Not Yet.
+- Identity Administration API status: Not Yet.
 
 ### Missing Capabilities
 
-- Finalized context ownership and module relocation strategy.
+- Identity administration delivery surfaces remain implementation work.
 
 ### Target State
 
-Identity context focuses strictly on identity/security concerns with clear contracts to People and Properties contexts.
+Identity Integration remains a Platform Capability.
+
+Core.Identity continues to own the identity domain model.
+
+Infrastructure.Security continues to own authorization runtime services, policy provider behavior, and request-authorization adapters.
+
+Host continues to own application startup composition and middleware wiring.
+
+Masterdom.Modules.Security owns the security module bootstrap and dependency-registration entry point.
 
 ### Gap
 
-Strong implementation exists; context segmentation is incomplete.
+Architectural identity and ownership are resolved; remaining work is implementation.
 
 ### Recommendation
 
-Perform bounded-context ownership audit and phased migration.
+Use the resolved ownership model as the architectural baseline for future Identity Integration implementation packages.
 
 ### Future Work Packages
 
-PKG-Identity-Context-Alignment.
+ID-2.0 Identity Integration Implementation.
 
 ## 20. Security Architecture
 
@@ -1079,35 +1110,38 @@ PKG-Identity-Context-Alignment.
 
 ### Current State
 
-Security guidance is documented; implementation baseline is primarily identity-oriented with dedicated security module scaffold.
+Security guidance is documented; Masterdom.Modules.Security now owns the bootstrap and dependency-registration boundary, Infrastructure.Security owns runtime authorization implementations, and Host owns application startup composition and middleware use.
 
 ### Strengths
 
 - Security governance exists.
+- Authentication and authorization runtime behavior is already implemented and test-backed.
+- Security module bootstrap is now implemented and module-owned.
 
 ### Weaknesses
 
-- Security module architecture and runtime components are not yet populated.
+- Identity administration and broader identity workflow surfaces are not yet implemented.
 
 ### Missing Capabilities
 
-- Central authorization policy engine, secrets boundary model, and security telemetry architecture.
+- Published API status remains Not Yet.
+- Identity Administration API status remains Not Yet.
 
 ### Target State
 
-Comprehensive security architecture spanning identity, authorization, audit, and operational controls.
+Comprehensive security architecture spanning identity, authorization, audit, and operational controls, implemented against the resolved Host/Core.Identity/Infrastructure.Security ownership model.
 
 ### Gap
 
-Governance present; security-platform implementation partial.
+Architecture is resolved; implementation of identity workflows remains pending.
 
 ### Recommendation
 
-Define security architecture package with explicit policy model and cross-module contracts.
+Use the current ownership boundary as the reference for future Security and Identity Integration implementation packages.
 
 ### Future Work Packages
 
-PKG-Security-Architecture.
+ID-2.0 Identity Integration Implementation.
 
 ## 21. Persistence Architecture
 

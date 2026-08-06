@@ -1,12 +1,12 @@
-﻿using Masterdom.Host.Api;
-using Masterdom.Host.Security;
+using Masterdom.Host.Api;
 using Masterdom.Infrastructure;
 using Masterdom.Infrastructure.Persistence;
+using Masterdom.Modules.Security;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddMasterdomIdentityIntegration(builder.Configuration);
+builder.Services.AddSecurityModule(builder.Configuration);
 builder.Services.AddPropertyBusinessCapabilityRuntime();
 
 var connectionString =
@@ -30,13 +30,21 @@ app.MapPeopleEndpoints();
 app.MapLeaseEndpoints();
 app.MapTenancyEndpoints();
 app.MapMeteringEndpoints();
+app.MapMaintenanceEndpoints();
+app.MapInventoryEndpoints();
 app.MapBillingEndpoints();
 app.MapFinancialLedgerEndpoints();
 app.MapPaymentEndpoints();
+app.MapIdentityAdministrationEndpoints();
 app.MapReportingEndpoints();
 app.MapNotificationEndpoints();
 app.MapDocumentEndpoints();
 
 app.Run();
 
-public partial class Program;
+/// <summary>
+/// Application entry-point marker for integration tests.
+/// </summary>
+public partial class Program
+{
+}

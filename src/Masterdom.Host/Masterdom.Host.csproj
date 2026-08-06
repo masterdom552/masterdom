@@ -3,6 +3,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Masterdom.Platform\Masterdom.Platform.csproj" />
         <ProjectReference Include="..\Masterdom.Infrastructure\Masterdom.Infrastructure.csproj" />
+        <ProjectReference Include="..\Masterdom.Modules.Security\Masterdom.Modules.Security.csproj" />
         <ProjectReference
             Include="..\Masterdom.Modules.Properties\Masterdom.Modules.Properties.csproj" />
         <ProjectReference
@@ -12,6 +13,10 @@
         <ProjectReference
             Include="..\Masterdom.Modules.Tenancy\Masterdom.Modules.Tenancy.csproj" />
         <ProjectReference
+            Include="..\Masterdom.Modules.Maintenance\Masterdom.Modules.Maintenance.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.Inventory\Masterdom.Modules.Inventory.csproj" />
+        <ProjectReference
             Include="..\Masterdom.Modules.Reporting\Masterdom.Modules.Reporting.csproj" />
         <ProjectReference
             Include="..\Masterdom.Modules.Notifications\Masterdom.Modules.Notifications.csproj" />
@@ -20,7 +25,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
@@ -32,6 +36,7 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
     </PropertyGroup>
 
 </Project>

@@ -1,5 +1,19 @@
 # Repository Snapshot 2026-08-02
 
+## Supersession Note (2026-08-05)
+
+This snapshot remains historically accurate for 2026-08-02.
+
+Current repository reality has advanced; Documents capability is now complete for Stage 2 scope and is tracked in synchronized roadmap and architecture records.
+
+Notifications capability is also now complete for Stage 2 scope and is tracked in synchronized roadmap and architecture records.
+
+Reporting capability is also now complete for Stage 2 scope and is tracked in synchronized roadmap and architecture records.
+
+Billing and Financial Ledger capability status has also advanced since this historical snapshot. Current synchronized records classify Billing and Financial Ledger as complete for Stage 2 scope, and classify automatic Billing/Payment to Financial Ledger activation as intentionally deferred to future Platform Integration.
+
+Identity Integration architectural classification has also advanced since this historical snapshot. Current synchronized records classify Identity Integration as a Platform Capability, record Core.Identity as the identity domain owner, record Infrastructure.Security as the authorization runtime owner, record Host as the authentication composition owner, and treat remaining Identity/Security work as implementation rather than unresolved architecture.
+
 ## Purpose
 
 Record repository implementation reality at the time PKG-4B.1 synchronization closed.
@@ -29,9 +43,9 @@ Record repository implementation reality at the time PKG-4B.1 synchronization cl
 - Intelligence: Not Started
 - Policy Framework: In Progress
 - Utility Rating: In Progress
-- Metering: In Progress
+- Metering: Complete
 - Subsidy Optimization: In Progress
-- Reporting: Not Started
+- Reporting: Complete
 - Settings: Not Started
 
 ## Implementation Evidence Highlights

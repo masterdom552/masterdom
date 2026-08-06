@@ -226,6 +226,60 @@ internal sealed class MeteringQueryAuthorizationDecorator<TQuery, TResult>
         AuthorizationDecoratorSupport.Execute(query, _inner.Handle, _authorizationService);
 }
 
+internal sealed class MaintenanceCommandAuthorizationDecorator<TCommand, TResult>
+    : Masterdom.Modules.Maintenance.Application.Support.ICommandHandler<TCommand, TResult>
+{
+    private readonly Masterdom.Modules.Maintenance.Application.Support.ICommandHandler<TCommand, TResult> _inner;
+    private readonly IRequestAuthorizationService _authorizationService;
+
+    public MaintenanceCommandAuthorizationDecorator(
+        Masterdom.Modules.Maintenance.Application.Support.ICommandHandler<TCommand, TResult> inner,
+        IRequestAuthorizationService authorizationService)
+    {
+        _inner = inner ?? throw new ArgumentNullException(nameof(inner));
+        _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
+    }
+
+    public TResult Handle(TCommand command) =>
+        AuthorizationDecoratorSupport.Execute(command, _inner.Handle, _authorizationService);
+}
+
+internal sealed class MaintenanceQueryAuthorizationDecorator<TQuery, TResult>
+    : Masterdom.Modules.Maintenance.Application.Support.IQueryHandler<TQuery, TResult>
+{
+    private readonly Masterdom.Modules.Maintenance.Application.Support.IQueryHandler<TQuery, TResult> _inner;
+    private readonly IRequestAuthorizationService _authorizationService;
+
+    public MaintenanceQueryAuthorizationDecorator(
+        Masterdom.Modules.Maintenance.Application.Support.IQueryHandler<TQuery, TResult> inner,
+        IRequestAuthorizationService authorizationService)
+    {
+        _inner = inner ?? throw new ArgumentNullException(nameof(inner));
+        _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
+    }
+
+    public TResult Handle(TQuery query) =>
+        AuthorizationDecoratorSupport.Execute(query, _inner.Handle, _authorizationService);
+}
+
+internal sealed class InventoryCommandAuthorizationDecorator<TCommand, TResult>
+    : Masterdom.Modules.Inventory.Application.Support.ICommandHandler<TCommand, TResult>
+{
+    private readonly Masterdom.Modules.Inventory.Application.Support.ICommandHandler<TCommand, TResult> _inner;
+    private readonly IRequestAuthorizationService _authorizationService;
+
+    public InventoryCommandAuthorizationDecorator(
+        Masterdom.Modules.Inventory.Application.Support.ICommandHandler<TCommand, TResult> inner,
+        IRequestAuthorizationService authorizationService)
+    {
+        _inner = inner ?? throw new ArgumentNullException(nameof(inner));
+        _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
+    }
+
+    public TResult Handle(TCommand command) =>
+        AuthorizationDecoratorSupport.Execute(command, _inner.Handle, _authorizationService);
+}
+
 internal sealed class BillingCommandAuthorizationDecorator<TCommand, TResult>
     : Masterdom.Modules.Billing.Application.Support.ICommandHandler<TCommand, TResult>
 {

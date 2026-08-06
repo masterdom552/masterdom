@@ -5,7 +5,7 @@
 - Version: 1.0
 - Status: Active
 - Owner: Domain Engineering
-- Last Updated: 2026-07-27
+- Last Updated: 2026-08-04
 - Next Review: [TBD]
 - Related ADRs: [docs/adr/ADR-0004_Domain_Boundaries.md](../adr/ADR-0004_Domain_Boundaries.md)
 - Related Standards: [docs/standards/ENG-001_Engineering_Standards.md](../standards/ENG-001_Engineering_Standards.md)
@@ -51,6 +51,7 @@ classDiagram
       +RecordMoveOut(...)
       +Close(...)
       +Archive()
+      +UpdateNotes(...)
     }
 
     Tenancy "1" --> "*" OccupantReference : owns
@@ -75,6 +76,9 @@ Tenancy aggregate emits:
 - MoveInRecordedDomainEvent
 - MoveOutRecordedDomainEvent
 - TenancyClosedDomainEvent
+- TenancyArchivedDomainEvent
+
+Tenancy aggregate does not emit a domain event for notes updates.
 
 ## Cross-Context Boundary
 
@@ -95,6 +99,46 @@ Tenancy module application layer follows the established command/query handler p
 - Unit-of-work abstraction
 - Platform orchestrator
 - Execution results
+
+### Current Command Inventory
+
+- CreateTenancyCommand
+- AddOccupantCommand
+- RemoveOccupantCommand
+- RecordMoveInCommand
+- RecordMoveOutCommand
+- CloseTenancyCommand
+- ArchiveTenancyCommand
+- UpdateTenancyNotesCommand
+
+### Current Query Inventory
+
+- GetTenancyByIdQuery
+
+### Current Handler Inventory
+
+- CreateTenancyCommandHandler
+- AddOccupantCommandHandler
+- RemoveOccupantCommandHandler
+- RecordMoveInCommandHandler
+- RecordMoveOutCommandHandler
+- CloseTenancyCommandHandler
+- ArchiveTenancyCommandHandler
+- UpdateTenancyNotesCommandHandler
+- GetTenancyByIdQueryHandler
+
+### Current Endpoint Inventory
+
+- POST /api/tenancies/
+- PUT /api/tenancies/{tenancyId}/occupants
+- POST /api/tenancies/{tenancyId}/occupants/remove
+- PUT /api/tenancies/{tenancyId}/move-in
+- PUT /api/tenancies/{tenancyId}/move-out
+- PUT /api/tenancies/{tenancyId}/close
+- PUT /api/tenancies/{tenancyId}/archive
+- PUT /api/tenancies/{tenancyId}/notes
+- GET /api/tenancies/{tenancyId}
+- GET /api/tenancies/{tenancyId}/occupancy
 
 ## Persistence Boundary
 

@@ -5,7 +5,7 @@
 - Version: [TBD]
 - Status: Draft
 - Owner: [TBD]
-- Last Updated: 2026-07-27
+- Last Updated: 2026-08-06
 - Next Review: [TBD]
 - Related ADRs: [docs/adr/README.md](../adr/README.md)
 - Related Standards: [docs/standards/README.md](../standards/README.md)
@@ -38,10 +38,16 @@ Architects, technical leads, and contributors changing module boundaries or plat
 - Calculation engine contracts: [docs/architecture/CALCULATION_ENGINE_CONTRACTS.md](CALCULATION_ENGINE_CONTRACTS.md)
 - Calculation engine execution pipeline: [docs/architecture/CALCULATION_ENGINE_EXECUTION_PIPELINE.md](CALCULATION_ENGINE_EXECUTION_PIPELINE.md)
 - Business module migration policy: [docs/architecture/BUSINESS_MODULE_MIGRATION_POLICY.md](BUSINESS_MODULE_MIGRATION_POLICY.md)
+- Business module completion standard: [docs/architecture/BUSINESS_MODULE_COMPLETION_STANDARD.md](BUSINESS_MODULE_COMPLETION_STANDARD.md)
+- Module lifecycle standard: [docs/governance/MODULE_LIFECYCLE_STANDARD.md](../governance/MODULE_LIFECYCLE_STANDARD.md)
+- Governance index: [docs/governance/README.md](../governance/README.md)
 - Business context platform: [docs/architecture/BUSINESS_CONTEXT_PLATFORM.md](BUSINESS_CONTEXT_PLATFORM.md)
 - Recommendation and decision architecture: [docs/architecture/RECOMMENDATION_DECISION_ARCHITECTURE.md](RECOMMENDATION_DECISION_ARCHITECTURE.md)
 - Platform architecture stabilization baseline (PDP-008): [docs/architecture/PDP-008_PLATFORM_ARCHITECTURE_STABILIZATION.md](PDP-008_PLATFORM_ARCHITECTURE_STABILIZATION.md)
 - Property domain foundation: [docs/architecture/PROPERTY_DOMAIN_FOUNDATION.md](PROPERTY_DOMAIN_FOUNDATION.md)
+- Reporting platform capability foundation: [docs/architecture/REPORTING_PLATFORM_CAPABILITY_FOUNDATION.md](REPORTING_PLATFORM_CAPABILITY_FOUNDATION.md)
+- Notifications platform capability foundation: [docs/architecture/NOTIFICATIONS_PLATFORM_CAPABILITY_FOUNDATION.md](NOTIFICATIONS_PLATFORM_CAPABILITY_FOUNDATION.md)
+- Documents domain foundation: [docs/architecture/DOCUMENTS_DOMAIN_FOUNDATION.md](DOCUMENTS_DOMAIN_FOUNDATION.md)
 - ADR catalog and lifecycle: [docs/adr/README.md](../adr/README.md)
 - Foundational standards: [docs/standards/ENG-001_Engineering_Standards.md](../standards/ENG-001_Engineering_Standards.md)
 - Dependency and modularity guidance: [docs/standards/DEPENDENCY_RULES.md](../standards/DEPENDENCY_RULES.md)

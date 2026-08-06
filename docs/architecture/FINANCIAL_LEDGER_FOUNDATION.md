@@ -21,7 +21,11 @@ This foundation records posted financial events but does not own bills, payments
 
 Billing owns obligations, adjustments, and credits, but explicitly excludes ledger posting.
 
-Payment owns receipt, allocation, and reversal history, but explicitly excludes ledger posting and accounting journals.
+Payment core is complete for Stage 2 and owns receipt, allocation, and reversal history, while ledger posting and accounting journals remain intentionally outside the Payment foundation.
+
+Automatic Billing to Financial Ledger and Payment to Financial Ledger activation is intentionally deferred and belongs to future Platform Integration work rather than Financial Ledger implementation scope.
+
+This deferred activation is not missing Financial Ledger implementation and is not a Billing or Payment deficiency.
 
 Policy Framework provides reusable policy versioning and scope governance, but not accounting behavior.
 

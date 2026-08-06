@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using Masterdom.Core.Security;
-using Masterdom.Host.Security;
+using Masterdom.Modules.Security;
 using Microsoft.AspNetCore.Http;
 
 namespace Masterdom.Platform.Infrastructure.Tests.Property;

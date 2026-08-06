@@ -26,6 +26,10 @@
         <ProjectReference
             Include="..\..\src\Masterdom.Modules.Metering\Masterdom.Modules.Metering.csproj" />
         <ProjectReference
+            Include="..\..\src\Masterdom.Modules.Maintenance\Masterdom.Modules.Maintenance.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.Inventory\Masterdom.Modules.Inventory.csproj" />
+        <ProjectReference
             Include="..\..\src\Masterdom.Modules.UtilityRating\Masterdom.Modules.UtilityRating.csproj" />
         <ProjectReference
             Include="..\..\src\Masterdom.Modules.SubsidyOptimization\Masterdom.Modules.SubsidyOptimization.csproj" />

@@ -1,7 +1,7 @@
 # MASTERDOM_ROADMAP
 
 Version: 2.0
-Status: Synchronized to repository (2026-08-02)
+Status: Synchronized to repository (2026-08-06)
 
 ## Purpose
 
@@ -16,7 +16,8 @@ Architecture layers:
 - Infrastructure: implemented (`src/Masterdom.Infrastructure`, persistence, migrations, orchestrators, DI runtime wiring).
 - Abstractions: implemented in targeted shared surfaces (`src/Masterdom.Abstractions/Financial`, `src/Masterdom.Abstractions/Translation`).
 - Identity: substantially implemented (identity entities, role/permission model, persistence mapping and package history from PKG-001..PKG-006).
-- Security: planning/not started at module delivery level (`src/Masterdom.Modules.Security` currently project shell).
+- Security: in progress at module delivery level (`src/Masterdom.Modules.Security` now owns bootstrap, dependency registration, and identity administration foundation command/runtime flow; Infrastructure.Security retains runtime authorization implementations; Host retains startup composition and middleware use).
+- Identity Integration: architectural identity resolved as a Platform Capability; remaining work is implementation.
 
 Business capability status:
 
@@ -24,19 +25,19 @@ Business capability status:
 - People: Complete (within Property capability vertical slice).
 - Lease: Complete (within Property capability vertical slice).
 - Tenancy: Complete (within Property capability vertical slice).
-- Billing: Substantially Complete (domain/application/infrastructure/tests present, capability sequencing deferred).
-- Financial Ledger: Substantially Complete (domain/application/infrastructure/tests present, sequencing deferred).
-- Documents: Not Started (project shell only).
-- Inventory: Not Started (project shell only).
+- Billing: Complete (Stage 2 scope; domain/application/infrastructure/tests present, automatic Financial Ledger activation intentionally deferred to future Platform Integration).
+- Financial Ledger: Complete (Stage 2 scope; posting capabilities implemented, automatic Billing and Payment activation intentionally deferred to future Platform Integration).
+- Documents: Complete (Stage 2 scope; platform document-generation capability).
+- Inventory: In Progress (first vertical slice implemented: create inventory item).
 - CRM: Not Started (project shell only).
-- Maintenance: Not Started (project shell only).
-- Notifications: Not Started (project shell only).
+- Maintenance: In Progress (vertical slices implemented: create ticket, get by id, assign ticket).
+- Notifications: Complete (Stage 2 scope; platform notification capability).
 - Intelligence: Not Started (project shell only).
 - Policy Framework: In Progress (domain/application/handlers/tests present).
 - Utility Rating: In Progress (domain/application/handlers/tests present).
-- Metering: In Progress (domain/application/handlers/tests present).
+- Metering: Complete (domain/application/handlers/tests, authorization, DI, and API exposure present).
 - Subsidy Optimization: In Progress (domain/application/handlers/tests present).
-- Reporting: Not Started (project shell only).
+- Reporting: Complete (Stage 2 scope; projection-centric platform capability).
 - Settings: Not Started (project shell only).
 
 ## Package History State
@@ -47,7 +48,11 @@ Completed package records detected under `.masterdom/implementation`:
 
 Current package:
 
-- PKG-4B.1 Repository Snapshot and Progress Synchronization.
+- None.
+
+Current repository state:
+
+- Developer Validation Pending (INV-2.0, MT-2.1, ID-2.1).
 
 ## Canonical Implementation Sequence
 
@@ -55,18 +60,18 @@ Current package:
 2. People (Complete in Property vertical slice)
 3. Lease (Complete in Property vertical slice)
 4. Tenancy (Complete in Property vertical slice)
-5. Identity Integration
-6. Authorization
-7. Property Security
-8. Billing
-9. Financial Ledger
+5. ID-1.x Identity Integration Investigation Series (Complete)
+6. Identity Architecture Closure (Complete)
+7. ID-2.0 Security Module Bootstrap (In Progress)
+8. ID-2.1 Identity Administration Foundation
+9. Authorization
+10. Property Security
 
 ## Deferred Work Register
 
 Intentionally deferred:
 
-- Billing sequencing activation after Property capability closure gates and security sequence.
-- Financial Ledger sequencing activation after Property capability closure gates and security sequence.
+- Automatic Billing and Payment activation into Financial Ledger under future Platform Integration.
 - Cross-capability authorization rollout.
 - Platform-wide approval workflow rollout.
 - Security rollout beyond Property capability.
@@ -74,7 +79,7 @@ Intentionally deferred:
 ## Outstanding Architectural Debt (Current)
 
 - Property capability security enforcement is deferred by design and not yet implemented.
-- Cross-capability policy/authorization harmonization remains pending identity integration package sequence.
+- Identity Integration architecture is closed; remaining work is implementation of identity workflows and cross-capability policy/authorization harmonization.
 - Some `.masterdom` legacy package lineage naming is historical and non-linear (`PKG-3H`, `PKG-3I`), requiring index-based canonical ordering.
 
 Resolved and removed from debt:

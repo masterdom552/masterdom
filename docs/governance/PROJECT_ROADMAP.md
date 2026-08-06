@@ -17,7 +17,7 @@
 | Phase 1 | Foundation           | Completed   |
 | Phase 2 | Financial Platform   | Active      |
 | Phase 3 | Property Platform    | Not Started |
-| Phase 4 | Tenancy              | Not Started |
+| Phase 4 | Tenancy              | Completed   |
 | Phase 5 | Operations           | Not Started |
 | Phase 6 | Production Readiness | Not Started |
 

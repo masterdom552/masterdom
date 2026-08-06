@@ -149,6 +149,188 @@ public sealed class PropertyApplicationService : IPropertyApplicationService
         return _repository.Search(query.CodeContains, query.Take);
     }
 
+    public Property ChangeDescription(ChangeDescriptionCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        var property = GetRequiredProperty(command.PropertyId);
+        property.ChangeDescription(command.Description);
+        PersistAndCoordinate(property, "ChangeDescription");
+        return property;
+    }
+
+    public Property ChangeRemarks(ChangeRemarksCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        var property = GetRequiredProperty(command.PropertyId);
+        property.ChangeRemarks(command.Remarks);
+        PersistAndCoordinate(property, "ChangeRemarks");
+        return property;
+    }
+
+    public Property ChangeOwner(ChangeOwnerCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        var property = GetRequiredProperty(command.PropertyId);
+        property.ChangeOwner(command.OwnerId);
+        PersistAndCoordinate(property, "ChangeOwner");
+        return property;
+    }
+
+    public Property ChangeAddress(ChangeAddressCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        var property = GetRequiredProperty(command.PropertyId);
+        property.ChangeAddress(command.Address);
+        PersistAndCoordinate(property, "ChangeAddress");
+        return property;
+    }
+
+    public Property ConfigureSettings(ConfigureSettingsCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        var property = GetRequiredProperty(command.PropertyId);
+        property.ConfigureSettings(command.Settings);
+        PersistAndCoordinate(property, "ConfigureSettings");
+        return property;
+    }
+
+    public Property ChangeParentProperty(ChangeParentPropertyCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        var property = GetRequiredProperty(command.PropertyId);
+        property.ChangeParentProperty(command.ParentPropertyId);
+        PersistAndCoordinate(property, "ChangeParentProperty");
+        return property;
+    }
+
+    public Property SetEffectivePeriod(SetEffectivePeriodCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        var property = GetRequiredProperty(command.PropertyId);
+        property.SetEffectivePeriod(command.FromUtc, command.ToUtc);
+        PersistAndCoordinate(property, "SetEffectivePeriod");
+        return property;
+    }
+
+    public Property SetDisplayOrder(SetDisplayOrderCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        var property = GetRequiredProperty(command.PropertyId);
+        property.SetDisplayOrder(command.DisplayOrder);
+        PersistAndCoordinate(property, "SetDisplayOrder");
+        return property;
+    }
+
+    public Property HideProperty(HidePropertyCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        var property = GetRequiredProperty(command.PropertyId);
+        property.Hide();
+        PersistAndCoordinate(property, "HideProperty");
+        return property;
+    }
+
+    public Property ShowProperty(ShowPropertyCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        var property = GetRequiredProperty(command.PropertyId);
+        property.Show();
+        PersistAndCoordinate(property, "ShowProperty");
+        return property;
+    }
+
+    public Property ChangeType(ChangeTypeCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        var property = GetRequiredProperty(command.PropertyId);
+        property.ChangeType(command.Type);
+        PersistAndCoordinate(property, "ChangeType");
+        return property;
+    }
+
+    public Unit AddExistingUnit(AddExistingUnitCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        var property = GetRequiredProperty(command.PropertyId);
+
+        var unit = new Unit(
+            command.UnitId,
+            command.Code,
+            command.Name,
+            command.Type,
+            OccupancyStatus.Vacant,
+            command.Capacity);
+
+        if (command.ParentUnitId is not null)
+        {
+            unit.AssignParentUnit(command.ParentUnitId);
+        }
+
+        property.AddUnit(unit);
+        PersistAndCoordinate(property, "AddExistingUnit");
+        return unit;
+    }
+
+    public Property UpsertMetadata(UpsertMetadataCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        var property = GetRequiredProperty(command.PropertyId);
+        property.UpsertMetadata(new PropertyMetadata(command.Key, command.Value));
+        PersistAndCoordinate(property, "UpsertMetadata");
+        return property;
+    }
+
+    public bool RemoveMetadata(RemoveMetadataCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        var property = GetRequiredProperty(command.PropertyId);
+        var removed = property.RemoveMetadata(command.Key);
+        if (removed)
+        {
+            PersistAndCoordinate(property, "RemoveMetadata");
+        }
+
+        return removed;
+    }
+
+    public Property AddRelationship(AddRelationshipCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        var property = GetRequiredProperty(command.PropertyId);
+        property.AddRelationship(new PropertyRelationship(command.TargetPropertyId, command.Type));
+        PersistAndCoordinate(property, "AddRelationship");
+        return property;
+    }
+
+    public bool RemoveRelationship(RemoveRelationshipCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        var property = GetRequiredProperty(command.PropertyId);
+        var removed = property.RemoveRelationship(command.TargetPropertyId, command.Type);
+        if (removed)
+        {
+            PersistAndCoordinate(property, "RemoveRelationship");
+        }
+
+        return removed;
+    }
+
     private Property GetRequiredProperty(PropertyId propertyId)
     {
         var property = _repository.GetById(propertyId);

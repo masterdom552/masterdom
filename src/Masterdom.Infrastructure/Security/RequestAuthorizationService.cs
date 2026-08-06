@@ -12,6 +12,9 @@ using Masterdom.Modules.Metering.Application.Commands;
 using Masterdom.Modules.Metering.Application.Queries;
 using Masterdom.Modules.Billing.Application.Commands;
 using Masterdom.Modules.Billing.Application.Queries;
+using Masterdom.Modules.Inventory.Application.Commands;
+using Masterdom.Modules.Maintenance.Application.Commands;
+using Masterdom.Modules.Maintenance.Application.Queries;
 using Masterdom.Modules.FinancialLedger.Application.Commands;
 using Masterdom.Modules.FinancialLedger.Application.Queries;
 using Masterdom.Modules.Payment.Application.Commands;
@@ -65,7 +68,7 @@ internal sealed class RequestAuthorizationService : IRequestAuthorizationService
             AddContactCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.AddContact, PersonId: command.PersonId.Value),
             RemoveContactCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.RemoveContact, PersonId: command.PersonId.Value),
             AddIdentityDocumentCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.AddIdentityDocument, PersonId: command.PersonId.Value),
-            AddRelationshipCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.AddRelationship, PersonId: command.PersonId.Value),
+            Masterdom.Modules.People.Application.Commands.AddRelationshipCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.AddRelationship, PersonId: command.PersonId.Value),
             GetPersonByIdQuery query => new AuthorizationContext(PropertyCapabilityOperationNames.GetPersonById, PersonId: query.PersonId.Value),
             GetPersonByNumberQuery => new AuthorizationContext(PropertyCapabilityOperationNames.GetPersonByNumber),
             SearchPeopleQuery => new AuthorizationContext(PropertyCapabilityOperationNames.SearchPeople),
@@ -87,6 +90,7 @@ internal sealed class RequestAuthorizationService : IRequestAuthorizationService
             RecordMoveOutCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.RecordMoveOut, ResolveTenancyPropertyId(command.TenancyId.Value)),
             CloseTenancyCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.CloseTenancy, ResolveTenancyPropertyId(command.TenancyId.Value)),
             ArchiveTenancyCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.ArchiveTenancy, ResolveTenancyPropertyId(command.TenancyId.Value)),
+            UpdateTenancyNotesCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.UpdateTenancyNotes, ResolveTenancyPropertyId(command.TenancyId.Value)),
             GetTenancyByIdQuery query => new AuthorizationContext(PropertyCapabilityOperationNames.GetTenancyById, ResolveTenancyPropertyId(query.TenancyId.Value)),
 
             InstallMeterCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.InstallMeter, command.MeterLocationReference.PropertyId),
@@ -96,6 +100,12 @@ internal sealed class RequestAuthorizationService : IRequestAuthorizationService
             RetireMeterCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.RetireMeter, ResolveMeterPropertyId(command.MeterId.Value)),
             GetMeterByIdQuery query => new AuthorizationContext(PropertyCapabilityOperationNames.GetMeterById, ResolveMeterPropertyId(query.MeterId.Value)),
             GetMeterByNumberQuery query => new AuthorizationContext(PropertyCapabilityOperationNames.GetMeterByNumber, ResolveMeterPropertyId(query.MeterNumber.Value)),
+
+            CreateMaintenanceTicketCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.CreateMaintenanceTicket, command.PropertyId),
+            AssignMaintenanceTicketCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.AssignMaintenanceTicket, ResolveMaintenanceTicketPropertyId(command.MaintenanceTicketId.Value)),
+            GetMaintenanceTicketByIdQuery query => new AuthorizationContext(PropertyCapabilityOperationNames.GetMaintenanceTicketById, ResolveMaintenanceTicketPropertyId(query.MaintenanceTicketId.Value)),
+
+            CreateInventoryItemCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.CreateInventoryItem, command.PropertyId),
 
             GenerateBillCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.GenerateBill, command.PropertyReference.PropertyId),
             FinalizeBillCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.FinalizeBill, ResolveBillPropertyId(command.BillId.Value)),
@@ -206,6 +216,15 @@ internal sealed class RequestAuthorizationService : IRequestAuthorizationService
             .AsNoTracking()
             .Where(x => x.BillNumber.Value == billNumber)
             .Select(x => (Guid?)x.PropertyReference.PropertyId)
+            .FirstOrDefault();
+    }
+
+    private Guid? ResolveMaintenanceTicketPropertyId(Guid maintenanceTicketId)
+    {
+        return _dbContext.MaintenanceTickets
+            .AsNoTracking()
+            .Where(x => x.Id.Value == maintenanceTicketId)
+            .Select(x => (Guid?)x.PropertyId)
             .FirstOrDefault();
     }
 }

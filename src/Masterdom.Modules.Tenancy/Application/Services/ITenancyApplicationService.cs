@@ -24,5 +24,7 @@ public interface ITenancyApplicationService
 
     TenancyAggregate ArchiveTenancy(ArchiveTenancyCommand command);
 
+    TenancyAggregate UpdateNotes(UpdateTenancyNotesCommand command);
+
     TenancyAggregate? GetTenancy(GetTenancyByIdQuery query);
 }

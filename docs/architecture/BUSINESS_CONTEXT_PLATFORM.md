@@ -5,7 +5,7 @@
 - Version: 1.0
 - Status: Active
 - Owner: Platform and Domain Engineering
-- Last Updated: 2026-08-03
+- Last Updated: 2026-08-06
 - Next Review: [TBD]
 - Related ADRs: [docs/adr/ADR-0001_Modular_Architecture.md](../adr/ADR-0001_Modular_Architecture.md), [docs/adr/ADR-0002_Configuration_First.md](../adr/ADR-0002_Configuration_First.md), [docs/adr/ADR-0004_Domain_Boundaries.md](../adr/ADR-0004_Domain_Boundaries.md), [docs/adr/ADR-0005_Versioned_Configuration.md](../adr/ADR-0005_Versioned_Configuration.md)
 - Related Standards: [docs/standards/ENG-001_Engineering_Standards.md](../standards/ENG-001_Engineering_Standards.md), [docs/standards/BUSINESS_CONFIGURATION_ASSET_STANDARD.md](../standards/BUSINESS_CONFIGURATION_ASSET_STANDARD.md)
@@ -70,7 +70,7 @@ Business Context owns references to:
 - Meter Context
 - Billing Context
 - Payment Context
-- Reporting Context
+- Reporting Capability
 - Financial Ledger Context
 - Configuration Context
 - Language Context
@@ -139,6 +139,9 @@ Contains read-only payment state:
 - allocations
 - reversals
 - credits
+- receipts
+- payment versions
+- snapshots
 
 ### Configuration Context
 

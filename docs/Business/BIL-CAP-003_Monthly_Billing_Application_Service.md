@@ -132,7 +132,7 @@ MonthlyBillFactory is a construction helper only.
 - MonthlyBillingApplicationService does not own bill number construction logic.
 - Bill numbers are generated through a dedicated bill number seam.
 - Current behavior is preserved intentionally.
-- A Billing-owned, persistence-aware numbering policy is deferred to a follow-up package.
+- A Billing-owned, persistence-aware numbering policy remains deferred.
 
 ## Non-Responsibilities
 
@@ -142,6 +142,11 @@ MonthlyBillFactory is a construction helper only.
 - No persistence implementation or repository access.
 - No payment or ledger behavior.
 - No replacement of aggregate invariants.
+
+## Repository Dependency
+
+- Charge composition currently uses a temporary persistence-backed implementation for rent read facts because the repository does not yet define the published Lease/Tenancy read surface required by the documented architecture.
+- This is a repository architecture dependency, not a Billing completion issue.
 
 ## Persistence Phase
 

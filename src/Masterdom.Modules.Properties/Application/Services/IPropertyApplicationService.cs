@@ -26,4 +26,36 @@ public interface IPropertyApplicationService
     IReadOnlyCollection<Unit> ListUnits(ListUnitsQuery query);
 
     IReadOnlyCollection<Property> SearchProperties(SearchPropertiesQuery query);
+
+    Property ChangeDescription(ChangeDescriptionCommand command);
+
+    Property ChangeRemarks(ChangeRemarksCommand command);
+
+    Property ChangeOwner(ChangeOwnerCommand command);
+
+    Property ChangeAddress(ChangeAddressCommand command);
+
+    Property ConfigureSettings(ConfigureSettingsCommand command);
+
+    Property ChangeParentProperty(ChangeParentPropertyCommand command);
+
+    Property SetEffectivePeriod(SetEffectivePeriodCommand command);
+
+    Property SetDisplayOrder(SetDisplayOrderCommand command);
+
+    Property HideProperty(HidePropertyCommand command);
+
+    Property ShowProperty(ShowPropertyCommand command);
+
+    Property ChangeType(ChangeTypeCommand command);
+
+    Unit AddExistingUnit(AddExistingUnitCommand command);
+
+    Property UpsertMetadata(UpsertMetadataCommand command);
+
+    bool RemoveMetadata(RemoveMetadataCommand command);
+
+    Property AddRelationship(AddRelationshipCommand command);
+
+    bool RemoveRelationship(RemoveRelationshipCommand command);
 }

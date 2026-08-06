@@ -5,7 +5,7 @@
 - Version: 1.0
 - Status: Active
 - Owner: Platform Engineering
-- Last Updated: 2026-07-27
+- Last Updated: 2026-08-06
 - Next Review: [TBD]
 - Related ADRs: [docs/adr/ADR-0003_Module_Registration.md](../adr/ADR-0003_Module_Registration.md)
 - Related Standards: [docs/standards/DEPENDENCY_RULES.md](../standards/DEPENDENCY_RULES.md)
@@ -39,13 +39,20 @@ Current example:
 - People module now contains active domain/application/infrastructure source for universal business identity and participates as a first-class bounded context module.
 - Tenancy module now contains active domain/application/infrastructure source for occupancy lifecycle and participates as a first-class bounded context module.
 - Lease module now contains active domain/application/infrastructure source for contractual lifecycle and versioned commercial terms.
-- Billing module now contains active domain/application/infrastructure source for obligation lifecycle and immutable snapshot versioning.
+- Identity Integration is a Platform Capability rather than a Business Bounded Context; Core.Identity owns the identity domain model, Host owns authentication pipeline composition, and Infrastructure.Security owns authorization runtime services.
+- Masterdom.Modules.Security now contains active application/infrastructure source for security bootstrap and identity administration foundation role creation flow.
+- Billing module now contains active domain/application/infrastructure source for obligation lifecycle and immutable snapshot versioning, and is complete for Stage 2 with automatic Financial Ledger activation intentionally deferred to future Platform Integration.
 - Metering module now contains active domain/application/infrastructure source for meter asset lifecycle and reading governance.
+- Maintenance module now contains active domain/application/infrastructure source for maintenance ticket intake, retrieval, and assignment operations.
+- Inventory module now contains active domain/application/infrastructure source for inventory item intake baseline operations.
 - Utility Rating module now contains active domain/application/infrastructure source for tariff-based consumption rating and immutable versioned outputs.
 - Subsidy Optimization module now contains active domain/application/infrastructure source for advisory optimization runs and versioned recommendation output.
 - Policy Framework module now contains active domain/application/infrastructure source for reusable policy selection governance, scoped assignments, and immutable policy-version history.
-- Payment module now contains active domain/application/infrastructure source for payment lifecycle governance, bill-settlement allocation, receipts, and immutable payment-version history.
-- Financial Ledger module now contains active domain/application/infrastructure source for immutable accounting history, balanced journal posting, reversing entries, and posting-batch lifecycle.
+- Payment module now contains active domain/application/infrastructure source for payment lifecycle governance, bill-settlement allocation, receipts, and immutable payment-version history, and is complete for Stage 2.
+- Notifications module now contains active application/source for notification orchestration, metadata-driven templates, delivery, retry, preferences, and history, and is complete for Stage 2 capability scope.
+- Documents module now contains active application/infrastructure source for projection-driven document generation, template/history persistence, and secured API orchestration, and is complete for Stage 2 capability scope.
+- Reporting module now contains active application/source for projection-centric report orchestration, report metadata, registry-driven read-model integration, export, templates, snapshots, and endpoint exposure, and is complete for Stage 2 capability scope.
+- Financial Ledger module now contains active domain/application/infrastructure source for immutable accounting history, balanced journal posting, reversing entries, and posting-batch lifecycle, and is complete for Stage 2 with automatic Billing and Payment activation intentionally deferred to future Platform Integration.
 
 ## Startup Pipeline
 

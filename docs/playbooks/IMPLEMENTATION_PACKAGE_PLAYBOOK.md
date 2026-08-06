@@ -5,199 +5,231 @@
 
 # Purpose
 
-This playbook defines the standard lifecycle for delivering significant
-changes within the Masterdom repository.
+This playbook defines the mandatory repository workflow for delivering
+implementation packages in Masterdom.
 
-Every substantial feature, architectural change, or cross-module
-enhancement should begin with an approved Implementation Package (PKG).
+An implementation package (PKG) is a self-contained unit of work that
+must be independently completable and leave the repository buildable.
 
-------------------------------------------------------------------------
+Every significant feature, architectural improvement, or cross-module
+change MUST follow this playbook.
 
-# Lifecycle
+This document is a process standard. It is not a coding standard and it
+is not an architecture doctrine.
 
-The implementation-package lifecycle is frozen.
+# Package Lifecycle
 
-Canonical repository-wide workflow:
+The implementation package lifecycle is mandatory.
 
-Read-only Architecture Audit
-	↓
-Architecture Decision
-	↓
-Smallest Correct Implementation
-	↓
-Read-only Validation Audit
-	↓
-Package Complete
+The repository-wide workflow is:
 
-Every implementation package MUST:
+Investigate
+↓
+Analyze
+↓
+Recommend
+↓
+Implement
+↓
+Build
+↓
+Test
+↓
+Review
+↓
+Document
+↓
+Report
 
-- begin with a read-only architecture audit
-- identify the smallest correct implementation
-- finish with a read-only validation audit
+Every implementation package MUST follow this sequence.
 
-A package may not be marked COMPLETE unless the validation audit
-succeeds.
+A package MUST NOT be marked complete until all phases are finished and
+exit criteria are satisfied.
 
-The implementation workflow is considered stable.
+# Investigation Phase
 
-Future changes to the workflow are not permitted unless an actual
-implementation package exposes a concrete architectural deficiency.
+The Investigation phase MUST establish the current state of the codebase
+and the problem space before implementation begins.
 
-Repository process must not evolve merely because a different process
-could be imagined.
+During Investigation, contributors MUST:
 
-Governance changes require implementation evidence.
+- Read relevant architecture documents.
+- Understand existing implementation and repository conventions.
+- Identify the root cause of the requested change.
+- Avoid assumptions about current behavior.
+- Search source and documentation before modifying code.
+- Capture affected modules, dependencies, and boundaries.
 
-------------------------------------------------------------------------
+The Investigation phase MUST produce:
 
-# Phase 1 -- Read-only Architecture Audit
+- Current architecture context
+- Scope of impacted modules
+- Relevant repository governance references
+- Preliminary risk and dependency assessment
 
-The package must begin with a read-only audit.
+# Analysis Phase
 
-Required outputs:
+The Analysis phase MUST determine the smallest correct implementation.
 
--   Current architecture
--   Dependency direction
--   Architectural debt relevant to scope
--   Root cause
--   Smallest correct implementation
--   Implementation plan
+During Analysis, contributors MUST:
 
-The audit should also capture, where applicable:
+- Validate the proposed change against existing standards.
+- Confirm domain ownership and boundary constraints.
+- Identify required module-level effects.
+- Establish test and validation requirements.
+- Document alternatives and selected direction.
 
--   Business problem
--   Expected outcome
--   Stakeholders
--   Existing behavior
--   Business rules
--   Risks
--   Dependencies
--   Alternatives considered
--   Affected modules
--   Domain boundaries
--   Public contracts
--   Configuration changes
--   Data model changes
--   Security implications
--   Test strategy
--   Documentation plan
--   Rollback considerations
+Analysis MUST NOT approve broad or speculative scope.
 
-If architecture changes materially, create or update an ADR.
+# Recommendation Phase
 
-Implementation should not begin until this phase is complete.
+The Recommendation phase MUST record the chosen package boundary,
+implementation approach, and justification.
 
-------------------------------------------------------------------------
-
-# Phase 2 -- Architecture Decision
-
-The architecture decision records the chosen package boundary and the
-smallest correct implementation justified by the audit.
-
-Decision outputs must include:
+The Recommendation output SHOULD include:
 
 - selected architectural direction
-- smallest correct implementation
+- smallest correct implementation scope
 - rejected alternatives
+- impact on modules and interfaces
+- required documentation and validation plan
 
-Implementation must not begin until the architecture decision is
-recorded.
+Implementation MUST NOT begin until Recommendation is recorded.
 
-------------------------------------------------------------------------
+# Implementation Phase
 
-# Phase 3 -- Smallest Correct Implementation
+The Implementation phase MUST execute the approved scope with discipline.
 
-During implementation:
+During Implementation, contributors MUST:
 
--   Follow repository standards.
--   Implement only approved scope.
--   Preserve module boundaries.
--   Preserve dependency direction.
--   Commit small, logical changes.
--   Avoid unrelated refactoring.
--   Keep documentation synchronized.
+- Make small, incremental changes.
+- Preserve architecture and module boundaries.
+- Reuse existing platform capabilities.
+- Avoid duplication of business logic.
+- Complete vertical slices from domain through API.
+- Follow domain-first order.
+- Avoid unrelated refactoring.
+- Keep documentation synchronized with changes.
 
-------------------------------------------------------------------------
+Implementation SHOULD remain coordinated with the validation plan.
 
-# Phase 4 -- Read-only Validation Audit
+# Build Phase
 
-Validate the package using a read-only audit after implementation.
+The Build phase MUST confirm that the package compiles in the repository
+context.
 
-Architecture verification must include:
+Required actions:
 
--   Dependency direction
--   Package boundaries
--   Layering
--   Composition root where applicable
+- Run `dotnet restore`.
+- Run `dotnet build Masterdom.slnx`.
 
-Code verification must include:
+Build failures MUST be corrected before proceeding.
 
--   Build
--   Targeted automated tests
--   Architecture compliance tests
--   Regression checks where applicable
+# Test Phase
 
-Documentation verification must include:
+The Test phase MUST verify behavior and architecture.
 
--   ADR consistency
--   Standards consistency
--   Implementation notes
--   Package documentation when applicable
+Required actions:
 
-Failures must be corrected before review.
+- Run `dotnet test`.
+- Execute targeted unit tests.
+- Execute integration tests when applicable.
+- Execute architecture tests when applicable.
+- Execute regression tests when applicable.
 
+Test failures MUST be corrected before review.
 
-# Phase 5 -- Review
+# Review Phase
 
-Review should cover:
+The Review phase MUST validate package quality and correctness.
 
--   Architecture
--   Code quality
--   Business correctness
--   Testing
--   Documentation
--   Architecture audit evidence
--   Validation audit evidence
+Review MUST cover:
 
-Review findings should be resolved before completion.
+- architecture
+- code quality
+- business correctness
+- testing
+- documentation
+- investigation evidence
+- validation evidence
 
+Review findings MUST be resolved before completion.
 
-# Phase 6 -- Completion
+# Document Phase
 
-A package is complete when:
+The Document phase MUST capture package decisions and impacts.
 
--   Code is merged.
--   Documentation is updated.
--   Tests pass.
--   Read-only architecture audit is recorded.
--   Architecture decision is recorded.
--   Read-only validation audit is recorded and green.
--   Acceptance criteria are satisfied.
--   Related ADRs are complete.
+Documentation MUST include:
 
-------------------------------------------------------------------------
+- architecture impact
+- documentation impact
+- public API changes
+- ADR updates when required
+- implementation notes
 
-# Deliverables
+Documentation updates are required only when impacted.
 
-Typical deliverables include:
+# Report Phase
 
--   Source code
--   Tests
--   Documentation
--   Configuration
--   Migration scripts (if required)
--   Release notes (where applicable)
+The Report phase MUST provide a completion summary.
 
-------------------------------------------------------------------------
+Every package MUST finish with a Completion Report containing:
 
-# Compliance
+- Summary
+- Files changed
+- Architecture impact
+- Documentation impact
+- Remaining work
+- Recommendations
 
-A PKG complies when it:
+# Validation
 
--   Follows the defined lifecycle.
--   Begins with a read-only architecture audit.
--   Records an architecture decision before implementation.
--   Ends with a successful read-only validation audit.
--   Produces all required deliverables.
--   Passes validation.
--   Leaves the repository in a releasable state.
+Required validation commands before package completion:
+
+- `dotnet restore`
+- `dotnet build Masterdom.slnx`
+- `dotnet test`
+
+Additional validation is required when appropriate.
+
+Build failures or test failures prevent package completion.
+
+# Completion Report
+
+Every implementation package MUST conclude with a Completion Report.
+
+The report MUST include:
+
+- Summary of work performed
+- Files changed
+- Architecture impact
+- Documentation impact
+- Remaining work
+- Recommendations
+
+# Exit Criteria
+
+A package is complete only when:
+
+- the repository builds
+- tests pass
+- documentation is updated when impacted
+- no incomplete implementation remains
+- the repository is left in a releasable state
+
+# Cross-reference Governance
+
+This playbook MUST be used together with:
+
+- `docs/architecture/BUSINESS_MODULE_COMPLETION_STANDARD.md`
+- `docs/architecture/BUSINESS_MODULE_MIGRATION_POLICY.md`
+- `docs/standards/ENG-001_Engineering_Standards.md`
+- `docs/standards/DEPENDENCY_RULES.md`
+- `docs/standards/MOD-001_Module_Boundary_Standard.md`
+
+This document defines the process. Existing standards define the
+engineering and architectural requirements.
+
+See also: [docs/governance/MODULE_LIFECYCLE_STANDARD.md](../governance/MODULE_LIFECYCLE_STANDARD.md) for the repository-level module lifecycle standard.
+Repository baseline synchronization is documented there as the final post-closure governance phase.
+Governance navigation is available in [docs/governance/README.md](../governance/README.md).

@@ -1,13 +1,22 @@
 using System.Text;
 using Masterdom.Core.Security;
+using Masterdom.Infrastructure.Security;
+using Masterdom.Modules.Security.Application.Commands;
+using Masterdom.Modules.Security.Application.Handlers.Commands;
+using Masterdom.Modules.Security.Application.Services;
+using Masterdom.Modules.Security.Application.Support;
+using Masterdom.Modules.Security.Domain.Repositories;
+using Masterdom.Modules.Security.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Masterdom.Host.Security;
+namespace Masterdom.Modules.Security;
 
-internal static class AuthenticationServiceCollectionExtensions
+public static class SecurityModuleServiceCollectionExtensions
 {
-    public static IServiceCollection AddMasterdomIdentityIntegration(
+    public static IServiceCollection AddSecurityModule(
         this IServiceCollection services,
         IConfiguration configuration)
     {
@@ -48,7 +57,18 @@ internal static class AuthenticationServiceCollectionExtensions
             });
 
         services.AddAuthorizationBuilder();
+        services.AddSecurityInfrastructureRuntime();
+
+        AddIdentityAdministrationRuntime(services);
 
         return services;
+    }
+
+    private static void AddIdentityAdministrationRuntime(IServiceCollection services)
+    {
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IIdentityAdministrationUnitOfWork, IdentityAdministrationUnitOfWork>();
+        services.AddScoped<IIdentityAdministrationService, IdentityAdministrationService>();
+        services.AddScoped<ICommandHandler<CreateRoleCommand, ExecutionResult<Masterdom.Core.Identity.Entities.Role.Role>>, CreateRoleCommandHandler>();
     }
 }
