@@ -64,13 +64,27 @@ SHOULD: Avoid direct commits to the default branch.
 
 ## Feature Branches
 
-Create a feature branch for each implementation package.
+Create exactly one feature branch for each implementation package.
+
+Each package branch MUST start from the latest validated `main` branch.
+
+Long-lived implementation branches are PROHIBITED.
+
+PROHIBITED example:
+
+-   feature/next-vertical-slice
 
 Suggested naming:
 
--   feature/billing-engine
--   feature/property-import
--   feature/platform-startup
+-   feature/<package-id>
+
+Examples:
+
+-   feature/inv-2.1
+-   feature/mt-2.2
+-   feature/ur-2.0
+-   feature/pf-2.0
+-   feature/pay-2.0
 
 ## Bug Fixes
 
@@ -143,6 +157,17 @@ Before merging:
 -   Resolve conflicts.
 -   Ensure CI passes.
 -   Confirm required reviews are complete.
+
+Each implementation package branch MUST complete, in order:
+
+-   Developer Build
+-   Developer Tests
+-   Documentation Synchronization
+-   Metadata Synchronization
+-   Repository Baseline Synchronization
+-   Package Closure
+-   Merge to `main`
+-   Version tag when appropriate
 
 ------------------------------------------------------------------------
 

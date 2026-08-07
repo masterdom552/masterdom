@@ -22,6 +22,7 @@ public sealed class MaintenanceApplicationHandlersTests
         var service = new MaintenanceApplicationService(repository, unitOfWork, orchestrator);
         var createHandler = new CreateMaintenanceTicketCommandHandler(service);
         var assignHandler = new AssignMaintenanceTicketCommandHandler(service);
+        var closeHandler = new CloseMaintenanceTicketCommandHandler(service);
         var getByIdHandler = new GetMaintenanceTicketByIdQueryHandler(service);
 
         var createResult = createHandler.Handle(new CreateMaintenanceTicketCommand(
@@ -50,6 +51,17 @@ public sealed class MaintenanceApplicationHandlersTests
         Assert.Equal(2, orchestrator.MutationCount);
         Assert.Equal(assignedToPersonId, assignResult.Value!.AssignedToPersonId);
         Assert.Equal(assignedAtUtc, assignResult.Value.AssignedAtUtc);
+
+        var closeResult = closeHandler.Handle(
+            new CloseMaintenanceTicketCommand(
+                createResult.Value.Id,
+                DateTime.UtcNow));
+
+        Assert.True(closeResult.IsSuccess);
+        Assert.NotNull(closeResult.Value);
+        Assert.Equal(3, unitOfWork.ExecuteCount);
+        Assert.Equal(3, orchestrator.MutationCount);
+        Assert.Equal(MaintenanceTicketStatus.Closed, closeResult.Value!.Status);
 
         var getResult = getByIdHandler.Handle(
             new GetMaintenanceTicketByIdQuery(createResult.Value!.Id));

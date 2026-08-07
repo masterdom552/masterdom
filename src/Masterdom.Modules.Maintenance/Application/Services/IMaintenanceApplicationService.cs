@@ -10,5 +10,7 @@ public interface IMaintenanceApplicationService
 
     MaintenanceTicketAggregate AssignMaintenanceTicket(AssignMaintenanceTicketCommand command);
 
+    MaintenanceTicketAggregate CloseMaintenanceTicket(CloseMaintenanceTicketCommand command);
+
     MaintenanceTicketAggregate? GetMaintenanceTicketById(GetMaintenanceTicketByIdQuery query);
 }

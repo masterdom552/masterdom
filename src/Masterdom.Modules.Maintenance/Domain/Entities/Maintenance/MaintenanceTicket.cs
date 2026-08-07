@@ -122,6 +122,31 @@ public sealed class MaintenanceTicket : AggregateRoot<MaintenanceTicketId>, IHas
             assignedAtUtc));
     }
 
+    public void Close(DateTime closedAtUtc)
+    {
+        if (closedAtUtc.Kind != DateTimeKind.Utc)
+        {
+            throw new InvalidOperationException("ClosedAtUtc must be in UTC.");
+        }
+
+        if (Status == MaintenanceTicketStatus.Closed)
+        {
+            throw new InvalidOperationException("Maintenance ticket is already closed.");
+        }
+
+        if (closedAtUtc < CreatedAtUtc)
+        {
+            throw new InvalidOperationException("ClosedAtUtc cannot be earlier than CreatedAtUtc.");
+        }
+
+        Status = MaintenanceTicketStatus.Closed;
+
+        Raise(new MaintenanceTicketClosedDomainEvent(
+            Id,
+            PropertyId,
+            closedAtUtc));
+    }
+
     public void ClearDomainEvents()
     {
         _domainEvents.Clear();

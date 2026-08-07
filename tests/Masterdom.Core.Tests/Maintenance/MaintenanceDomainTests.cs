@@ -43,4 +43,22 @@ public sealed class MaintenanceDomainTests
         Assert.Equal(assignedAtUtc, maintenanceTicket.AssignedAtUtc);
         Assert.Contains(maintenanceTicket.DomainEvents, x => x is MaintenanceTicketAssignedDomainEvent);
     }
+
+    [Fact]
+    public void Close_ShouldSetClosedStatusAndRaiseClosedEvent()
+    {
+        var maintenanceTicket = MaintenanceTicket.Create(
+            MaintenanceTicketId.New(),
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            "Window issue",
+            "Window does not lock.",
+            DateTime.UtcNow.AddMinutes(-5));
+
+        var closedAtUtc = DateTime.UtcNow;
+        maintenanceTicket.Close(closedAtUtc);
+
+        Assert.Equal(MaintenanceTicketStatus.Closed, maintenanceTicket.Status);
+        Assert.Contains(maintenanceTicket.DomainEvents, x => x is MaintenanceTicketClosedDomainEvent);
+    }
 }

@@ -46,6 +46,26 @@ Every implementation package MUST follow this sequence.
 A package MUST NOT be marked complete until all phases are finished and
 exit criteria are satisfied.
 
+# Branch Discipline
+
+Each implementation package MUST use one dedicated feature branch.
+
+Branch naming MUST follow:
+
+- `feature/<package-id>`
+
+Examples:
+
+- `feature/inv-2.1`
+- `feature/mt-2.2`
+- `feature/ur-2.0`
+- `feature/pf-2.0`
+- `feature/pay-2.0`
+
+Each package branch MUST start from the latest validated `main` branch.
+
+Long-lived implementation branches are prohibited.
+
 # Investigation Phase
 
 The Investigation phase MUST establish the current state of the codebase
@@ -216,6 +236,17 @@ A package is complete only when:
 - documentation is updated when impacted
 - no incomplete implementation remains
 - the repository is left in a releasable state
+
+Package completion also requires branch-level closure actions:
+
+- Developer Build
+- Developer Tests
+- Documentation Synchronization
+- Metadata Synchronization
+- Repository Baseline Synchronization
+- Package Closure
+- Merge to `main`
+- Version tag when appropriate
 
 # Cross-reference Governance
 

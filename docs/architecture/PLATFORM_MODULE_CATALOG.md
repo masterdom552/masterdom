@@ -43,7 +43,7 @@ Current example:
 - Masterdom.Modules.Security now contains active application/infrastructure source for security bootstrap and identity administration foundation role creation flow.
 - Billing module now contains active domain/application/infrastructure source for obligation lifecycle and immutable snapshot versioning, and is complete for Stage 2 with automatic Financial Ledger activation intentionally deferred to future Platform Integration.
 - Metering module now contains active domain/application/infrastructure source for meter asset lifecycle and reading governance.
-- Maintenance module now contains active domain/application/infrastructure source for maintenance ticket intake, retrieval, and assignment operations.
+- Maintenance module now contains active domain/application/infrastructure source for maintenance ticket intake, retrieval, assignment, and closure operations.
 - Inventory module now contains active domain/application/infrastructure source for inventory item intake baseline operations.
 - Utility Rating module now contains active domain/application/infrastructure source for tariff-based consumption rating and immutable versioned outputs.
 - Subsidy Optimization module now contains active domain/application/infrastructure source for advisory optimization runs and versioned recommendation output.

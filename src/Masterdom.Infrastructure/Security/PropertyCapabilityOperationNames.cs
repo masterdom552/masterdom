@@ -53,6 +53,7 @@ internal static class PropertyCapabilityOperationNames
 
     public const string CreateMaintenanceTicket = "maintenance.tickets.create";
     public const string AssignMaintenanceTicket = "maintenance.tickets.assign";
+    public const string CloseMaintenanceTicket = "maintenance.tickets.close";
     public const string GetMaintenanceTicketById = "maintenance.tickets.read.by-id";
 
     public const string CreateInventoryItem = "inventory.items.create";

@@ -16,6 +16,7 @@ internal static class MaintenanceEndpoints
 
         group.MapPost("/", CreateMaintenanceTicket);
         group.MapPost("/{maintenanceTicketId:guid}/assign", AssignMaintenanceTicket);
+        group.MapPost("/{maintenanceTicketId:guid}/close", CloseMaintenanceTicket);
         group.MapGet("/{maintenanceTicketId:guid}", GetMaintenanceTicketById);
 
         return app;
@@ -68,6 +69,21 @@ internal static class MaintenanceEndpoints
             : ApiExecutionResults.ToErrorResult(result.ErrorCode, result.ErrorMessage);
     }
 
+    internal static IResult CloseMaintenanceTicket(
+        Guid maintenanceTicketId,
+        CloseMaintenanceTicketRequest request,
+        ICommandHandler<CloseMaintenanceTicketCommand, ExecutionResult<MaintenanceTicketAggregate>> handler)
+    {
+        var command = new CloseMaintenanceTicketCommand(
+            MaintenanceTicketId.From(maintenanceTicketId),
+            request.ClosedAtUtc);
+
+        var result = handler.Handle(command);
+        return result.IsSuccess && result.Value is not null
+            ? TypedResults.Ok(MaintenanceTicketResponse.From(result.Value))
+            : ApiExecutionResults.ToErrorResult(result.ErrorCode, result.ErrorMessage);
+    }
+
     internal sealed record CreateMaintenanceTicketRequest(
         Guid PropertyId,
         Guid UnitId,
@@ -78,6 +94,8 @@ internal static class MaintenanceEndpoints
     internal sealed record AssignMaintenanceTicketRequest(
         Guid AssignedToPersonId,
         DateTime AssignedAtUtc);
+
+    internal sealed record CloseMaintenanceTicketRequest(DateTime ClosedAtUtc);
 
     internal sealed record MaintenanceTicketResponse(
         Guid Id,

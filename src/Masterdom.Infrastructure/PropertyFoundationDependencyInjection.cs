@@ -386,6 +386,7 @@ public static class PropertyFoundationDependencyInjection
 
         AddMaintenanceCommandHandler<CreateMaintenanceTicketCommand, Masterdom.Modules.Maintenance.Application.Support.ExecutionResult<MaintenanceTicketAggregate>, CreateMaintenanceTicketCommandHandler>(services);
         AddMaintenanceCommandHandler<AssignMaintenanceTicketCommand, Masterdom.Modules.Maintenance.Application.Support.ExecutionResult<MaintenanceTicketAggregate>, AssignMaintenanceTicketCommandHandler>(services);
+        AddMaintenanceCommandHandler<CloseMaintenanceTicketCommand, Masterdom.Modules.Maintenance.Application.Support.ExecutionResult<MaintenanceTicketAggregate>, CloseMaintenanceTicketCommandHandler>(services);
         AddMaintenanceQueryHandler<GetMaintenanceTicketByIdQuery, Masterdom.Modules.Maintenance.Application.Support.ExecutionResult<MaintenanceTicketAggregate>, GetMaintenanceTicketByIdQueryHandler>(services);
     }
 

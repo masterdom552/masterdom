@@ -57,6 +57,7 @@ internal sealed class DefaultCapabilityAuthorizationPolicyProvider : ICapability
 
             [PropertyCapabilityOperationNames.CreateMaintenanceTicket] = new(PropertyCapabilityOperationNames.CreateMaintenanceTicket, "maintenance.tickets.create", true, true, false),
             [PropertyCapabilityOperationNames.AssignMaintenanceTicket] = new(PropertyCapabilityOperationNames.AssignMaintenanceTicket, "maintenance.tickets.manage", true, true, false),
+            [PropertyCapabilityOperationNames.CloseMaintenanceTicket] = new(PropertyCapabilityOperationNames.CloseMaintenanceTicket, "maintenance.tickets.manage", true, true, false),
             [PropertyCapabilityOperationNames.GetMaintenanceTicketById] = new(PropertyCapabilityOperationNames.GetMaintenanceTicketById, "maintenance.tickets.read", true, true, false),
 
             [PropertyCapabilityOperationNames.CreateInventoryItem] = new(PropertyCapabilityOperationNames.CreateInventoryItem, "inventory.items.create", true, true, false),

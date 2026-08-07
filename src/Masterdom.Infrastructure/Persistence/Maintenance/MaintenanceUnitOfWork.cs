@@ -13,13 +13,6 @@ public sealed class MaintenanceUnitOfWork : IMaintenanceUnitOfWork
 
     public void Execute(Action operation)
     {
-        ArgumentNullException.ThrowIfNull(operation);
-
-        using var transaction = _dbContext.Database.BeginTransaction();
-
-        operation();
-        _dbContext.SaveChanges();
-
-        transaction.Commit();
+        DbContextUnitOfWorkExecutor.Execute(_dbContext, operation);
     }
 }

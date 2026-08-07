@@ -31,6 +31,7 @@ public sealed class MaintenanceRuntimeCompositionTests
 
         Assert.NotNull(scope.ServiceProvider.GetService<ICommandHandler<CreateMaintenanceTicketCommand, ExecutionResult<MaintenanceTicketAggregate>>>());
         Assert.NotNull(scope.ServiceProvider.GetService<ICommandHandler<AssignMaintenanceTicketCommand, ExecutionResult<MaintenanceTicketAggregate>>>());
+        Assert.NotNull(scope.ServiceProvider.GetService<ICommandHandler<CloseMaintenanceTicketCommand, ExecutionResult<MaintenanceTicketAggregate>>>());
         Assert.NotNull(scope.ServiceProvider.GetService<IQueryHandler<GetMaintenanceTicketByIdQuery, ExecutionResult<MaintenanceTicketAggregate>>>());
     }
 
@@ -44,6 +45,8 @@ public sealed class MaintenanceRuntimeCompositionTests
             .GetRequiredService<ICommandHandler<CreateMaintenanceTicketCommand, ExecutionResult<MaintenanceTicketAggregate>>>();
         var assignHandler = scope.ServiceProvider
             .GetRequiredService<ICommandHandler<AssignMaintenanceTicketCommand, ExecutionResult<MaintenanceTicketAggregate>>>();
+        var closeHandler = scope.ServiceProvider
+            .GetRequiredService<ICommandHandler<CloseMaintenanceTicketCommand, ExecutionResult<MaintenanceTicketAggregate>>>();
         var getByIdHandler = scope.ServiceProvider
             .GetRequiredService<IQueryHandler<GetMaintenanceTicketByIdQuery, ExecutionResult<MaintenanceTicketAggregate>>>();
 
@@ -73,6 +76,14 @@ public sealed class MaintenanceRuntimeCompositionTests
         var assignResponse = await ExecuteAsync(assignResult);
         Assert.Equal(StatusCodes.Status200OK, assignResponse.StatusCode);
 
+        var closeResult = MaintenanceEndpoints.CloseMaintenanceTicket(
+            maintenanceTicketId,
+            new MaintenanceEndpoints.CloseMaintenanceTicketRequest(DateTime.UtcNow),
+            closeHandler);
+
+        var closeResponse = await ExecuteAsync(closeResult);
+        Assert.Equal(StatusCodes.Status200OK, closeResponse.StatusCode);
+
         var getResult = MaintenanceEndpoints.GetMaintenanceTicketById(maintenanceTicketId, getByIdHandler);
         var getResponse = await ExecuteAsync(getResult);
 
@@ -81,6 +92,7 @@ public sealed class MaintenanceRuntimeCompositionTests
         using var getJson = JsonDocument.Parse(getResponse.Body!);
         Assert.Equal("Door lock issue", getJson.RootElement.GetProperty("title").GetString());
         Assert.Equal(assignedToPersonId, getJson.RootElement.GetProperty("assignedToPersonId").GetGuid());
+        Assert.Equal("Closed", getJson.RootElement.GetProperty("status").GetString());
     }
 
     private static ServiceProvider BuildProvider()

@@ -65,6 +65,27 @@ public sealed class MaintenanceApplicationService : IMaintenanceApplicationServi
         return maintenanceTicket;
     }
 
+    public MaintenanceTicketAggregate CloseMaintenanceTicket(CloseMaintenanceTicketCommand command)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+
+        var maintenanceTicket = _repository.GetById(command.MaintenanceTicketId);
+        if (maintenanceTicket is null)
+        {
+            throw new InvalidOperationException($"Maintenance ticket '{command.MaintenanceTicketId}' was not found.");
+        }
+
+        maintenanceTicket.Close(command.ClosedAtUtc);
+
+        _unitOfWork.Execute(() =>
+        {
+            _repository.Update(maintenanceTicket);
+        });
+
+        _platformOrchestrator.OnMaintenanceTicketMutated(maintenanceTicket, "CloseMaintenanceTicket");
+        return maintenanceTicket;
+    }
+
     public MaintenanceTicketAggregate? GetMaintenanceTicketById(GetMaintenanceTicketByIdQuery query)
     {
         ArgumentNullException.ThrowIfNull(query);

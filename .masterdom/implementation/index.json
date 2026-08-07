@@ -1,8 +1,8 @@
 {
     "snapshotDateUtc": "2026-08-06",
     "sourceOfTruth": "repository-evidence",
-    "activePackage": null,
-    "currentState": "No Active Package. INV-2.0, MT-2.1, and ID-2.1 are Closed.",
+    "activePackage": "MT-2.2-MAINTENANCE-CLOSE-TICKET-VERTICAL-SLICE",
+    "currentState": "Closed (MT-2.2)",
     "completedPackages": [
         {
             "id": "PKG-001",
@@ -132,6 +132,17 @@
             "objective": "Implement the first complete identity administration vertical slice using existing repository architecture and conventions.",
             "outcome": "Completed",
             "validation": "dotnet build Masterdom.slnx and dotnet test Masterdom.slnx passed (664 passed, 0 failed, 0 skipped)",
+            "acceptance": "Met",
+            "remainingDebt": "No package-blocking debt",
+            "successor": "Authorization"
+        },
+        {
+            "id": "MT-2.2",
+            "title": "Maintenance Close Ticket (Vertical Slice)",
+            "status": "Closed",
+            "objective": "Resolve runtime integration defect and complete maintenance close-ticket vertical slice behavior under repository conventions.",
+            "outcome": "Completed",
+            "validation": "dotnet build Masterdom.slnx and dotnet test Masterdom.slnx passed (716 passed, 0 failed, 0 skipped)",
             "acceptance": "Met",
             "remainingDebt": "No package-blocking debt",
             "successor": "Authorization"

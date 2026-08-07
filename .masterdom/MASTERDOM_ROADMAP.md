@@ -30,7 +30,7 @@ Business capability status:
 - Documents: Complete (Stage 2 scope; platform document-generation capability).
 - Inventory: Complete (first vertical slice closed after developer validation).
 - CRM: Not Started (project shell only).
-- Maintenance: Complete (create ticket, get by id, and assign ticket slices closed after developer validation).
+- Maintenance: Complete (create ticket, get by id, assign ticket, and close ticket slices implemented; MT-2.2 closed after full-suite validation).
 - Notifications: Complete (Stage 2 scope; platform notification capability).
 - Intelligence: Not Started (project shell only).
 - Policy Framework: In Progress (domain/application/handlers/tests present).
@@ -48,11 +48,11 @@ Completed package records detected under `.masterdom/implementation`:
 
 Current package:
 
-- None.
+- MT-2.2 Maintenance Close Ticket (Vertical Slice).
 
 Current repository state:
 
-- No Active Package. INV-2.0, MT-2.1, and ID-2.1 are Closed.
+- Closed (MT-2.2).
 
 ## Canonical Implementation Sequence
 

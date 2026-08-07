@@ -103,6 +103,7 @@ internal sealed class RequestAuthorizationService : IRequestAuthorizationService
 
             CreateMaintenanceTicketCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.CreateMaintenanceTicket, command.PropertyId),
             AssignMaintenanceTicketCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.AssignMaintenanceTicket, ResolveMaintenanceTicketPropertyId(command.MaintenanceTicketId.Value)),
+            CloseMaintenanceTicketCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.CloseMaintenanceTicket, ResolveMaintenanceTicketPropertyId(command.MaintenanceTicketId.Value)),
             GetMaintenanceTicketByIdQuery query => new AuthorizationContext(PropertyCapabilityOperationNames.GetMaintenanceTicketById, ResolveMaintenanceTicketPropertyId(query.MaintenanceTicketId.Value)),
 
             CreateInventoryItemCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.CreateInventoryItem, command.PropertyId),
