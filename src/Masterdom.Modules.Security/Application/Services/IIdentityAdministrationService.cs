@@ -6,4 +6,6 @@ namespace Masterdom.Modules.Security.Application.Services;
 public interface IIdentityAdministrationService
 {
     RoleAggregate CreateRole(CreateRoleCommand command);
+
+    RoleAggregate? GetRoleByCode(string roleCode);
 }

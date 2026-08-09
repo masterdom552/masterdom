@@ -1,7 +1,7 @@
 # MASTERDOM_ROADMAP
 
 Version: 2.0
-Status: Synchronized to repository (2026-08-06)
+Status: Synchronized to repository (2026-08-07)
 
 ## Purpose
 
@@ -30,7 +30,7 @@ Business capability status:
 - Documents: Complete (Stage 2 scope; platform document-generation capability).
 - Inventory: Complete (first vertical slice closed after developer validation).
 - CRM: Not Started (project shell only).
-- Maintenance: Complete (create ticket, get by id, assign ticket, and close ticket slices implemented; MT-2.2 closed after full-suite validation).
+- Maintenance: Complete (create ticket, get by id, assign ticket, and close ticket slices implemented; capability catalog is now the authoritative planning source).
 - Notifications: Complete (Stage 2 scope; platform notification capability).
 - Intelligence: Not Started (project shell only).
 - Policy Framework: In Progress (domain/application/handlers/tests present).
@@ -46,13 +46,18 @@ Completed package records detected under `.masterdom/implementation`:
 
 - PKG-001, PKG-002, PKG-003, PKG-004, PKG-005, PKG-006, PKG-3H, PKG-3I.
 
-Current package:
+Current capability:
 
-- MT-2.2 Maintenance Close Ticket (Vertical Slice).
+- CAP-017 Policy Framework.
 
 Current repository state:
 
-- Closed (MT-2.2).
+- In Progress (CAP-017).
+
+## Capability Catalog Reference
+
+- Authoritative source: `.masterdom/capabilities/CAPABILITY_CATALOG.json`
+- Next executable capability: `CAP-017` Policy Framework
 
 ## Canonical Implementation Sequence
 

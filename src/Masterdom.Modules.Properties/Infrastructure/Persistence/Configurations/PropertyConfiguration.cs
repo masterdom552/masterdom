@@ -160,6 +160,10 @@ public sealed class PropertyConfiguration : IEntityTypeConfiguration<Property>
             .FindNavigation(nameof(Property.Units))!
             .SetPropertyAccessMode(PropertyAccessMode.Field);
 
+        builder.Metadata
+            .FindNavigation(nameof(Property.StockLocations))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
+
         builder.Navigation(x => x.Metadata)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
 
@@ -170,5 +174,10 @@ public sealed class PropertyConfiguration : IEntityTypeConfiguration<Property>
             .WithOne()
             .HasForeignKey(x => x.PropertyId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(x => x.StockLocations)
+            .WithOne()
+            .HasForeignKey(x => x.PropertyId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

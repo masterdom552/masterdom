@@ -1,0 +1,38 @@
+name: Migration Integrity
+
+on:
+    pull_request:
+        paths:
+            - "src/Masterdom.Infrastructure/Migrations/**"
+            - "src/Masterdom.Infrastructure/Persistence/**"
+            - "scripts/**"
+            - ".masterdom/governance/**"
+            - ".github/workflows/migration-integrity.yml"
+    push:
+        branches:
+            - main
+        paths:
+            - "src/Masterdom.Infrastructure/Migrations/**"
+            - "src/Masterdom.Infrastructure/Persistence/**"
+            - "scripts/**"
+            - ".masterdom/governance/**"
+            - ".github/workflows/migration-integrity.yml"
+
+jobs:
+    validate-migration-integrity:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v4
+              with:
+                  global-json-file: global.json
+
+            - name: Restore
+              run: dotnet restore Masterdom.slnx
+
+            - name: Validate Migration Integrity
+              run: bash scripts/validate-migration.sh pre

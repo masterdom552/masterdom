@@ -12,6 +12,7 @@ public sealed class InventoryItem : AggregateRoot<InventoryItemId>, IHasDomainEv
     private InventoryItem(
         InventoryItemId id,
         Guid propertyId,
+        Guid stockLocationId,
         string sku,
         string name,
         decimal quantityOnHand,
@@ -19,6 +20,7 @@ public sealed class InventoryItem : AggregateRoot<InventoryItemId>, IHasDomainEv
         : base(id)
     {
         PropertyId = propertyId;
+        StockLocationId = stockLocationId;
         Sku = sku;
         Name = name;
         QuantityOnHand = quantityOnHand;
@@ -26,6 +28,8 @@ public sealed class InventoryItem : AggregateRoot<InventoryItemId>, IHasDomainEv
     }
 
     public Guid PropertyId { get; private set; }
+
+    public Guid StockLocationId { get; private set; }
 
     public string Sku { get; private set; }
 
@@ -40,6 +44,7 @@ public sealed class InventoryItem : AggregateRoot<InventoryItemId>, IHasDomainEv
     public static InventoryItem Create(
         InventoryItemId id,
         Guid propertyId,
+        Guid stockLocationId,
         string sku,
         string name,
         decimal quantityOnHand,
@@ -50,6 +55,11 @@ public sealed class InventoryItem : AggregateRoot<InventoryItemId>, IHasDomainEv
         if (propertyId == Guid.Empty)
         {
             throw new ArgumentException("PropertyId cannot be empty.", nameof(propertyId));
+        }
+
+        if (stockLocationId == Guid.Empty)
+        {
+            throw new ArgumentException("StockLocationId cannot be empty.", nameof(stockLocationId));
         }
 
         ArgumentException.ThrowIfNullOrWhiteSpace(sku);
@@ -78,6 +88,7 @@ public sealed class InventoryItem : AggregateRoot<InventoryItemId>, IHasDomainEv
         var inventoryItem = new InventoryItem(
             id,
             propertyId,
+            stockLocationId,
             sku.Trim(),
             name.Trim(),
             quantityOnHand,
@@ -86,10 +97,91 @@ public sealed class InventoryItem : AggregateRoot<InventoryItemId>, IHasDomainEv
         inventoryItem.Raise(new InventoryItemCreatedDomainEvent(
             inventoryItem.Id,
             inventoryItem.PropertyId,
+            inventoryItem.StockLocationId,
             inventoryItem.Sku,
             inventoryItem.CreatedAtUtc));
 
         return inventoryItem;
+    }
+
+    public void ReceiveStock(decimal receivedQuantity)
+    {
+        if (receivedQuantity <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(receivedQuantity), "ReceivedQuantity must be greater than zero.");
+        }
+
+        QuantityOnHand += receivedQuantity;
+
+        Raise(new InventoryStockReceivedDomainEvent(
+            Id,
+            PropertyId,
+            receivedQuantity,
+            DateTime.UtcNow));
+    }
+
+    public void AdjustStock(decimal adjustmentQuantity)
+    {
+        if (adjustmentQuantity == 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(adjustmentQuantity), "AdjustmentQuantity cannot be zero.");
+        }
+
+        var adjustedQuantityOnHand = QuantityOnHand + adjustmentQuantity;
+        if (adjustedQuantityOnHand < 0)
+        {
+            throw new InvalidOperationException("QuantityOnHand cannot be negative.");
+        }
+
+        QuantityOnHand = adjustedQuantityOnHand;
+
+        Raise(new InventoryStockAdjustedDomainEvent(
+            Id,
+            PropertyId,
+            adjustmentQuantity,
+            QuantityOnHand,
+            DateTime.UtcNow));
+    }
+
+    public void TransferStockTo(InventoryItem destinationInventoryItem, decimal transferQuantity)
+    {
+        ArgumentNullException.ThrowIfNull(destinationInventoryItem);
+
+        if (destinationInventoryItem.PropertyId != PropertyId)
+        {
+            throw new InvalidOperationException("Source and destination inventory items must belong to the same property.");
+        }
+
+        if (destinationInventoryItem.StockLocationId == StockLocationId)
+        {
+            throw new InvalidOperationException("Source and destination stock locations must be different.");
+        }
+
+        if (destinationInventoryItem.Sku != Sku)
+        {
+            throw new InvalidOperationException("Source and destination inventory items must have the same SKU.");
+        }
+
+        if (transferQuantity <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(transferQuantity), "TransferQuantity must be greater than zero.");
+        }
+
+        if (QuantityOnHand < transferQuantity)
+        {
+            throw new InvalidOperationException("Insufficient stock quantity for transfer.");
+        }
+
+        QuantityOnHand -= transferQuantity;
+        destinationInventoryItem.QuantityOnHand += transferQuantity;
+
+        Raise(new InventoryStockTransferredDomainEvent(
+            PropertyId,
+            Sku,
+            StockLocationId,
+            destinationInventoryItem.StockLocationId,
+            transferQuantity,
+            DateTime.UtcNow));
     }
 
     public void ClearDomainEvents()

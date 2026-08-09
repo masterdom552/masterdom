@@ -3,6 +3,8 @@ using Masterdom.Core.Security;
 using Masterdom.Infrastructure.Security;
 using Masterdom.Modules.Security.Application.Commands;
 using Masterdom.Modules.Security.Application.Handlers.Commands;
+using Masterdom.Modules.Security.Application.Handlers.Queries;
+using Masterdom.Modules.Security.Application.Queries;
 using Masterdom.Modules.Security.Application.Services;
 using Masterdom.Modules.Security.Application.Support;
 using Masterdom.Modules.Security.Domain.Repositories;
@@ -70,5 +72,6 @@ public static class SecurityModuleServiceCollectionExtensions
         services.AddScoped<IIdentityAdministrationUnitOfWork, IdentityAdministrationUnitOfWork>();
         services.AddScoped<IIdentityAdministrationService, IdentityAdministrationService>();
         services.AddScoped<ICommandHandler<CreateRoleCommand, ExecutionResult<Masterdom.Core.Identity.Entities.Role.Role>>, CreateRoleCommandHandler>();
+        services.AddScoped<IQueryHandler<GetRoleByCodeQuery, ExecutionResult<Masterdom.Core.Identity.Entities.Role.Role>>, GetRoleByCodeQueryHandler>();
     }
 }

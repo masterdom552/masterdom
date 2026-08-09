@@ -143,6 +143,124 @@ public sealed class SubsidyOptimizationModuleArchitectureTests
         Assert.Empty(offenders);
     }
 
+    [Fact]
+    public void SubsidyOptimizer_ShouldResolveGovernedConfigurationBeforeScenarioGeneration()
+    {
+        var source = File.ReadAllText(Path.Combine(
+            RepositoryRoot,
+            "src",
+            "Masterdom.Modules.SubsidyOptimization",
+            "Application",
+            "Maximizer",
+            "SubsidyMaximizerService.cs"));
+
+        var resolveIndex = source.IndexOf("ResolveGovernedConfiguration", StringComparison.Ordinal);
+        var generateIndex = source.IndexOf("_scenarioGenerator.Generate", StringComparison.Ordinal);
+
+        Assert.True(resolveIndex >= 0);
+        Assert.True(generateIndex > resolveIndex);
+        Assert.Contains("Resolve<SubsidyPolicyConfiguration>", source, StringComparison.Ordinal);
+        Assert.Contains("Resolve<OptimizationModelConfiguration>", source, StringComparison.Ordinal);
+        Assert.Contains("Resolve<OptimizationStrategyConfiguration>", source, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void SubsidyOptimizationCompletion_ShouldRequireEvidence_AndLegacyHandlersShouldNotBeRegistered()
+    {
+        var complete = typeof(OptimizationRunAggregate).GetMethod(nameof(OptimizationRunAggregate.Complete));
+        var serviceContract = typeof(ISubsidyOptimizationApplicationService);
+        var composition = File.ReadAllText(Path.Combine(
+            RepositoryRoot,
+            "src",
+            "Masterdom.Infrastructure",
+            "PropertyFoundationDependencyInjection.cs"));
+
+        Assert.NotNull(complete);
+        Assert.Equal(typeof(Masterdom.Modules.SubsidyOptimization.Domain.Entities.SubsidyOptimization.OptimizationExecutionEvidence), complete!.GetParameters()[4].ParameterType);
+        Assert.False(complete.GetParameters()[4].HasDefaultValue);
+        Assert.Null(serviceContract.GetMethod("CompleteOptimization"));
+        Assert.DoesNotContain("AddSubsidyOptimizationCommandHandler<StartOptimizationCommand", composition, StringComparison.Ordinal);
+        Assert.DoesNotContain("AddSubsidyOptimizationCommandHandler<CompleteOptimizationCommand", composition, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void SubsidyOptimizer_ShouldNotContainAuthoritativeFixedScenarioOrRankingWeights()
+    {
+        var generator = File.ReadAllText(Path.Combine(
+            RepositoryRoot,
+            "src",
+            "Masterdom.Modules.SubsidyOptimization",
+            "Application",
+            "Maximizer",
+            "ScenarioGenerator.cs"));
+        var evaluator = File.ReadAllText(Path.Combine(
+            RepositoryRoot,
+            "src",
+            "Masterdom.Modules.SubsidyOptimization",
+            "Application",
+            "Maximizer",
+            "ScenarioEvaluator.cs"));
+
+        Assert.DoesNotContain("0.98m", generator, StringComparison.Ordinal);
+        Assert.DoesNotContain("0.95m", generator, StringComparison.Ordinal);
+        Assert.DoesNotContain("2.5m", evaluator, StringComparison.Ordinal);
+        Assert.DoesNotContain("1.7m", evaluator, StringComparison.Ordinal);
+        Assert.Contains("model.SubsidyWeight", evaluator, StringComparison.Ordinal);
+        Assert.Contains("strategy.ConsumptionFactors", generator, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void SubsidyOptimizationEndpoints_ShouldRemainAuthenticatedAndHideConfigurationValues()
+    {
+        var source = File.ReadAllText(Path.Combine(
+            RepositoryRoot,
+            "src",
+            "Masterdom.Host",
+            "Api",
+            "SubsidyOptimizationEndpoints.cs"));
+        var request = source[
+            source.IndexOf("internal sealed record ExecuteOptimizationRequest", StringComparison.Ordinal)..source.IndexOf("internal sealed record ArchiveOptimizationRunRequest", StringComparison.Ordinal)];
+
+        Assert.Contains(".RequireAuthorization()", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("SubsidyWeight", request, StringComparison.Ordinal);
+        Assert.DoesNotContain("SubsidyAmount", request, StringComparison.Ordinal);
+        Assert.DoesNotContain("SanctionedLoadLimit", request, StringComparison.Ordinal);
+        Assert.DoesNotContain("ConsumptionFactors", request, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void SubsidyOptimizationMeteringContract_ShouldPublishAuthoritativeParticipationStatus()
+    {
+        var status = typeof(MeteringConsumptionHistoryContract).GetProperty(
+            nameof(MeteringConsumptionHistoryContract.MeterStatus));
+
+        Assert.NotNull(status);
+        Assert.Equal(typeof(string), status!.PropertyType);
+    }
+
+    [Fact]
+    public void SubsidyOptimizationHandlers_ShouldBeAuthorizationDecoratedAndMapped()
+    {
+        var composition = File.ReadAllText(Path.Combine(
+            RepositoryRoot,
+            "src",
+            "Masterdom.Infrastructure",
+            "PropertyFoundationDependencyInjection.cs"));
+        var mappings = File.ReadAllText(Path.Combine(
+            RepositoryRoot,
+            "src",
+            "Masterdom.Infrastructure",
+            "Security",
+            "RequestAuthorizationService.cs"));
+
+        Assert.Contains("SubsidyOptimizationCommandAuthorizationDecorator", composition, StringComparison.Ordinal);
+        Assert.Contains("SubsidyOptimizationQueryAuthorizationDecorator", composition, StringComparison.Ordinal);
+        Assert.Contains("ExecuteSubsidyOptimizationCommand command =>", mappings, StringComparison.Ordinal);
+        Assert.Contains("GetOptimizationRunByIdQuery query =>", mappings, StringComparison.Ordinal);
+        Assert.Contains("ArchiveOptimizationRunCommand command =>", mappings, StringComparison.Ordinal);
+        Assert.Contains("ValidateSubsidyExecutionScope", mappings, StringComparison.Ordinal);
+    }
+
     private static IEnumerable<string> EnumerateSubsidyModuleSourceFiles()
     {
         return Directory.EnumerateFiles(

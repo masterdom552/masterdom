@@ -5,6 +5,10 @@
         <ProjectReference Include="..\Masterdom.Infrastructure\Masterdom.Infrastructure.csproj" />
         <ProjectReference Include="..\Masterdom.Modules.Security\Masterdom.Modules.Security.csproj" />
         <ProjectReference
+            Include="..\Masterdom.Modules.UtilityRating\Masterdom.Modules.UtilityRating.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.CRM\Masterdom.Modules.CRM.csproj" />
+        <ProjectReference
             Include="..\Masterdom.Modules.Properties\Masterdom.Modules.Properties.csproj" />
         <ProjectReference
             Include="..\Masterdom.Modules.People\Masterdom.Modules.People.csproj" />

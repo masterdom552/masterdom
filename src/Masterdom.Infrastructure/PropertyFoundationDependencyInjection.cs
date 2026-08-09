@@ -7,6 +7,7 @@ using Masterdom.Modules.Properties.Application.Support;
 using Masterdom.Modules.Properties.Domain.Entities.Property;
 using Masterdom.Modules.Properties.Domain.Repositories;
 using Masterdom.Infrastructure.Persistence.Property;
+using Masterdom.Infrastructure.Persistence.CRM;
 using Masterdom.Infrastructure.Persistence.Lease;
 using Masterdom.Infrastructure.Persistence.People;
 using Masterdom.Infrastructure.Persistence.Tenancy;
@@ -25,6 +26,13 @@ using Masterdom.Modules.People.Application.Queries;
 using Masterdom.Modules.People.Application.Services;
 using Masterdom.Modules.People.Domain.Entities.Person;
 using Masterdom.Modules.People.Domain.Repositories;
+using Masterdom.Modules.CRM.Application.Commands;
+using Masterdom.Modules.CRM.Application.Handlers.Commands;
+using Masterdom.Modules.CRM.Application.Handlers.Queries;
+using Masterdom.Modules.CRM.Application.Queries;
+using Masterdom.Modules.CRM.Application.Services;
+using Masterdom.Modules.CRM.Domain.Entities.Party;
+using Masterdom.Modules.CRM.Domain.Repositories;
 using Masterdom.Modules.Tenancy.Application.Commands;
 using Masterdom.Modules.Tenancy.Application.Handlers.Commands;
 using Masterdom.Modules.Tenancy.Application.Handlers.Queries;
@@ -68,6 +76,7 @@ using Masterdom.Modules.Billing.Application.Capabilities.Billability;
 using Masterdom.Modules.Billing.Application.Capabilities.BillPersistence;
 using Masterdom.Modules.Billing.Application.Publication;
 using Masterdom.Infrastructure.Persistence.FinancialLedger;
+using Masterdom.Infrastructure.Persistence.UtilityRating;
 using Masterdom.Modules.FinancialLedger.Application.Commands;
 using Masterdom.Modules.FinancialLedger.Application.Handlers.Commands;
 using Masterdom.Modules.FinancialLedger.Application.Handlers.Queries;
@@ -89,6 +98,14 @@ using Masterdom.Modules.Payment.Application.Queries;
 using Masterdom.Modules.Payment.Application.Services;
 using Masterdom.Modules.Payment.Domain.Entities.Payment;
 using Masterdom.Modules.Payment.Domain.Repositories;
+using Masterdom.Modules.UtilityRating.Application.Commands;
+using Masterdom.Modules.UtilityRating.Application.Handlers.Commands;
+using Masterdom.Modules.UtilityRating.Application.Handlers.Queries;
+using Masterdom.Modules.UtilityRating.Application.Queries;
+using Masterdom.Modules.UtilityRating.Application.Services;
+using Masterdom.Modules.UtilityRating.Domain.Entities.UtilityRating;
+using Masterdom.Modules.UtilityRating.Domain.Repositories;
+using UtilityRatingAggregate = Masterdom.Modules.UtilityRating.Domain.Entities.UtilityRating.UtilityRating;
 using Masterdom.Modules.Reporting.Application.Handlers.Queries;
 using Masterdom.Modules.Reporting.Application.Models;
 using Masterdom.Modules.Reporting.Application.Queries;
@@ -105,7 +122,16 @@ using Masterdom.Modules.Documents.Application.Handlers.Queries;
 using Masterdom.Modules.Documents.Application.Models;
 using Masterdom.Modules.Documents.Application.Queries;
 using Masterdom.Modules.Documents.Application.Services;
+using Masterdom.Modules.Settings.Application.Services;
+using Masterdom.Modules.Intelligence.Application.Services;
+using Masterdom.Infrastructure.Persistence.SubsidyOptimization;
+using Masterdom.Modules.SubsidyOptimization.Application.Handlers.Queries;
+using Masterdom.Modules.SubsidyOptimization.Application.Handlers.Commands;
+using Masterdom.Modules.SubsidyOptimization.Application.Commands;
+using Masterdom.Modules.SubsidyOptimization.Application.Queries;
+using Masterdom.Modules.SubsidyOptimization.Application.Services;
 using Masterdom.Modules.SubsidyOptimization.Application.Maximizer;
+using Masterdom.Modules.SubsidyOptimization.Domain.Repositories;
 using Masterdom.Platform.CalculationEngine;
 using Masterdom.Platform.CalculationEngine.Contracts;
 using Masterdom.Platform.Notifications;
@@ -129,6 +155,7 @@ using MaintenanceTicketAggregate = Masterdom.Modules.Maintenance.Domain.Entities
 using BillAggregate = Masterdom.Modules.Billing.Domain.Entities.Billing.Bill;
 using LedgerAggregate = Masterdom.Modules.FinancialLedger.Domain.Entities.FinancialLedger.Ledger;
 using PaymentAggregate = Masterdom.Modules.Payment.Domain.Entities.Payment.Payment;
+using OptimizationRunAggregate = Masterdom.Modules.SubsidyOptimization.Domain.Entities.SubsidyOptimization.OptimizationRun;
 
 namespace Masterdom.Infrastructure;
 
@@ -154,6 +181,7 @@ public static class PropertyFoundationDependencyInjection
 
         AddPlatformFoundation(services);
         AddPropertyRuntime(services);
+        AddCrmRuntime(services);
         AddPeopleRuntime(services);
         AddLeaseRuntime(services);
         AddTenancyRuntime(services);
@@ -161,11 +189,14 @@ public static class PropertyFoundationDependencyInjection
         AddInventoryRuntime(services);
         AddMaintenanceRuntime(services);
         AddBillingRuntime(services);
+        AddUtilityRatingRuntime(services);
         AddFinancialLedgerRuntime(services);
         AddPaymentRuntime(services);
         AddReportingRuntime(services);
         AddNotificationsRuntime(services);
         AddDocumentsRuntime(services);
+        AddSettingsRuntime(services);
+        AddIntelligenceRuntime(services);
         AddSubsidyOptimizationRuntime(services);
 
         return services;
@@ -268,7 +299,7 @@ public static class PropertyFoundationDependencyInjection
         AddPropertyCommandHandler<UpsertMetadataCommand, ExecutionResult<PropertyAggregate>, UpsertMetadataCommandHandler>(services);
         AddPropertyCommandHandler<RemoveMetadataCommand, ExecutionResult<bool>, RemoveMetadataCommandHandler>(services);
         AddPropertyCommandHandler<Masterdom.Modules.Properties.Application.Commands.AddRelationshipCommand, ExecutionResult<PropertyAggregate>, Masterdom.Modules.Properties.Application.Handlers.Commands.AddRelationshipCommandHandler>(services);
-        AddPropertyCommandHandler<RemoveRelationshipCommand, ExecutionResult<bool>, RemoveRelationshipCommandHandler>(services);
+        AddPropertyCommandHandler<Masterdom.Modules.Properties.Application.Commands.RemoveRelationshipCommand, ExecutionResult<bool>, Masterdom.Modules.Properties.Application.Handlers.Commands.RemoveRelationshipCommandHandler>(services);
 
         AddPropertyQueryHandler<GetPropertyByIdQuery, ExecutionResult<PropertyAggregate>, GetPropertyByIdQueryHandler>(services);
         AddPropertyQueryHandler<GetPropertyByCodeQuery, ExecutionResult<PropertyAggregate>, GetPropertyByCodeQueryHandler>(services);
@@ -296,12 +327,40 @@ public static class PropertyFoundationDependencyInjection
         AddPeopleQueryHandler<SearchPeopleQuery, Masterdom.Modules.People.Application.Support.ExecutionResult<IReadOnlyCollection<Person>>, SearchPeopleQueryHandler>(services);
     }
 
+    private static void AddCrmRuntime(IServiceCollection services)
+    {
+        services.AddScoped<IPartyRepository, PartyRepository>();
+        services.AddScoped<Masterdom.Modules.CRM.Application.Support.IPartyUnitOfWork, PartyUnitOfWork>();
+        services.AddScoped<Masterdom.Modules.CRM.Application.Support.IPartyPlatformOrchestrator, PartyPlatformOrchestrator>();
+        services.AddScoped<IPartyApplicationService, PartyApplicationService>();
+
+        AddCrmCommandHandler<CreatePartyCommand, Masterdom.Modules.CRM.Application.Support.ExecutionResult<Party>, CreatePartyCommandHandler>(services);
+        AddCrmCommandHandler<UpdatePartyCommand, Masterdom.Modules.CRM.Application.Support.ExecutionResult<Party>, UpdatePartyCommandHandler>(services);
+        AddCrmCommandHandler<DeactivatePartyCommand, Masterdom.Modules.CRM.Application.Support.ExecutionResult<Party>, DeactivatePartyCommandHandler>(services);
+        AddCrmCommandHandler<AddContactMethodCommand, Masterdom.Modules.CRM.Application.Support.ExecutionResult<Party>, AddContactMethodCommandHandler>(services);
+        AddCrmCommandHandler<RemoveContactMethodCommand, Masterdom.Modules.CRM.Application.Support.ExecutionResult<bool>, RemoveContactMethodCommandHandler>(services);
+        AddCrmCommandHandler<AddAddressCommand, Masterdom.Modules.CRM.Application.Support.ExecutionResult<Party>, AddAddressCommandHandler>(services);
+        AddCrmCommandHandler<RemoveAddressCommand, Masterdom.Modules.CRM.Application.Support.ExecutionResult<bool>, RemoveAddressCommandHandler>(services);
+        AddCrmCommandHandler<CreateRelationshipCommand, Masterdom.Modules.CRM.Application.Support.ExecutionResult<Party>, CreateRelationshipCommandHandler>(services);
+        AddCrmCommandHandler<Masterdom.Modules.CRM.Application.Commands.RemoveRelationshipCommand, Masterdom.Modules.CRM.Application.Support.ExecutionResult<bool>, Masterdom.Modules.CRM.Application.Handlers.Commands.RemoveRelationshipCommandHandler>(services);
+        AddCrmCommandHandler<AssignPartyRoleCommand, Masterdom.Modules.CRM.Application.Support.ExecutionResult<Party>, AssignPartyRoleCommandHandler>(services);
+        AddCrmCommandHandler<RemovePartyRoleCommand, Masterdom.Modules.CRM.Application.Support.ExecutionResult<bool>, RemovePartyRoleCommandHandler>(services);
+        AddCrmCommandHandler<DeactivatePartyRoleCommand, Masterdom.Modules.CRM.Application.Support.ExecutionResult<bool>, DeactivatePartyRoleCommandHandler>(services);
+        AddCrmCommandHandler<ReactivatePartyRoleCommand, Masterdom.Modules.CRM.Application.Support.ExecutionResult<bool>, ReactivatePartyRoleCommandHandler>(services);
+
+        AddCrmQueryHandler<GetPartyByIdQuery, Masterdom.Modules.CRM.Application.Support.ExecutionResult<Party>, GetPartyByIdQueryHandler>(services);
+        AddCrmQueryHandler<SearchPartiesQuery, Masterdom.Modules.CRM.Application.Support.ExecutionResult<IReadOnlyCollection<Party>>, SearchPartiesQueryHandler>(services);
+        AddCrmQueryHandler<GetPartyRolesQuery, Masterdom.Modules.CRM.Application.Support.ExecutionResult<IReadOnlyCollection<PartyRoleAssignment>>, GetPartyRolesQueryHandler>(services);
+        AddCrmQueryHandler<SearchPartiesByRoleQuery, Masterdom.Modules.CRM.Application.Support.ExecutionResult<IReadOnlyCollection<Party>>, SearchPartiesByRoleQueryHandler>(services);
+    }
+
     private static void AddLeaseRuntime(IServiceCollection services)
     {
         services.AddScoped<ILeaseRepository, LeaseRepository>();
         services.AddScoped<Masterdom.Modules.Lease.Application.Support.ILeaseUnitOfWork, LeaseUnitOfWork>();
         services.AddScoped<Masterdom.Modules.Lease.Application.Support.ILeasePlatformOrchestrator, LeasePlatformOrchestrator>();
         services.AddScoped<ILeaseApplicationService, LeaseApplicationService>();
+        services.AddScoped<ILeasePolicyCatalog, LeasePolicyCatalog>();
 
         AddLeaseCommandHandler<CreateLeaseCommand, Masterdom.Modules.Lease.Application.Support.ExecutionResult<LeaseAggregate>, CreateLeaseCommandHandler>(services);
         AddLeaseCommandHandler<ActivateLeaseCommand, Masterdom.Modules.Lease.Application.Support.ExecutionResult<LeaseAggregate>, ActivateLeaseCommandHandler>(services);
@@ -377,6 +436,18 @@ public static class PropertyFoundationDependencyInjection
         AddBillingQueryHandler<GetBillByNumberQuery, Masterdom.Modules.Billing.Application.Support.ExecutionResult<BillAggregate>, GetBillByNumberQueryHandler>(services);
     }
 
+    private static void AddUtilityRatingRuntime(IServiceCollection services)
+    {
+        services.AddScoped<IUtilityRatingRepository, UtilityRatingRepository>();
+        services.AddScoped<Masterdom.Modules.UtilityRating.Application.Support.IUtilityRatingUnitOfWork, UtilityRatingUnitOfWork>();
+        services.AddScoped<Masterdom.Modules.UtilityRating.Application.Support.IUtilityRatingPlatformOrchestrator, UtilityRatingPlatformOrchestrator>();
+        services.AddScoped<Masterdom.Modules.UtilityRating.Application.Services.IUtilityRatingApplicationService, UtilityRatingApplicationService>();
+
+        AddUtilityRatingCommandHandler<RateConsumptionCommand, Masterdom.Modules.UtilityRating.Application.Support.ExecutionResult<UtilityRatingAggregate>, RateConsumptionCommandHandler>(services);
+        AddUtilityRatingQueryHandler<GetRatingByIdQuery, Masterdom.Modules.UtilityRating.Application.Support.ExecutionResult<UtilityRatingAggregate>, GetRatingByIdQueryHandler>(services);
+        AddUtilityRatingQueryHandler<GetLatestRatingQuery, Masterdom.Modules.UtilityRating.Application.Support.ExecutionResult<UtilityRatingAggregate>, GetLatestRatingQueryHandler>(services);
+    }
+
     private static void AddMaintenanceRuntime(IServiceCollection services)
     {
         services.AddScoped<IMaintenanceTicketRepository, MaintenanceTicketRepository>();
@@ -395,9 +466,13 @@ public static class PropertyFoundationDependencyInjection
         services.AddScoped<IInventoryItemRepository, InventoryItemRepository>();
         services.AddScoped<Masterdom.Modules.Inventory.Application.Support.IInventoryUnitOfWork, InventoryUnitOfWork>();
         services.AddScoped<Masterdom.Modules.Inventory.Application.Support.IInventoryPlatformOrchestrator, InventoryPlatformOrchestrator>();
+        services.AddScoped<Masterdom.Modules.Inventory.Application.Support.IInventoryStockLocationLookup, InventoryStockLocationLookup>();
         services.AddScoped<IInventoryApplicationService, InventoryApplicationService>();
 
         AddInventoryCommandHandler<CreateInventoryItemCommand, Masterdom.Modules.Inventory.Application.Support.ExecutionResult<InventoryItemAggregate>, CreateInventoryItemCommandHandler>(services);
+        AddInventoryCommandHandler<ReceiveStockCommand, Masterdom.Modules.Inventory.Application.Support.ExecutionResult<InventoryItemAggregate>, ReceiveStockCommandHandler>(services);
+        AddInventoryCommandHandler<AdjustStockCommand, Masterdom.Modules.Inventory.Application.Support.ExecutionResult<InventoryItemAggregate>, AdjustStockCommandHandler>(services);
+        AddInventoryCommandHandler<TransferInventoryCommand, Masterdom.Modules.Inventory.Application.Support.ExecutionResult<InventoryItemAggregate>, TransferInventoryCommandHandler>(services);
     }
 
     private static void AddFinancialLedgerRuntime(IServiceCollection services)
@@ -506,8 +581,31 @@ public static class PropertyFoundationDependencyInjection
         AddDocumentsQueryHandler<GetDocumentHistoryQuery, Masterdom.Modules.Documents.Application.Support.ExecutionResult<IReadOnlyCollection<DocumentHistoryEntry>>, GetDocumentHistoryQueryHandler>(services);
     }
 
+    private static void AddSettingsRuntime(IServiceCollection services)
+    {
+        services.AddScoped<SettingsCapabilityBehaviorService>();
+    }
+
+    private static void AddIntelligenceRuntime(IServiceCollection services)
+    {
+        services.AddScoped<IntelligenceCapabilityBehaviorService>();
+    }
+
     private static void AddSubsidyOptimizationRuntime(IServiceCollection services)
     {
+        services.AddScoped<IOptimizationRunRepository, OptimizationRunRepository>();
+        services.AddScoped<Masterdom.Modules.SubsidyOptimization.Application.Support.ISubsidyOptimizationUnitOfWork, SubsidyOptimizationUnitOfWork>();
+        services.AddScoped<Masterdom.Modules.SubsidyOptimization.Application.Support.ISubsidyOptimizationPlatformOrchestrator, SubsidyOptimizationPlatformOrchestrator>();
+        services.AddScoped<ISubsidyOptimizationApplicationService, SubsidyOptimizationApplicationService>();
+
+        AddSubsidyOptimizationQueryHandler<GetOptimizationRunByIdQuery, Masterdom.Modules.SubsidyOptimization.Application.Support.ExecutionResult<OptimizationRunAggregate>, GetOptimizationRunByIdQueryHandler>(services);
+        AddSubsidyOptimizationQueryHandler<GetLatestOptimizationRunQuery, Masterdom.Modules.SubsidyOptimization.Application.Support.ExecutionResult<OptimizationRunAggregate>, GetLatestOptimizationRunQueryHandler>(services);
+
+        AddSubsidyOptimizationCommandHandler<ExecuteSubsidyOptimizationCommand, Masterdom.Modules.SubsidyOptimization.Application.Support.ExecutionResult<OptimizationRunAggregate>, ExecuteSubsidyOptimizationCommandHandler>(services);
+        AddSubsidyOptimizationCommandHandler<CreateScenarioVersionCommand, Masterdom.Modules.SubsidyOptimization.Application.Support.ExecutionResult<OptimizationRunAggregate>, CreateScenarioVersionCommandHandler>(services);
+        AddSubsidyOptimizationCommandHandler<ArchiveRecommendationCommand, Masterdom.Modules.SubsidyOptimization.Application.Support.ExecutionResult<OptimizationRunAggregate>, ArchiveRecommendationCommandHandler>(services);
+        AddSubsidyOptimizationCommandHandler<ArchiveOptimizationRunCommand, Masterdom.Modules.SubsidyOptimization.Application.Support.ExecutionResult<OptimizationRunAggregate>, ArchiveOptimizationRunCommandHandler>(services);
+
         services.AddCalculationEngine();
         services.AddScoped<ConsumptionEstimator>();
         services.AddScoped<ForecastEngine>();
@@ -558,6 +656,26 @@ public static class PropertyFoundationDependencyInjection
         services.AddScoped<THandler>();
         services.AddScoped<Masterdom.Modules.People.Application.Support.IQueryHandler<TQuery, TResult>>(serviceProvider =>
             new PeopleQueryAuthorizationDecorator<TQuery, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddCrmCommandHandler<TCommand, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.CRM.Application.Support.ICommandHandler<TCommand, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.CRM.Application.Support.ICommandHandler<TCommand, TResult>>(serviceProvider =>
+            new CrmCommandAuthorizationDecorator<TCommand, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddCrmQueryHandler<TQuery, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.CRM.Application.Support.IQueryHandler<TQuery, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.CRM.Application.Support.IQueryHandler<TQuery, TResult>>(serviceProvider =>
+            new CrmQueryAuthorizationDecorator<TQuery, TResult>(
                 serviceProvider.GetRequiredService<THandler>(),
                 serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
     }
@@ -668,6 +786,42 @@ public static class PropertyFoundationDependencyInjection
         services.AddScoped<THandler>();
         services.AddScoped<Masterdom.Modules.Billing.Application.Support.IQueryHandler<TQuery, TResult>>(serviceProvider =>
             new BillingQueryAuthorizationDecorator<TQuery, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddUtilityRatingQueryHandler<TQuery, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.UtilityRating.Application.Support.IQueryHandler<TQuery, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.UtilityRating.Application.Support.IQueryHandler<TQuery, TResult>>(serviceProvider =>
+            serviceProvider.GetRequiredService<THandler>());
+    }
+
+    private static void AddUtilityRatingCommandHandler<TCommand, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.UtilityRating.Application.Support.ICommandHandler<TCommand, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.UtilityRating.Application.Support.ICommandHandler<TCommand, TResult>>(serviceProvider =>
+            serviceProvider.GetRequiredService<THandler>());
+    }
+
+    private static void AddSubsidyOptimizationQueryHandler<TQuery, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.SubsidyOptimization.Application.Support.IQueryHandler<TQuery, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.SubsidyOptimization.Application.Support.IQueryHandler<TQuery, TResult>>(serviceProvider =>
+            new SubsidyOptimizationQueryAuthorizationDecorator<TQuery, TResult>(
+                serviceProvider.GetRequiredService<THandler>(),
+                serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
+    }
+
+    private static void AddSubsidyOptimizationCommandHandler<TCommand, TResult, THandler>(IServiceCollection services)
+        where THandler : class, Masterdom.Modules.SubsidyOptimization.Application.Support.ICommandHandler<TCommand, TResult>
+    {
+        services.AddScoped<THandler>();
+        services.AddScoped<Masterdom.Modules.SubsidyOptimization.Application.Support.ICommandHandler<TCommand, TResult>>(serviceProvider =>
+            new SubsidyOptimizationCommandAuthorizationDecorator<TCommand, TResult>(
                 serviceProvider.GetRequiredService<THandler>(),
                 serviceProvider.GetRequiredService<IRequestAuthorizationService>()));
     }

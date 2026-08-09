@@ -6,13 +6,15 @@ namespace Masterdom.Modules.SubsidyOptimization.Application.Services;
 
 public interface ISubsidyOptimizationApplicationService
 {
-    OptimizationRunAggregate StartOptimization(StartOptimizationCommand command);
+    OptimizationRunAggregate ExecuteOptimization(ExecuteSubsidyOptimizationCommand command);
 
-    OptimizationRunAggregate CompleteOptimization(CompleteOptimizationCommand command);
+    OptimizationRunAggregate StartOptimization(StartOptimizationCommand command);
 
     OptimizationRunAggregate CreateScenarioVersion(CreateScenarioVersionCommand command);
 
     OptimizationRunAggregate ArchiveRecommendation(ArchiveRecommendationCommand command);
+
+    OptimizationRunAggregate ArchiveOptimizationRun(ArchiveOptimizationRunCommand command);
 
     OptimizationRunAggregate? GetOptimizationRun(GetOptimizationRunByIdQuery query);
 

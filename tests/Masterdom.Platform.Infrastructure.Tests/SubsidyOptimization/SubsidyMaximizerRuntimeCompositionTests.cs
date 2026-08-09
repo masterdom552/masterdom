@@ -4,6 +4,7 @@ using Masterdom.Modules.SubsidyOptimization.Contracts.Metering;
 using Masterdom.Modules.SubsidyOptimization.Contracts.UtilityRating;
 using Masterdom.Platform.CalculationEngine.Contracts;
 using Masterdom.Platform.Recommendation;
+using Masterdom.Platform.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Masterdom.Platform.Infrastructure.Tests.SubsidyOptimization;
@@ -35,17 +36,18 @@ public sealed class SubsidyMaximizerRuntimeCompositionTests
         using var scope = provider.CreateScope();
 
         var service = scope.ServiceProvider.GetRequiredService<ISubsidyMaximizerService>();
+        var ratedMeterId = Guid.NewGuid();
 
         var result = service.Execute(new SubsidyMaximizerRequest(
             ConsumptionHistory:
             [
-                new MeteringConsumptionHistoryContract(Guid.NewGuid(), new DateOnly(2026, 1, 1), new DateOnly(2026, 1, 31), 150m, DateTime.UtcNow),
-                new MeteringConsumptionHistoryContract(Guid.NewGuid(), new DateOnly(2026, 2, 1), new DateOnly(2026, 2, 28), 148m, DateTime.UtcNow),
-                new MeteringConsumptionHistoryContract(Guid.NewGuid(), new DateOnly(2026, 3, 1), new DateOnly(2026, 3, 31), 145m, DateTime.UtcNow)
+            new MeteringConsumptionHistoryContract(ratedMeterId, new DateOnly(2026, 1, 1), new DateOnly(2026, 1, 31), 150m, DateTime.UtcNow, "residential", "Active", 120m),
+                new MeteringConsumptionHistoryContract(Guid.NewGuid(), new DateOnly(2026, 2, 1), new DateOnly(2026, 2, 28), 148m, DateTime.UtcNow, "residential", "Active", 120m),
+                new MeteringConsumptionHistoryContract(Guid.NewGuid(), new DateOnly(2026, 3, 1), new DateOnly(2026, 3, 31), 145m, DateTime.UtcNow, "residential", "Active", 120m)
             ],
             RatedConsumptions:
             [
-                new RatedConsumptionContract(Guid.NewGuid(), Guid.NewGuid(), new DateOnly(2026, 1, 1), new DateOnly(2026, 1, 31), 144m, 44m, DateTime.UtcNow)
+                new RatedConsumptionContract(Guid.NewGuid(), ratedMeterId, new DateOnly(2026, 1, 1), new DateOnly(2026, 1, 31), 144m, 44m, DateTime.UtcNow)
             ],
             ImportedDatasets:
             [
@@ -75,6 +77,8 @@ public sealed class SubsidyMaximizerRuntimeCompositionTests
     {
         var services = new ServiceCollection();
         services.AddPropertyBusinessCapabilityRuntime();
+        services.AddSingleton<IConfigurationRepository>(new InMemoryConfigurationRepository(
+            SubsidyOptimizationTestConfiguration.CreateRecords()));
 
         return services.BuildServiceProvider(validateScopes: true);
     }

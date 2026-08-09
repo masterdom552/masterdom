@@ -23,6 +23,10 @@ public sealed class InventoryItemConfiguration : IEntityTypeConfiguration<Invent
             .HasColumnName("property_id")
             .IsRequired();
 
+        builder.Property(x => x.StockLocationId)
+            .HasColumnName("stock_location_id")
+            .IsRequired();
+
         builder.Property(x => x.Sku)
             .HasColumnName("sku")
             .HasMaxLength(64)
@@ -45,8 +49,11 @@ public sealed class InventoryItemConfiguration : IEntityTypeConfiguration<Invent
         builder.HasIndex(x => x.PropertyId)
             .HasDatabaseName("ix_inventory_items_property_id");
 
-        builder.HasIndex(x => new { x.PropertyId, x.Sku })
-            .HasDatabaseName("ux_inventory_items_property_id_sku")
+        builder.HasIndex(x => x.StockLocationId)
+            .HasDatabaseName("ix_inventory_items_stock_location_id");
+
+        builder.HasIndex(x => new { x.PropertyId, x.StockLocationId, x.Sku })
+            .HasDatabaseName("ux_inventory_items_property_id_stock_location_id_sku")
             .IsUnique();
 
         builder.Ignore(x => x.DomainEvents);

@@ -59,7 +59,9 @@ public sealed class OptimizationRunConfiguration : IEntityTypeConfiguration<Opti
             .IsRequired();
 
         builder.Property(x => x.OptimizationStatus)
-            .HasValueObjectConversion(OptimizationStatus.Create)
+            .HasConversion(
+                value => value.Value,
+                value => OptimizationStatus.Create(value))
             .HasColumnName("optimization_status")
             .HasMaxLength(50)
             .IsRequired();
@@ -91,6 +93,17 @@ public sealed class OptimizationRunConfiguration : IEntityTypeConfiguration<Opti
                     ? null
                     : DeserializeConsumptionForecast(json))
             .HasColumnName("consumption_forecast")
+            .HasColumnType("jsonb");
+
+        builder.Property(x => x.ExecutionEvidence)
+            .HasConversion(
+                value => value == null
+                    ? null
+                    : JsonSerializer.Serialize(ExecutionEvidencePersistenceModel.FromDomain(value), JsonSerializerOptions.Web),
+                json => string.IsNullOrWhiteSpace(json)
+                    ? null
+                    : DeserializeExecutionEvidence(json))
+            .HasColumnName("execution_evidence")
             .HasColumnType("jsonb");
 
         builder.Property(x => x.StartedAtUtc)
@@ -128,7 +141,9 @@ public sealed class OptimizationRunConfiguration : IEntityTypeConfiguration<Opti
                 .IsRequired();
 
             recommendationBuilder.Property(x => x.Priority)
-                .HasValueObjectConversion(RecommendationPriority.Create)
+                .HasConversion(
+                    value => value.Value,
+                    value => RecommendationPriority.Create(value))
                 .HasColumnName("priority")
                 .HasMaxLength(50)
                 .IsRequired();
@@ -228,6 +243,17 @@ public sealed class OptimizationRunConfiguration : IEntityTypeConfiguration<Opti
                 .HasColumnType("jsonb")
                 .IsRequired();
 
+            snapshotBuilder.Property(x => x.ExecutionEvidence)
+                .HasConversion(
+                    value => value == null
+                        ? null
+                        : JsonSerializer.Serialize(ExecutionEvidencePersistenceModel.FromDomain(value), JsonSerializerOptions.Web),
+                    json => string.IsNullOrWhiteSpace(json)
+                        ? null
+                        : DeserializeExecutionEvidence(json))
+                .HasColumnName("execution_evidence")
+                .HasColumnType("jsonb");
+
             snapshotBuilder.HasIndex(x => x.SnapshotId)
                 .HasDatabaseName("ix_optimization_snapshots_snapshot_id");
         });
@@ -310,6 +336,14 @@ public sealed class OptimizationRunConfiguration : IEntityTypeConfiguration<Opti
         return RecommendationSet.Create(recommendations);
     }
 
+    private static OptimizationExecutionEvidence DeserializeExecutionEvidence(string json)
+    {
+        var model = JsonSerializer.Deserialize<ExecutionEvidencePersistenceModel>(json, JsonSerializerOptions.Web)
+            ?? throw new InvalidOperationException("Unable to deserialize optimization execution evidence.");
+
+        return model.ToDomain();
+    }
+
     private sealed record ScenarioPersistenceModel(string ScenarioId, string Name, string Description);
 
     private sealed record MeterGroupPersistenceModel(string MeterGroupCode, string DisplayName, IReadOnlyList<Guid> MeterIds)
@@ -330,6 +364,67 @@ public sealed class OptimizationRunConfiguration : IEntityTypeConfiguration<Opti
     private sealed record OptimizationResultPersistenceModel(decimal EstimatedSavings, decimal EstimatedCost, string Summary);
 
     private sealed record ConsumptionForecastPersistenceModel(decimal BaselineConsumption, decimal ProjectedConsumption, string Assumptions);
+
+    private sealed record ExecutionEvidencePersistenceModel(
+        string? TenantId,
+        string? PropertyId,
+        string ConfigurationContextVersion,
+        DateTime EffectiveDateUtc,
+        decimal OccupancyRate,
+        decimal ConfidenceThreshold,
+        string AlgorithmVersion,
+        IReadOnlyList<OptimizationMeterInput> MeterInputs,
+        IReadOnlyList<OptimizationRatingInput> RatingInputs,
+        IReadOnlyList<OptimizationImportedDatasetInput> ImportedDatasets,
+        OptimizationPolicySnapshot Policy,
+        OptimizationModelSnapshot Model,
+        OptimizationStrategySnapshot Strategy,
+        IReadOnlyList<OptimizationScenarioEvidence> Scenarios,
+        string SelectedScenarioCode,
+        OptimizationOutcomeEvidence Outcome)
+    {
+        public static ExecutionEvidencePersistenceModel FromDomain(OptimizationExecutionEvidence evidence)
+        {
+            return new ExecutionEvidencePersistenceModel(
+                evidence.TenantId,
+                evidence.PropertyId,
+                evidence.ConfigurationContextVersion,
+                evidence.EffectiveDateUtc,
+                evidence.OccupancyRate,
+                evidence.ConfidenceThreshold,
+                evidence.AlgorithmVersion,
+                evidence.MeterInputs,
+                evidence.RatingInputs,
+                evidence.ImportedDatasets,
+                evidence.Policy,
+                evidence.Model,
+                evidence.Strategy,
+                evidence.Scenarios,
+                evidence.SelectedScenarioCode,
+                evidence.Outcome);
+        }
+
+        public OptimizationExecutionEvidence ToDomain()
+        {
+            return OptimizationExecutionEvidence.Create(
+                TenantId,
+                PropertyId,
+                ConfigurationContextVersion,
+                EffectiveDateUtc,
+                OccupancyRate,
+                ConfidenceThreshold,
+                AlgorithmVersion,
+                MeterInputs,
+                RatingInputs,
+                ImportedDatasets,
+                Policy,
+                Model,
+                Strategy,
+                Scenarios,
+                SelectedScenarioCode,
+                Outcome);
+        }
+    }
 
     private sealed record RecommendationPersistenceModel(
         Guid RecommendationId,

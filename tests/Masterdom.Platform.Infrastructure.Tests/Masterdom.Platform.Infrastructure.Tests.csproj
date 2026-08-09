@@ -22,6 +22,10 @@
             Include="..\..\src\Masterdom.Infrastructure\Masterdom.Infrastructure.csproj" />
         <ProjectReference Include="..\..\src\Masterdom.Host\Masterdom.Host.csproj" />
         <ProjectReference
+            Include="..\..\src\Masterdom.Modules.UtilityRating\Masterdom.Modules.UtilityRating.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.CRM\Masterdom.Modules.CRM.csproj" />
+        <ProjectReference
             Include="..\..\src\Masterdom.Modules.Reporting\Masterdom.Modules.Reporting.csproj" />
         <ProjectReference
             Include="..\..\src\Masterdom.Modules.Notifications\Masterdom.Modules.Notifications.csproj" />

@@ -1705,6 +1705,48 @@ namespace Masterdom.Infrastructure.Migrations
                     b.ToTable("bills", (string)null);
                 });
 
+            modelBuilder.Entity("Masterdom.Modules.CRM.Domain.Entities.Party.Party", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("party_id");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("display_name");
+
+                    b.Property<string>("LegalName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("legal_name");
+
+                    b.Property<string>("PartyType")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("party_type");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at_utc");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("crm_parties", (string)null);
+                });
+
             modelBuilder.Entity("Masterdom.Modules.FinancialLedger.Domain.Entities.FinancialLedger.Ledger", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1732,6 +1774,54 @@ namespace Masterdom.Infrastructure.Migrations
                         .HasDatabaseName("ix_ledgers_ledger_code");
 
                     b.ToTable("ledgers", (string)null);
+                });
+
+            modelBuilder.Entity("Masterdom.Modules.Inventory.Domain.Entities.Inventory.InventoryItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid>("PropertyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("property_id");
+
+                    b.Property<decimal>("QuantityOnHand")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("quantity_on_hand");
+
+                    b.Property<string>("Sku")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("sku");
+
+                    b.Property<Guid>("StockLocationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("stock_location_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PropertyId")
+                        .HasDatabaseName("ix_inventory_items_property_id");
+
+                    b.HasIndex("StockLocationId")
+                        .HasDatabaseName("ix_inventory_items_stock_location_id");
+
+                    b.HasIndex("PropertyId", "StockLocationId", "Sku")
+                        .IsUnique()
+                        .HasDatabaseName("ux_inventory_items_property_id_stock_location_id_sku");
+
+                    b.ToTable("inventory_items", (string)null);
                 });
 
             modelBuilder.Entity("Masterdom.Modules.Lease.Domain.Entities.Lease.Lease", b =>
@@ -1784,6 +1874,66 @@ namespace Masterdom.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("leases", (string)null);
+                });
+
+            modelBuilder.Entity("Masterdom.Modules.Maintenance.Domain.Entities.Maintenance.MaintenanceTicket", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("AssignedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("assigned_at_utc");
+
+                    b.Property<Guid?>("AssignedToPersonId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("assigned_to_person_id");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("description");
+
+                    b.Property<Guid>("PropertyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("property_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("status");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("title");
+
+                    b.Property<Guid>("UnitId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("unit_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignedToPersonId")
+                        .HasDatabaseName("ix_maintenance_tickets_assigned_to_person_id");
+
+                    b.HasIndex("PropertyId")
+                        .HasDatabaseName("ix_maintenance_tickets_property_id");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("ix_maintenance_tickets_status");
+
+                    b.HasIndex("UnitId")
+                        .HasDatabaseName("ix_maintenance_tickets_unit_id");
+
+                    b.ToTable("maintenance_tickets", (string)null);
                 });
 
             modelBuilder.Entity("Masterdom.Modules.Metering.Domain.Entities.Metering.Meter", b =>
@@ -2105,7 +2255,47 @@ namespace Masterdom.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Code")
+                        .IsUnique();
+
                     b.ToTable("properties", (string)null);
+                });
+
+            modelBuilder.Entity("Masterdom.Modules.Properties.Domain.Entities.Property.StockLocation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("stock_location_id");
+
+                    b.Property<string>("Code")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("code");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid>("PropertyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("property_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PropertyId")
+                        .HasDatabaseName("ix_stock_locations_property_id");
+
+                    b.HasIndex("PropertyId", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("ux_stock_locations_property_id_name");
+
+                    b.ToTable("stock_locations", (string)null);
                 });
 
             modelBuilder.Entity("Masterdom.Modules.Properties.Domain.Entities.Property.Unit", b =>
@@ -2153,7 +2343,8 @@ namespace Masterdom.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PropertyId");
+                    b.HasIndex("PropertyId", "Code")
+                        .IsUnique();
 
                     b.ToTable("property_units", (string)null);
                 });
@@ -2170,6 +2361,10 @@ namespace Masterdom.Infrastructure.Migrations
                     b.Property<string>("ConsumptionForecast")
                         .HasColumnType("jsonb")
                         .HasColumnName("consumption_forecast");
+
+                    b.Property<string>("ExecutionEvidence")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("execution_evidence");
 
                     b.Property<string>("MeterGroup")
                         .IsRequired()
@@ -2678,6 +2873,260 @@ namespace Masterdom.Infrastructure.Migrations
                         });
 
                     b.Navigation("Versions");
+                });
+
+            modelBuilder.Entity("Masterdom.Modules.CRM.Domain.Entities.Party.Party", b =>
+                {
+                    b.OwnsOne("Masterdom.Modules.CRM.Domain.Entities.Party.AuditInfo", "AuditInfo", b1 =>
+                        {
+                            b1.Property<Guid>("PartyId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("CreatedBy")
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("created_by");
+
+                            b1.Property<string>("UpdatedBy")
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("updated_by");
+
+                            b1.HasKey("PartyId");
+
+                            b1.ToTable("crm_parties");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PartyId");
+                        });
+
+                    b.OwnsMany("Masterdom.Modules.CRM.Domain.Entities.Party.Address", "Addresses", b1 =>
+                        {
+                            b1.Property<int>("id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("id"));
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasMaxLength(120)
+                                .HasColumnType("character varying(120)")
+                                .HasColumnName("city");
+
+                            b1.Property<string>("Country")
+                                .IsRequired()
+                                .HasMaxLength(120)
+                                .HasColumnType("character varying(120)")
+                                .HasColumnName("country");
+
+                            b1.Property<bool>("IsPreferred")
+                                .HasColumnType("boolean")
+                                .HasColumnName("is_preferred");
+
+                            b1.Property<string>("Line1")
+                                .IsRequired()
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("line1");
+
+                            b1.Property<string>("Line2")
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("line2");
+
+                            b1.Property<string>("PostalCode")
+                                .IsRequired()
+                                .HasMaxLength(32)
+                                .HasColumnType("character varying(32)")
+                                .HasColumnName("postal_code");
+
+                            b1.Property<string>("StateOrProvince")
+                                .IsRequired()
+                                .HasMaxLength(120)
+                                .HasColumnType("character varying(120)")
+                                .HasColumnName("state_or_province");
+
+                            b1.Property<string>("Type")
+                                .IsRequired()
+                                .HasMaxLength(64)
+                                .HasColumnType("character varying(64)")
+                                .HasColumnName("address_type");
+
+                            b1.Property<Guid>("party_id")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("id");
+
+                            b1.HasIndex("party_id");
+
+                            b1.ToTable("crm_party_addresses", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("party_id");
+                        });
+
+                    b.OwnsMany("Masterdom.Modules.CRM.Domain.Entities.Party.ContactMethod", "ContactMethods", b1 =>
+                        {
+                            b1.Property<int>("id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("id"));
+
+                            b1.Property<bool>("IsPreferred")
+                                .HasColumnType("boolean")
+                                .HasColumnName("is_preferred");
+
+                            b1.Property<string>("Type")
+                                .IsRequired()
+                                .HasMaxLength(64)
+                                .HasColumnType("character varying(64)")
+                                .HasColumnName("contact_type");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(256)
+                                .HasColumnType("character varying(256)")
+                                .HasColumnName("contact_value");
+
+                            b1.Property<Guid>("party_id")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("id");
+
+                            b1.HasIndex("party_id", "Type", "Value")
+                                .IsUnique();
+
+                            b1.ToTable("crm_party_contact_methods", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("party_id");
+                        });
+
+                    b.OwnsMany("Masterdom.Modules.CRM.Domain.Entities.Party.PartyRoleAssignment", "RoleAssignments", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid")
+                                .HasColumnName("party_role_assignment_id");
+
+                            b1.Property<DateTime>("AssignedAtUtc")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("assigned_at_utc");
+
+                            b1.Property<string>("AssignmentReason")
+                                .HasMaxLength(1000)
+                                .HasColumnType("character varying(1000)")
+                                .HasColumnName("assignment_reason");
+
+                            b1.Property<DateTime?>("DeactivatedAtUtc")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("deactivated_at_utc");
+
+                            b1.Property<string>("DeactivationReason")
+                                .HasMaxLength(1000)
+                                .HasColumnType("character varying(1000)")
+                                .HasColumnName("deactivation_reason");
+
+                            b1.Property<DateTime>("EffectiveFromUtc")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("effective_from_utc");
+
+                            b1.Property<DateTime?>("EffectiveToUtc")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("effective_to_utc");
+
+                            b1.Property<DateTime?>("ReactivatedAtUtc")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("reactivated_at_utc");
+
+                            b1.Property<string>("ReactivationReason")
+                                .HasMaxLength(1000)
+                                .HasColumnType("character varying(1000)")
+                                .HasColumnName("reactivation_reason");
+
+                            b1.Property<string>("RemovalReason")
+                                .HasMaxLength(1000)
+                                .HasColumnType("character varying(1000)")
+                                .HasColumnName("removal_reason");
+
+                            b1.Property<DateTime?>("RemovedAtUtc")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("removed_at_utc");
+
+                            b1.Property<string>("RoleType")
+                                .IsRequired()
+                                .HasMaxLength(64)
+                                .HasColumnType("character varying(64)")
+                                .HasColumnName("role_type");
+
+                            b1.Property<string>("Status")
+                                .IsRequired()
+                                .HasMaxLength(32)
+                                .HasColumnType("character varying(32)")
+                                .HasColumnName("status");
+
+                            b1.Property<Guid>("party_id")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("RoleType", "Status");
+
+                            b1.HasIndex("party_id", "RoleType", "Status");
+
+                            b1.ToTable("crm_party_role_assignments", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("party_id");
+                        });
+
+                    b.OwnsMany("Masterdom.Modules.CRM.Domain.Entities.Party.Relationship", "Relationships", b1 =>
+                        {
+                            b1.Property<int>("id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("id"));
+
+                            b1.Property<bool>("AllowsSelfReference")
+                                .HasColumnType("boolean")
+                                .HasColumnName("allows_self_reference");
+
+                            b1.Property<Guid>("RelatedPartyId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("related_party_id");
+
+                            b1.Property<string>("Type")
+                                .IsRequired()
+                                .HasMaxLength(64)
+                                .HasColumnType("character varying(64)")
+                                .HasColumnName("relationship_type");
+
+                            b1.Property<Guid>("party_id")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("id");
+
+                            b1.HasIndex("party_id", "RelatedPartyId", "Type")
+                                .IsUnique();
+
+                            b1.ToTable("crm_party_relationships", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("party_id");
+                        });
+
+                    b.Navigation("Addresses");
+
+                    b.Navigation("AuditInfo")
+                        .IsRequired();
+
+                    b.Navigation("ContactMethods");
+
+                    b.Navigation("Relationships");
+
+                    b.Navigation("RoleAssignments");
                 });
 
             modelBuilder.Entity("Masterdom.Modules.FinancialLedger.Domain.Entities.FinancialLedger.Ledger", b =>
@@ -4009,7 +4458,8 @@ namespace Masterdom.Infrastructure.Migrations
 
                             b1.HasKey("id");
 
-                            b1.HasIndex("property_id");
+                            b1.HasIndex("property_id", "Key")
+                                .IsUnique();
 
                             b1.ToTable("property_metadata", (string)null);
 
@@ -4053,6 +4503,15 @@ namespace Masterdom.Infrastructure.Migrations
                     b.Navigation("Relationships");
 
                     b.Navigation("Settings")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Masterdom.Modules.Properties.Domain.Entities.Property.StockLocation", b =>
+                {
+                    b.HasOne("Masterdom.Modules.Properties.Domain.Entities.Property.Property", null)
+                        .WithMany("StockLocations")
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -4146,6 +4605,10 @@ namespace Masterdom.Infrastructure.Migrations
                                 .IsRequired()
                                 .HasColumnType("jsonb")
                                 .HasColumnName("consumption_forecast");
+
+                            b1.Property<string>("ExecutionEvidence")
+                                .HasColumnType("jsonb")
+                                .HasColumnName("execution_evidence");
 
                             b1.Property<string>("OptimizationResult")
                                 .IsRequired()
@@ -4259,6 +4722,8 @@ namespace Masterdom.Infrastructure.Migrations
 
             modelBuilder.Entity("Masterdom.Modules.Properties.Domain.Entities.Property.Property", b =>
                 {
+                    b.Navigation("StockLocations");
+
                     b.Navigation("Units");
                 });
 #pragma warning restore 612, 618

@@ -23,6 +23,24 @@ internal static class PropertyCapabilityOperationNames
     public const string GetPersonByNumber = "people.read.by-number";
     public const string SearchPeople = "people.search";
 
+    public const string CreateParty = "crm.parties.create";
+    public const string UpdateParty = "crm.parties.update";
+    public const string DeactivateParty = "crm.parties.deactivate";
+    public const string AddContactMethod = "crm.parties.contact-methods.add";
+    public const string RemoveContactMethod = "crm.parties.contact-methods.remove";
+    public const string AddAddress = "crm.parties.addresses.add";
+    public const string RemoveAddress = "crm.parties.addresses.remove";
+    public const string CreatePartyRelationship = "crm.parties.relationships.create";
+    public const string RemovePartyRelationship = "crm.parties.relationships.remove";
+    public const string AssignPartyRole = "crm.parties.roles.assign";
+    public const string RemovePartyRole = "crm.parties.roles.remove";
+    public const string DeactivatePartyRole = "crm.parties.roles.deactivate";
+    public const string ReactivatePartyRole = "crm.parties.roles.reactivate";
+    public const string GetPartyRoles = "crm.parties.roles.read";
+    public const string SearchPartiesByRole = "crm.parties.roles.search";
+    public const string GetPartyById = "crm.parties.read.by-id";
+    public const string SearchParties = "crm.parties.search";
+
     public const string CreateLease = "leases.create";
     public const string ActivateLease = "leases.activate";
     public const string RenewLease = "leases.renew";
@@ -57,8 +75,12 @@ internal static class PropertyCapabilityOperationNames
     public const string GetMaintenanceTicketById = "maintenance.tickets.read.by-id";
 
     public const string CreateInventoryItem = "inventory.items.create";
+    public const string ReceiveInventoryStock = "inventory.items.receive";
+    public const string AdjustInventoryStock = "inventory.items.adjust";
+    public const string TransferInventoryStock = "inventory.items.transfer";
 
     public const string CreateIdentityRole = "identity.roles.create";
+    public const string GetIdentityRoleByCode = "identity.roles.read.by-code";
 
     public const string GenerateBill = "billing.generate";
     public const string FinalizeBill = "billing.finalize";
@@ -93,4 +115,8 @@ internal static class PropertyCapabilityOperationNames
     public const string DownloadDocument = "documents.download";
     public const string RegenerateDocument = "documents.regenerate";
     public const string GetDocumentHistory = "documents.history";
+
+    public const string ExecuteSubsidyOptimization = "subsidyoptimization.execute";
+    public const string ReadSubsidyOptimization = "subsidyoptimization.read";
+    public const string ManageSubsidyOptimization = "subsidyoptimization.manage";
 }

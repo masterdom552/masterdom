@@ -1,3 +1,6 @@
+using Masterdom.Modules.SubsidyOptimization.Contracts.UtilityRating;
+using Masterdom.Modules.SubsidyOptimization.Domain.Entities.SubsidyOptimization;
+
 namespace Masterdom.Modules.SubsidyOptimization.Application.Maximizer;
 
 public sealed class ScenarioEvaluator
@@ -11,12 +14,20 @@ public sealed class ScenarioEvaluator
 
     public IReadOnlyList<SubsidyOptimizationScenario> RankScenarios(
         IReadOnlyCollection<SubsidyOptimizationScenario> scenarios,
+        SubsidyPolicyConfiguration policy,
+        OptimizationModelConfiguration model,
+        OptimizationStrategyConfiguration strategy,
+        IReadOnlyCollection<RatedConsumptionContract> ratedConsumptions,
         DateTime effectiveDateUtc)
     {
         ArgumentNullException.ThrowIfNull(scenarios);
+        ArgumentNullException.ThrowIfNull(policy);
+        ArgumentNullException.ThrowIfNull(model);
+        ArgumentNullException.ThrowIfNull(strategy);
+        ArgumentNullException.ThrowIfNull(ratedConsumptions);
 
         var scoredScenarios = scenarios
-            .Select(x => x with { RankScore = CalculateScore(x, effectiveDateUtc) })
+            .Select(x => Evaluate(x, policy, model, strategy, ratedConsumptions, effectiveDateUtc))
             .ToArray();
 
         var preliminaryOrder = SubsidyCalculationRuntimeInvoker.ReadIntList(
@@ -72,26 +83,95 @@ public sealed class ScenarioEvaluator
             ordered.AddRange(tieBreakOrder.Select(localIndex => scoredScenarios[tieGroup[localIndex]]));
         }
 
-        return ordered;
+        return ordered
+            .OrderByDescending(x => x.IsFeasible)
+            .ThenByDescending(x => x.RankScore)
+            .ThenBy(x => x.ForecastConsumptionUnits)
+            .ToArray();
     }
 
-    private decimal CalculateScore(SubsidyOptimizationScenario scenario, DateTime effectiveDateUtc)
+    private SubsidyOptimizationScenario Evaluate(
+        SubsidyOptimizationScenario scenario,
+        SubsidyPolicyConfiguration policy,
+        OptimizationModelConfiguration model,
+        OptimizationStrategyConfiguration strategy,
+        IReadOnlyCollection<RatedConsumptionContract> ratedConsumptions,
+        DateTime effectiveDateUtc)
     {
+        var slab = policy.Slabs
+            .OrderBy(x => x.MaximumUnits)
+            .FirstOrDefault(x => scenario.ForecastConsumptionUnits <= x.MaximumUnits);
+        var expectedSubsidy = slab?.SubsidyAmount ?? 0m;
+        var individualLoadViolation = scenario.MeterAllocations.Sum(
+            x => decimal.Max(0m, x.AllocatedUnits - x.SanctionedLoad));
+        var transferredUnits = OptimizationAllocationInvariant.CalculateTransferredUnits(
+            scenario.MeterAllocations.Select(x => x.MovementUnits));
+        var propertyLoadImpact = decimal.Max(0m, scenario.ForecastConsumptionUnits - policy.SanctionedLoadLimit);
+        var sanctionedLoadImpact = individualLoadViolation + transferredUnits + propertyLoadImpact;
+        var ratedUnits = ratedConsumptions.Sum(x => x.RatedUnits);
+        var ratedAmount = ratedConsumptions.Sum(x => x.RatedAmount);
+        var ratedUnitCost = ratedUnits <= 0m ? 0m : ratedAmount / ratedUnits;
+        var expectedCost = scenario.ForecastConsumptionUnits * ratedUnitCost
+            + sanctionedLoadImpact * policy.SanctionedLoadPenaltyPerUnit;
+        var allocationsConserved = OptimizationAllocationInvariant.IsConserved(
+            scenario.ForecastConsumptionUnits,
+            scenario.MeterAllocations.Select(x => x.AllocatedUnits),
+            model.BoundaryTolerance);
+        var movementsConserved = OptimizationAllocationInvariant.IsMovementConserved(
+            scenario.MeterAllocations.Select(x => x.MovementUnits),
+            model.BoundaryTolerance);
+        var movementWithinBudget = OptimizationAllocationInvariant.IsWithinMovementBudget(
+            scenario.ForecastConsumptionUnits,
+            strategy.MaximumCrossMeterMovementFraction,
+            scenario.MeterAllocations.Select(x => x.MovementUnits),
+            model.BoundaryTolerance);
+        var movementAllowed = strategy.PermitCrossMeterMovement
+            || scenario.MeterAllocations.All(x => x.MovementUnits == 0m);
+        var individualLoadsValid = scenario.MeterAllocations.All(x => x.AllocatedUnits >= 0m && x.AllocatedUnits <= x.SanctionedLoad);
+        var isFeasible = scenario.ForecastConsumptionUnits >= 0m
+            && allocationsConserved
+            && movementsConserved
+            && movementWithinBudget
+            && movementAllowed
+            && individualLoadsValid;
+        var risk = decimal.Abs(scenario.ForecastConsumptionUnits - scenario.EstimatedConsumptionUnits);
+        var preservation = expectedSubsidy <= 0m ? 0m : expectedSubsidy / decimal.Max(expectedSubsidy + expectedCost, 1m);
+
         var result = _runtime.Execute(
             "scoring.weighted_score",
             new Dictionary<string, object?>
             {
                 ["values"] = new[]
                 {
-                    scenario.ExpectedBenefit,
-                    -scenario.ExpectedRisk,
-                    scenario.SubsidyPreservationScore,
-                    scenario.ThresholdDelta
+                    expectedSubsidy,
+                    -expectedCost,
+                    -sanctionedLoadImpact,
+                    -risk
                 },
-                ["weights"] = new[] { 2.5m, 1.7m, 10m, 0.1m }
+                ["weights"] = new[]
+                {
+                    model.SubsidyWeight,
+                    model.CostWeight,
+                    model.LoadImpactWeight,
+                    model.RiskWeight
+                }
             },
             effectiveDateUtc);
 
-        return SubsidyCalculationRuntimeInvoker.ReadDecimal(result, "value");
+        var score = isFeasible ? SubsidyCalculationRuntimeInvoker.ReadDecimal(result, "value") : decimal.MinValue;
+        return scenario with
+        {
+            ExpectedSubsidy = expectedSubsidy,
+            ExpectedCost = expectedCost,
+            SanctionedLoadImpact = sanctionedLoadImpact,
+            ExpectedBenefit = expectedSubsidy,
+            ExpectedRisk = risk,
+            SubsidyPreservationScore = preservation,
+            IsFeasible = isFeasible,
+            InfeasibilityReason = isFeasible ? null : "Scenario violates property conservation, movement, or sanctioned-load constraints.",
+            TriggeredBoundary = slab?.MaximumUnits,
+            TradeOffSummary = $"subsidy={expectedSubsidy:F2};cost={expectedCost:F2};loadImpact={sanctionedLoadImpact:F2};risk={risk:F2}",
+            RankScore = score
+        };
     }
 }

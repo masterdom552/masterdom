@@ -34,9 +34,9 @@ public sealed class SubsidyMaximizerServiceTests
         var request = CreateRequest(
             consumptionHistory:
             [
-                new MeteringConsumptionHistoryContract(Guid.NewGuid(), new DateOnly(2026, 1, 1), new DateOnly(2026, 1, 31), 100m, DateTime.UtcNow),
-                new MeteringConsumptionHistoryContract(Guid.NewGuid(), new DateOnly(2026, 2, 1), new DateOnly(2026, 2, 28), 0m, DateTime.UtcNow),
-                new MeteringConsumptionHistoryContract(Guid.NewGuid(), new DateOnly(2026, 3, 1), new DateOnly(2026, 3, 31), 0m, DateTime.UtcNow)
+                new MeteringConsumptionHistoryContract(Guid.NewGuid(), new DateOnly(2026, 1, 1), new DateOnly(2026, 1, 31), 100m, DateTime.UtcNow, "residential", "Active", 120m),
+                new MeteringConsumptionHistoryContract(Guid.NewGuid(), new DateOnly(2026, 2, 1), new DateOnly(2026, 2, 28), 0m, DateTime.UtcNow, "residential", "Active", 120m),
+                new MeteringConsumptionHistoryContract(Guid.NewGuid(), new DateOnly(2026, 3, 1), new DateOnly(2026, 3, 31), 0m, DateTime.UtcNow, "residential", "Active", 120m)
             ]);
 
         var result = service.Execute(request);
@@ -54,6 +54,199 @@ public sealed class SubsidyMaximizerServiceTests
 
         Assert.True(result.RankedScenarios.Count >= 3);
         Assert.True(result.RankedScenarios[0].RankScore >= result.RankedScenarios[^1].RankScore);
+    }
+
+    [Fact]
+    public void Execute_ShouldEvaluateConfiguredCliffsAndSanctionedLoadImpact()
+    {
+        var result = CreateService().Execute(CreateRequest());
+
+        Assert.Contains(result.RankedScenarios, x => x.ForecastConsumptionUnits == 100m && x.TriggeredBoundary == 100m);
+        Assert.Contains(result.RankedScenarios, x => x.ForecastConsumptionUnits == 100.01m);
+        Assert.Contains(result.RankedScenarios, x => x.SanctionedLoadImpact > 0m && x.ExpectedCost > 0m);
+        Assert.All(result.RankedScenarios, x => Assert.False(string.IsNullOrWhiteSpace(x.TradeOffSummary)));
+    }
+
+    [Fact]
+    public void Execute_ShouldRejectMeterTypeExcludedByGovernedPolicy()
+    {
+        var request = CreateRequest(consumptionHistory:
+        [
+            new MeteringConsumptionHistoryContract(
+                Guid.NewGuid(),
+                new DateOnly(2026, 1, 1),
+                new DateOnly(2026, 1, 31),
+                100m,
+                DateTime.UtcNow,
+                MeterType: "commercial",
+                MeterStatus: "Active",
+                SanctionedLoad: 120m)
+        ]);
+
+        var exception = Assert.Throws<InvalidOperationException>(() => CreateService().Execute(request));
+        Assert.Contains("not eligible", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [MemberData(nameof(InvalidSanctionedLoads))]
+    public void Execute_ShouldRejectMissingOrNonpositiveSanctionedLoad(decimal? sanctionedLoad)
+    {
+        var request = CreateRequest(consumptionHistory:
+        [
+            new MeteringConsumptionHistoryContract(
+                Guid.NewGuid(),
+                new DateOnly(2026, 1, 1),
+                new DateOnly(2026, 1, 31),
+                100m,
+                DateTime.UtcNow,
+                "residential",
+                "Active",
+                sanctionedLoad)
+        ]);
+
+        var exception = Assert.Throws<InvalidOperationException>(() => CreateService().Execute(request));
+
+        Assert.Contains("positive sanctioned load", exception.Message, StringComparison.Ordinal);
+    }
+
+    public static TheoryData<decimal?> InvalidSanctionedLoads => new()
+    {
+        null,
+        0m,
+        -1m
+    };
+
+    [Fact]
+    public void Execute_ShouldRejectRatingOnlyMeter()
+    {
+        var request = CreateRequest();
+        request = request with
+        {
+            RatedConsumptions =
+            [
+                new RatedConsumptionContract(
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new DateOnly(2026, 1, 1),
+                    new DateOnly(2026, 1, 31),
+                    100m,
+                    50m,
+                    DateTime.UtcNow)
+            ]
+        };
+
+        var exception = Assert.Throws<InvalidOperationException>(() => CreateService().Execute(request));
+
+        Assert.Contains("does not correlate", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Execute_ShouldExcludeInactiveMetersBeforeForecastAndAllocation()
+    {
+        var activeMeterId = Guid.NewGuid();
+        var retiredMeterId = Guid.NewGuid();
+        var history = new[]
+        {
+            new MeteringConsumptionHistoryContract(activeMeterId, new DateOnly(2026, 1, 1), new DateOnly(2026, 1, 31), 100m, DateTime.UtcNow, "residential", "Active", 120m),
+            new MeteringConsumptionHistoryContract(retiredMeterId, new DateOnly(2026, 1, 1), new DateOnly(2026, 1, 31), 10_000m, DateTime.UtcNow, "residential", "Retired", 120m)
+        };
+        var request = CreateRequest(history) with
+        {
+            RatedConsumptions =
+            [
+                new RatedConsumptionContract(Guid.NewGuid(), activeMeterId, new DateOnly(2026, 1, 1), new DateOnly(2026, 1, 31), 100m, 50m, DateTime.UtcNow)
+            ]
+        };
+
+        var result = CreateService().Execute(request);
+
+        Assert.Single(result.ParticipatingConsumptionHistory);
+        Assert.Equal(activeMeterId, result.ParticipatingConsumptionHistory[0].MeterId);
+        Assert.All(result.RankedScenarios.SelectMany(x => x.MeterAllocations), allocation =>
+            Assert.Equal(activeMeterId, allocation.MeterId));
+    }
+
+    [Fact]
+    public void Execute_ShouldRejectUnknownMeterStatus()
+    {
+        var input = CreateRequest().ConsumptionHistory.First();
+        var request = CreateRequest([input with { MeterStatus = "Unknown" }]);
+
+        var exception = Assert.Throws<InvalidOperationException>(() => CreateService().Execute(request));
+
+        Assert.Contains("not recognized", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Execute_ShouldPreservePositiveSanctionedLoadForEveryMeterAllocation()
+    {
+        var result = CreateService().Execute(CreateRequest());
+
+        Assert.All(result.RankedScenarios, scenario =>
+            Assert.All(scenario.MeterAllocations, allocation => Assert.True(allocation.SanctionedLoad > 0m)));
+    }
+
+    [Fact]
+    public void Execute_ShouldRejectMalformedPolicyBeforeCalculation()
+    {
+        var runtime = new RecordingRuntimeInvoker();
+        var catalog = new RecordingBusinessConfigurationCatalog
+        {
+            Policy = new SubsidyPolicyConfiguration(
+                "invalid-policy",
+                [new SubsidySlabConfiguration(200m, 50m, true), new SubsidySlabConfiguration(100m, 25m, true)],
+                120m,
+                1m,
+                ["residential"])
+        };
+
+        Assert.Throws<InvalidOperationException>(() => CreateService(catalog, runtime).Execute(CreateRequest()));
+        Assert.Empty(runtime.CapabilityIds);
+    }
+
+    [Fact]
+    public void Execute_ShouldRejectMalformedModelBeforeCalculation()
+    {
+        var runtime = new RecordingRuntimeInvoker();
+        var catalog = new RecordingBusinessConfigurationCatalog
+        {
+            Model = new OptimizationModelConfiguration("invalid-model", 1m, 1m, 1m, 1m, 0.01m, 5)
+        };
+
+        var exception = Assert.Throws<InvalidOperationException>(() => CreateService(catalog, runtime).Execute(CreateRequest()));
+
+        Assert.Contains("mandatory subsidy cliff", exception.Message, StringComparison.Ordinal);
+        Assert.Empty(runtime.CapabilityIds);
+    }
+
+    [Fact]
+    public void Execute_ShouldRejectMalformedStrategyBeforeCalculation()
+    {
+        var runtime = new RecordingRuntimeInvoker();
+        var catalog = new RecordingBusinessConfigurationCatalog
+        {
+            Strategy = new OptimizationStrategyConfiguration("invalid-strategy", [1m, -0.5m], true, false, 0m)
+        };
+
+        Assert.Throws<InvalidOperationException>(() => CreateService(catalog, runtime).Execute(CreateRequest()));
+        Assert.Empty(runtime.CapabilityIds);
+    }
+
+    [Fact]
+    public void Execute_ShouldBeDeterministicForIdenticalInputsAndConfiguration()
+    {
+        var service = CreateService();
+        var request = CreateRequest();
+
+        var first = service.Execute(request).RankedScenarios;
+        var second = service.Execute(request).RankedScenarios;
+
+        Assert.Equal(first.Count, second.Count);
+        for (var index = 0; index < first.Count; index++)
+        {
+            Assert.Equal(first[index] with { MeterAllocations = [] }, second[index] with { MeterAllocations = [] });
+            Assert.Equal<SubsidyMeterAllocation>(first[index].MeterAllocations, second[index].MeterAllocations);
+        }
     }
 
     [Fact]
@@ -229,9 +422,9 @@ public sealed class SubsidyMaximizerServiceTests
     {
         var history = consumptionHistory ??
             [
-                new MeteringConsumptionHistoryContract(Guid.NewGuid(), new DateOnly(2026, 1, 1), new DateOnly(2026, 1, 31), 120m, DateTime.UtcNow),
-                new MeteringConsumptionHistoryContract(Guid.NewGuid(), new DateOnly(2026, 2, 1), new DateOnly(2026, 2, 28), 110m, DateTime.UtcNow),
-                new MeteringConsumptionHistoryContract(Guid.NewGuid(), new DateOnly(2026, 3, 1), new DateOnly(2026, 3, 31), 130m, DateTime.UtcNow)
+                new MeteringConsumptionHistoryContract(Guid.NewGuid(), new DateOnly(2026, 1, 1), new DateOnly(2026, 1, 31), 120m, DateTime.UtcNow, "residential", "Active", 120m),
+                new MeteringConsumptionHistoryContract(Guid.NewGuid(), new DateOnly(2026, 2, 1), new DateOnly(2026, 2, 28), 110m, DateTime.UtcNow, "residential", "Active", 120m),
+                new MeteringConsumptionHistoryContract(Guid.NewGuid(), new DateOnly(2026, 3, 1), new DateOnly(2026, 3, 31), 130m, DateTime.UtcNow, "residential", "Active", 120m)
             ];
 
         var rated =
@@ -270,10 +463,17 @@ public sealed class SubsidyMaximizerServiceTests
     {
         public HashSet<string> ConsumedKeys { get; } = new(StringComparer.OrdinalIgnoreCase);
 
+        public SubsidyPolicyConfiguration? Policy { get; init; }
+
+        public OptimizationModelConfiguration? Model { get; init; }
+
+        public OptimizationStrategyConfiguration? Strategy { get; init; }
+
         public BusinessConfigurationAsset<TPayload> Resolve<TPayload>(ConfigurationKey key, ConfigurationResolutionRequest request)
         {
             _ = request;
             ConsumedKeys.Add(key.Value);
+            var effectiveFromUtc = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
             var metadata = new BusinessConfigurationMetadata(
                 DefinitionId: key.Value,
@@ -281,15 +481,42 @@ public sealed class SubsidyMaximizerServiceTests
                 Version: 1,
                 Status: BusinessConfigurationStatus.Active,
                 Description: "test",
-                EffectiveFromUtc: DateTime.UtcNow.AddDays(-1),
+                EffectiveFromUtc: effectiveFromUtc,
                 EffectiveToUtc: null,
                 CreatedBy: "test",
                 ModifiedBy: "test",
-                CreatedAtUtc: DateTime.UtcNow.AddDays(-1),
-                ModifiedAtUtc: DateTime.UtcNow,
+                CreatedAtUtc: effectiveFromUtc,
+                ModifiedAtUtc: effectiveFromUtc,
                 AuditMetadata: new Dictionary<string, string>());
 
-            object payload = JsonDocument.Parse("{}").RootElement;
+            object payload = typeof(TPayload) switch
+            {
+                var type when type == typeof(SubsidyPolicyConfiguration) => Policy ?? new SubsidyPolicyConfiguration(
+                    "delhi-residential",
+                    [
+                        new SubsidySlabConfiguration(100m, 100m, true),
+                        new SubsidySlabConfiguration(200m, 50m, true),
+                        new SubsidySlabConfiguration(decimal.MaxValue, 0m, false)
+                    ],
+                    SanctionedLoadLimit: 115m,
+                    SanctionedLoadPenaltyPerUnit: 2m,
+                    EligibleMeterTypes: ["residential"]),
+                var type when type == typeof(OptimizationModelConfiguration) => Model ?? new OptimizationModelConfiguration(
+                    "balanced-v1",
+                    SubsidyWeight: 1m,
+                    CostWeight: 1m,
+                    LoadImpactWeight: 1m,
+                    RiskWeight: 0.1m,
+                    BoundaryTolerance: 0.01m,
+                    MaximumScenarioCount: 20),
+                var type when type == typeof(OptimizationStrategyConfiguration) => Strategy ?? new OptimizationStrategyConfiguration(
+                    "bounded-cliff-search-v1",
+                    ConsumptionFactors: [1m, 0.98m, 0.95m, 0.90m],
+                    IncludeSubsidyBoundaries: true,
+                    PermitCrossMeterMovement: false,
+                    MaximumCrossMeterMovementFraction: 0m),
+                _ => JsonDocument.Parse("{}").RootElement
+            };
 
             return new BusinessConfigurationAsset<TPayload>(
                 metadata,
@@ -355,7 +582,8 @@ public sealed class SubsidyMaximizerServiceTests
                 baseline,
                 baseline,
                 baseline * boundedOccupancy,
-                0m);
+                0m,
+                []);
         }
 
         var historicalAverage = orderedHistory.Average(x => x.TotalConsumptionUnits);
@@ -385,7 +613,8 @@ public sealed class SubsidyMaximizerServiceTests
             weightedAverage,
             failedMeterEstimate,
             occupancyAdjusted,
-            completeness);
+            completeness,
+            []);
     }
 
     private static SubsidyForecast CalculateExpectedForecast(

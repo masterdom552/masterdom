@@ -27,7 +27,26 @@ public sealed class UtilityRatingApplicationService : IUtilityRatingApplicationS
     {
         ArgumentNullException.ThrowIfNull(command);
 
-        var snapshot = command.ToSnapshot();
+        ConsumptionSnapshot snapshot;
+        try
+        {
+            snapshot = command.ToSnapshot();
+        }
+        catch (InvalidOperationException ex)
+        {
+            throw new ArgumentException(ex.Message, nameof(command), ex);
+        }
+
+        var tariffSchedule = _platformOrchestrator.ResolveTariffSchedule(
+            command.TariffCode,
+            snapshot.MeterReference.MeterId,
+            command.ConsumptionOutput.CapturedAtUtc);
+        if (tariffSchedule is null)
+        {
+            throw new ArgumentException(
+                $"A governed tariff configuration was not found for code '{command.TariffCode}'.",
+                nameof(command));
+        }
 
         var existing = _repository.GetByMeterPeriodAndVersion(
             snapshot.MeterReference,
@@ -39,11 +58,19 @@ public sealed class UtilityRatingApplicationService : IUtilityRatingApplicationS
             throw new InvalidOperationException("A rating already exists for meter, period, and version 1.");
         }
 
-        var rating = UtilityRatingAggregate.Rate(
-            UtilityRatingId.New(),
-            snapshot,
-            command.TariffSchedule,
-            DateTime.UtcNow);
+        UtilityRatingAggregate rating;
+        try
+        {
+            rating = UtilityRatingAggregate.Rate(
+                UtilityRatingId.New(),
+                snapshot,
+                tariffSchedule,
+                DateTime.UtcNow);
+        }
+        catch (InvalidOperationException ex)
+        {
+            throw new ArgumentException(ex.Message, nameof(command), ex);
+        }
 
         _unitOfWork.Execute(() => _repository.Add(rating));
         _platformOrchestrator.OnRatingMutated(rating, "RateConsumption");

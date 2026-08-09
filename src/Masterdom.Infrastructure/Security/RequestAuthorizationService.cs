@@ -1,5 +1,7 @@
 using Masterdom.Core.Security;
 using Masterdom.Infrastructure.Persistence;
+using Masterdom.Modules.CRM.Application.Commands;
+using Masterdom.Modules.CRM.Application.Queries;
 using Masterdom.Modules.Lease.Application.Commands;
 using Masterdom.Modules.Lease.Application.Queries;
 using Masterdom.Modules.People.Application.Commands;
@@ -24,6 +26,8 @@ using Masterdom.Modules.Notifications.Application.Queries;
 using Masterdom.Modules.Documents.Application.Commands;
 using Masterdom.Modules.Documents.Application.Queries;
 using Masterdom.Modules.Reporting.Application.Queries;
+using Masterdom.Modules.SubsidyOptimization.Application.Commands;
+using Masterdom.Modules.SubsidyOptimization.Application.Queries;
 using Microsoft.EntityFrameworkCore;
 
 namespace Masterdom.Infrastructure.Security;
@@ -36,19 +40,31 @@ internal interface IRequestAuthorizationService
 internal sealed class RequestAuthorizationService : IRequestAuthorizationService
 {
     private readonly IPropertyCapabilityAuthorizationService _authorizationService;
+    private readonly ICurrentUserAccessor _currentUserAccessor;
     private readonly MasterdomDbContext _dbContext;
 
     public RequestAuthorizationService(
         IPropertyCapabilityAuthorizationService authorizationService,
+        ICurrentUserAccessor currentUserAccessor,
         MasterdomDbContext dbContext)
     {
         _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
+        _currentUserAccessor = currentUserAccessor ?? throw new ArgumentNullException(nameof(currentUserAccessor));
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
     public AuthorizationResult Authorize(object request)
     {
         ArgumentNullException.ThrowIfNull(request);
+
+        if (request is ExecuteSubsidyOptimizationCommand executeCommand)
+        {
+            var scopeValidation = ValidateSubsidyExecutionScope(executeCommand);
+            if (!scopeValidation.IsAllowed)
+            {
+                return scopeValidation;
+            }
+        }
 
         var context = request switch
         {
@@ -72,6 +88,24 @@ internal sealed class RequestAuthorizationService : IRequestAuthorizationService
             GetPersonByIdQuery query => new AuthorizationContext(PropertyCapabilityOperationNames.GetPersonById, PersonId: query.PersonId.Value),
             GetPersonByNumberQuery => new AuthorizationContext(PropertyCapabilityOperationNames.GetPersonByNumber),
             SearchPeopleQuery => new AuthorizationContext(PropertyCapabilityOperationNames.SearchPeople),
+
+            CreatePartyCommand => new AuthorizationContext(PropertyCapabilityOperationNames.CreateParty),
+            UpdatePartyCommand => new AuthorizationContext(PropertyCapabilityOperationNames.UpdateParty),
+            DeactivatePartyCommand => new AuthorizationContext(PropertyCapabilityOperationNames.DeactivateParty),
+            AddContactMethodCommand => new AuthorizationContext(PropertyCapabilityOperationNames.AddContactMethod),
+            RemoveContactMethodCommand => new AuthorizationContext(PropertyCapabilityOperationNames.RemoveContactMethod),
+            AddAddressCommand => new AuthorizationContext(PropertyCapabilityOperationNames.AddAddress),
+            RemoveAddressCommand => new AuthorizationContext(PropertyCapabilityOperationNames.RemoveAddress),
+            CreateRelationshipCommand => new AuthorizationContext(PropertyCapabilityOperationNames.CreatePartyRelationship),
+            Masterdom.Modules.CRM.Application.Commands.RemoveRelationshipCommand => new AuthorizationContext(PropertyCapabilityOperationNames.RemovePartyRelationship),
+            AssignPartyRoleCommand => new AuthorizationContext(PropertyCapabilityOperationNames.AssignPartyRole),
+            RemovePartyRoleCommand => new AuthorizationContext(PropertyCapabilityOperationNames.RemovePartyRole),
+            DeactivatePartyRoleCommand => new AuthorizationContext(PropertyCapabilityOperationNames.DeactivatePartyRole),
+            ReactivatePartyRoleCommand => new AuthorizationContext(PropertyCapabilityOperationNames.ReactivatePartyRole),
+            GetPartyRolesQuery => new AuthorizationContext(PropertyCapabilityOperationNames.GetPartyRoles),
+            SearchPartiesByRoleQuery => new AuthorizationContext(PropertyCapabilityOperationNames.SearchPartiesByRole),
+            GetPartyByIdQuery => new AuthorizationContext(PropertyCapabilityOperationNames.GetPartyById),
+            SearchPartiesQuery => new AuthorizationContext(PropertyCapabilityOperationNames.SearchParties),
 
             CreateLeaseCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.CreateLease, command.Property.PropertyId),
             ActivateLeaseCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.ActivateLease, ResolveLeasePropertyId(command.LeaseId.Value)),
@@ -107,6 +141,9 @@ internal sealed class RequestAuthorizationService : IRequestAuthorizationService
             GetMaintenanceTicketByIdQuery query => new AuthorizationContext(PropertyCapabilityOperationNames.GetMaintenanceTicketById, ResolveMaintenanceTicketPropertyId(query.MaintenanceTicketId.Value)),
 
             CreateInventoryItemCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.CreateInventoryItem, command.PropertyId),
+            ReceiveStockCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.ReceiveInventoryStock, ResolveInventoryItemPropertyId(command.InventoryItemId.Value)),
+            AdjustStockCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.AdjustInventoryStock, ResolveInventoryItemPropertyId(command.InventoryItemId.Value)),
+            TransferInventoryCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.TransferInventoryStock, ResolveInventoryItemPropertyId(command.SourceInventoryItemId.Value)),
 
             GenerateBillCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.GenerateBill, command.PropertyReference.PropertyId),
             FinalizeBillCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.FinalizeBill, ResolveBillPropertyId(command.BillId.Value)),
@@ -142,11 +179,99 @@ internal sealed class RequestAuthorizationService : IRequestAuthorizationService
             RegenerateDocumentCommand command => new AuthorizationContext(PropertyCapabilityOperationNames.RegenerateDocument, PersonId: command.RequestedBy),
             GetDocumentHistoryQuery => new AuthorizationContext(PropertyCapabilityOperationNames.GetDocumentHistory),
 
+            ExecuteSubsidyOptimizationCommand command => new AuthorizationContext(
+                PropertyCapabilityOperationNames.ExecuteSubsidyOptimization,
+                ParseScopeId(command.Request.PropertyId),
+                ParseScopeId(command.Request.TenantId)),
+            GetOptimizationRunByIdQuery query => ResolveSubsidyRunContext(
+                PropertyCapabilityOperationNames.ReadSubsidyOptimization,
+                query.OptimizationRunId.Value),
+            GetLatestOptimizationRunQuery query => ResolveLatestSubsidyRunContext(
+                PropertyCapabilityOperationNames.ReadSubsidyOptimization,
+                query.ScenarioId.Value,
+                query.OptimizationPeriod.StartDate,
+                query.OptimizationPeriod.EndDate),
+            ArchiveOptimizationRunCommand command => ResolveSubsidyRunContext(
+                PropertyCapabilityOperationNames.ManageSubsidyOptimization,
+                command.OptimizationRunId.Value),
+            CreateScenarioVersionCommand command => ResolveSubsidyRunContext(
+                PropertyCapabilityOperationNames.ManageSubsidyOptimization,
+                command.OptimizationRunId.Value),
+            ArchiveRecommendationCommand command => ResolveSubsidyRunContext(
+                PropertyCapabilityOperationNames.ManageSubsidyOptimization,
+                command.OptimizationRunId.Value),
+
             _ => throw new InvalidOperationException($"No request authorization mapping exists for '{request.GetType().FullName}'.")
         };
 
         return _authorizationService.Authorize(context);
     }
+
+    private AuthorizationResult ValidateSubsidyExecutionScope(ExecuteSubsidyOptimizationCommand command)
+    {
+        var currentUser = _currentUserAccessor.GetCurrentUser();
+        if (!currentUser.IsAuthenticated)
+        {
+            return AuthorizationResult.Challenge();
+        }
+
+        if (!currentUser.IsInRole(MasterdomRoles.SuperUser)
+            && (!Guid.TryParse(command.Request.PropertyId, out _)
+                || (command.Request.UserId is not null
+                    && (!Guid.TryParse(command.Request.UserId, out var requestedUserId)
+                        || currentUser.UserId != requestedUserId))))
+        {
+            return AuthorizationResult.Forbid("The requested optimization property or user scope does not match the authenticated caller.");
+        }
+
+        if (currentUser.IsInRole(MasterdomRoles.Tenant)
+            && (!Guid.TryParse(command.Request.TenantId, out var tenantId)
+                || currentUser.PersonId != tenantId))
+        {
+            return AuthorizationResult.Forbid("The requested optimization tenant scope does not match the authenticated caller.");
+        }
+
+        return AuthorizationResult.Allowed();
+    }
+
+    private AuthorizationContext ResolveSubsidyRunContext(string operation, Guid optimizationRunId)
+    {
+        var scope = _dbContext.OptimizationRuns
+            .AsNoTracking()
+            .Where(x => x.Id.Value == optimizationRunId)
+            .Select(x => new { x.ExecutionEvidence!.PropertyId, x.ExecutionEvidence.TenantId })
+            .FirstOrDefault();
+
+        return new AuthorizationContext(
+            operation,
+            ParsePersistedScopeId(scope?.PropertyId),
+            ParsePersistedScopeId(scope?.TenantId));
+    }
+
+    private AuthorizationContext ResolveLatestSubsidyRunContext(
+        string operation,
+        string scenarioId,
+        DateOnly periodStart,
+        DateOnly periodEnd)
+    {
+        var scope = _dbContext.OptimizationRuns
+            .AsNoTracking()
+            .Where(x => x.Scenario.ScenarioId.Value == scenarioId
+                && x.OptimizationPeriod.StartDate == periodStart
+                && x.OptimizationPeriod.EndDate == periodEnd)
+            .OrderByDescending(x => x.OptimizationVersion.Value)
+            .Select(x => new { x.ExecutionEvidence!.PropertyId, x.ExecutionEvidence.TenantId })
+            .FirstOrDefault();
+
+        return new AuthorizationContext(
+            operation,
+            ParsePersistedScopeId(scope?.PropertyId),
+            ParsePersistedScopeId(scope?.TenantId));
+    }
+
+    private static Guid? ParseScopeId(string? value) => Guid.TryParse(value, out var id) ? id : null;
+
+    private static Guid? ParsePersistedScopeId(string? value) => Guid.TryParse(value, out var id) ? id : Guid.Empty;
 
     private Guid? ResolvePropertyId(string propertyCode)
     {
@@ -225,6 +350,15 @@ internal sealed class RequestAuthorizationService : IRequestAuthorizationService
         return _dbContext.MaintenanceTickets
             .AsNoTracking()
             .Where(x => x.Id.Value == maintenanceTicketId)
+            .Select(x => (Guid?)x.PropertyId)
+            .FirstOrDefault();
+    }
+
+    private Guid? ResolveInventoryItemPropertyId(Guid inventoryItemId)
+    {
+        return _dbContext.InventoryItems
+            .AsNoTracking()
+            .Where(x => x.Id.Value == inventoryItemId)
             .Select(x => (Guid?)x.PropertyId)
             .FirstOrDefault();
     }

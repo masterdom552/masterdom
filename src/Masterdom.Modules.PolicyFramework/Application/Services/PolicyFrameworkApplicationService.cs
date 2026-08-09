@@ -122,7 +122,7 @@ public sealed class PolicyFrameworkApplicationService : IPolicyFrameworkApplicat
     public PolicyAggregate? GetApplicablePolicy(GetApplicablePolicyQuery query)
     {
         ArgumentNullException.ThrowIfNull(query);
-        return _repository.GetApplicable(query.PolicyType, query.Scope, query.AsOfDate);
+        return _repository.GetApplicable(query.PolicyType, query.Scope, query.AsOfDate, query.PolicyCode);
     }
 
     private PolicyAggregate GetRequiredPolicy(PolicyId policyId)

@@ -64,6 +64,42 @@ internal sealed class PropertyCommandAuthorizationDecorator<TCommand, TResult>
         AuthorizationDecoratorSupport.Execute(command, _inner.Handle, _authorizationService);
 }
 
+internal sealed class SubsidyOptimizationCommandAuthorizationDecorator<TCommand, TResult>
+    : Masterdom.Modules.SubsidyOptimization.Application.Support.ICommandHandler<TCommand, TResult>
+{
+    private readonly Masterdom.Modules.SubsidyOptimization.Application.Support.ICommandHandler<TCommand, TResult> _inner;
+    private readonly IRequestAuthorizationService _authorizationService;
+
+    public SubsidyOptimizationCommandAuthorizationDecorator(
+        Masterdom.Modules.SubsidyOptimization.Application.Support.ICommandHandler<TCommand, TResult> inner,
+        IRequestAuthorizationService authorizationService)
+    {
+        _inner = inner ?? throw new ArgumentNullException(nameof(inner));
+        _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
+    }
+
+    public TResult Handle(TCommand command) =>
+        AuthorizationDecoratorSupport.Execute(command, _inner.Handle, _authorizationService);
+}
+
+internal sealed class SubsidyOptimizationQueryAuthorizationDecorator<TQuery, TResult>
+    : Masterdom.Modules.SubsidyOptimization.Application.Support.IQueryHandler<TQuery, TResult>
+{
+    private readonly Masterdom.Modules.SubsidyOptimization.Application.Support.IQueryHandler<TQuery, TResult> _inner;
+    private readonly IRequestAuthorizationService _authorizationService;
+
+    public SubsidyOptimizationQueryAuthorizationDecorator(
+        Masterdom.Modules.SubsidyOptimization.Application.Support.IQueryHandler<TQuery, TResult> inner,
+        IRequestAuthorizationService authorizationService)
+    {
+        _inner = inner ?? throw new ArgumentNullException(nameof(inner));
+        _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
+    }
+
+    public TResult Handle(TQuery query) =>
+        AuthorizationDecoratorSupport.Execute(query, _inner.Handle, _authorizationService);
+}
+
 internal sealed class PropertyQueryAuthorizationDecorator<TQuery, TResult>
     : Masterdom.Modules.Properties.Application.Support.IQueryHandler<TQuery, TResult>
 {
@@ -108,6 +144,42 @@ internal sealed class PeopleQueryAuthorizationDecorator<TQuery, TResult>
 
     public PeopleQueryAuthorizationDecorator(
         Masterdom.Modules.People.Application.Support.IQueryHandler<TQuery, TResult> inner,
+        IRequestAuthorizationService authorizationService)
+    {
+        _inner = inner ?? throw new ArgumentNullException(nameof(inner));
+        _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
+    }
+
+    public TResult Handle(TQuery query) =>
+        AuthorizationDecoratorSupport.Execute(query, _inner.Handle, _authorizationService);
+}
+
+internal sealed class CrmCommandAuthorizationDecorator<TCommand, TResult>
+    : Masterdom.Modules.CRM.Application.Support.ICommandHandler<TCommand, TResult>
+{
+    private readonly Masterdom.Modules.CRM.Application.Support.ICommandHandler<TCommand, TResult> _inner;
+    private readonly IRequestAuthorizationService _authorizationService;
+
+    public CrmCommandAuthorizationDecorator(
+        Masterdom.Modules.CRM.Application.Support.ICommandHandler<TCommand, TResult> inner,
+        IRequestAuthorizationService authorizationService)
+    {
+        _inner = inner ?? throw new ArgumentNullException(nameof(inner));
+        _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
+    }
+
+    public TResult Handle(TCommand command) =>
+        AuthorizationDecoratorSupport.Execute(command, _inner.Handle, _authorizationService);
+}
+
+internal sealed class CrmQueryAuthorizationDecorator<TQuery, TResult>
+    : Masterdom.Modules.CRM.Application.Support.IQueryHandler<TQuery, TResult>
+{
+    private readonly Masterdom.Modules.CRM.Application.Support.IQueryHandler<TQuery, TResult> _inner;
+    private readonly IRequestAuthorizationService _authorizationService;
+
+    public CrmQueryAuthorizationDecorator(
+        Masterdom.Modules.CRM.Application.Support.IQueryHandler<TQuery, TResult> inner,
         IRequestAuthorizationService authorizationService)
     {
         _inner = inner ?? throw new ArgumentNullException(nameof(inner));

@@ -10,7 +10,8 @@ public sealed class OptimizationSnapshot : ValueObject
         DateTime capturedAtUtc,
         OptimizationResult optimizationResult,
         ConsumptionForecast consumptionForecast,
-        RecommendationSet recommendationSet)
+        RecommendationSet recommendationSet,
+        OptimizationExecutionEvidence? executionEvidence)
     {
         SnapshotId = snapshotId;
         Version = version;
@@ -18,6 +19,7 @@ public sealed class OptimizationSnapshot : ValueObject
         OptimizationResult = optimizationResult;
         ConsumptionForecast = consumptionForecast;
         RecommendationSet = recommendationSet;
+        ExecutionEvidence = executionEvidence;
     }
 
     public Guid SnapshotId { get; }
@@ -32,12 +34,15 @@ public sealed class OptimizationSnapshot : ValueObject
 
     public RecommendationSet RecommendationSet { get; }
 
+    public OptimizationExecutionEvidence? ExecutionEvidence { get; }
+
     public static OptimizationSnapshot Create(
         OptimizationVersion version,
         DateTime capturedAtUtc,
         OptimizationResult optimizationResult,
         ConsumptionForecast consumptionForecast,
-        RecommendationSet recommendationSet)
+        RecommendationSet recommendationSet,
+        OptimizationExecutionEvidence? executionEvidence = null)
     {
         ArgumentNullException.ThrowIfNull(version);
         ArgumentNullException.ThrowIfNull(optimizationResult);
@@ -55,7 +60,8 @@ public sealed class OptimizationSnapshot : ValueObject
             capturedAtUtc,
             optimizationResult,
             consumptionForecast,
-            recommendationSet);
+            recommendationSet,
+            executionEvidence);
     }
 
     protected override IEnumerable<object?> GetEqualityComponents()
@@ -66,5 +72,6 @@ public sealed class OptimizationSnapshot : ValueObject
         yield return OptimizationResult;
         yield return ConsumptionForecast;
         yield return RecommendationSet;
+        yield return ExecutionEvidence;
     }
 }

@@ -5,4 +5,10 @@ public sealed record SubsidyConsumptionEstimate(
     decimal WeightedAverageUnits,
     decimal FailedMeterEstimateUnits,
     decimal OccupancyAdjustedUnits,
-    decimal DataCompletenessRatio);
+    decimal DataCompletenessRatio,
+    IReadOnlyList<SubsidyMeterEstimate> MeterEstimates);
+
+public sealed record SubsidyMeterEstimate(
+    Guid MeterId,
+    decimal BaselineUnits,
+    decimal SanctionedLoad);

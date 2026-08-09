@@ -11,6 +11,7 @@ namespace Masterdom.Modules.Properties.Domain.Entities.Property;
 public sealed class Property : AggregateRoot<PropertyId>, IHasDomainEvents
 {
     private readonly List<Unit> _units = [];
+    private readonly List<StockLocation> _stockLocations = [];
     private readonly List<PropertyMetadata> _metadata = [];
     private readonly List<PropertyRelationship> _relationships = [];
     private readonly List<IDomainEvent> _domainEvents = [];
@@ -137,6 +138,11 @@ public sealed class Property : AggregateRoot<PropertyId>, IHasDomainEvents
     /// Gets the units belonging to this property.
     /// </summary>
     public IReadOnlyCollection<Unit> Units => _units;
+
+    /// <summary>
+    /// Gets the stock locations belonging to this property.
+    /// </summary>
+    public IReadOnlyCollection<StockLocation> StockLocations => _stockLocations;
 
     /// <summary>
     /// Gets property metadata records.
@@ -463,6 +469,40 @@ public sealed class Property : AggregateRoot<PropertyId>, IHasDomainEvents
         Raise(new UnitRemovedDomainEvent(Id, unit.Id));
 
         return true;
+    }
+
+    /// <summary>
+    /// Adds a stock location to this property.
+    /// </summary>
+    public StockLocation AddStockLocation(string name, string? code = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
+        if (name.Length > 200)
+            throw new ArgumentException("Stock location name cannot exceed 200 characters.", nameof(name));
+
+        if (code is not null)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+                throw new ArgumentException("Stock location code cannot be whitespace.", nameof(code));
+            if (code.Length > 64)
+                throw new ArgumentException("Stock location code cannot exceed 64 characters.", nameof(code));
+        }
+
+        var trimmedName = name.Trim();
+
+        if (_stockLocations.Any(x => x.Name == trimmedName))
+            throw new InvalidOperationException($"A stock location named '{trimmedName}' already exists.");
+
+        var location = new StockLocation(
+            StockLocationId.New(),
+            trimmedName,
+            code?.Trim());
+
+        location.AttachToProperty(Id);
+        _stockLocations.Add(location);
+
+        return location;
     }
 
     /// <inheritdoc />

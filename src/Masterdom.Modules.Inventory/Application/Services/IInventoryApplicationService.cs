@@ -6,4 +6,10 @@ namespace Masterdom.Modules.Inventory.Application.Services;
 public interface IInventoryApplicationService
 {
     InventoryItemAggregate CreateInventoryItem(CreateInventoryItemCommand command);
+
+    InventoryItemAggregate ReceiveStock(ReceiveStockCommand command);
+
+    InventoryItemAggregate AdjustStock(AdjustStockCommand command);
+
+    InventoryItemAggregate TransferInventory(TransferInventoryCommand command);
 }

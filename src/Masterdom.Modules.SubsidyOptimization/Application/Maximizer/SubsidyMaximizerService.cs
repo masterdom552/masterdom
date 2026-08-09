@@ -70,27 +70,83 @@ public sealed class SubsidyMaximizerService : ISubsidyMaximizerService
             throw new InvalidOperationException("ConfigurationVersion is required.");
         }
 
+        var governedConfiguration = ResolveGovernedConfiguration(request);
+        SubsidyOptimizerConfigurationValidator.Validate(governedConfiguration, request.EffectiveDateUtc);
+
+        var invalidStatus = request.ConsumptionHistory.FirstOrDefault(x =>
+            !string.Equals(x.MeterStatus, "Installed", StringComparison.OrdinalIgnoreCase)
+            && !string.Equals(x.MeterStatus, "Active", StringComparison.OrdinalIgnoreCase)
+            && !string.Equals(x.MeterStatus, "Retired", StringComparison.OrdinalIgnoreCase));
+        if (invalidStatus is not null)
+        {
+            throw new InvalidOperationException($"Meter status '{invalidStatus.MeterStatus}' is not recognized for meter '{invalidStatus.MeterId}'.");
+        }
+
+        var activeHistory = request.ConsumptionHistory
+            .Where(x => string.Equals(x.MeterStatus, "Active", StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+        if (activeHistory.Length == 0)
+        {
+            throw new InvalidOperationException("At least one active meter consumption input is required.");
+        }
+
+        var activeMeterIds = activeHistory.Select(x => x.MeterId).ToHashSet();
+        var uncorrelatedRating = request.RatedConsumptions.FirstOrDefault(x => !activeMeterIds.Contains(x.MeterId));
+        if (uncorrelatedRating is not null)
+        {
+            throw new InvalidOperationException($"Rated consumption for meter '{uncorrelatedRating.MeterId}' does not correlate to an active participating meter.");
+        }
+
+        var invalidLoad = activeHistory.FirstOrDefault(x => x.SanctionedLoad is null or <= 0m);
+        if (invalidLoad is not null)
+        {
+            throw new InvalidOperationException($"A positive sanctioned load is required for meter '{invalidLoad.MeterId}'.");
+        }
+
+        var inconsistentMeter = activeHistory
+            .GroupBy(x => x.MeterId)
+            .FirstOrDefault(group => group.Select(x => x.SanctionedLoad).Distinct().Count() != 1
+                || group.Select(x => x.MeterType).Distinct(StringComparer.OrdinalIgnoreCase).Count() != 1);
+        if (inconsistentMeter is not null)
+        {
+            throw new InvalidOperationException($"Meter type and sanctioned load must be consistent for meter '{inconsistentMeter.Key}'.");
+        }
+
+        var ineligibleMeter = activeHistory.FirstOrDefault(x =>
+            !governedConfiguration.Policy.EligibleMeterTypes.Contains(x.MeterType, StringComparer.OrdinalIgnoreCase));
+        if (ineligibleMeter is not null)
+        {
+            throw new InvalidOperationException($"Meter type '{ineligibleMeter.MeterType}' is not eligible under the governed subsidy policy.");
+        }
+
         var businessContext = BuildBusinessContext(request);
-        var consumedConfigurationVersions = ResolveConfigurationVersions(request);
+        var consumedConfigurationVersions = ResolveConfigurationVersions(request, governedConfiguration.Versions);
 
         var estimate = _consumptionEstimator.Estimate(
-            request.ConsumptionHistory,
+            activeHistory,
             request.RatedConsumptions,
             request.OccupancyRate,
             request.EffectiveDateUtc);
 
         var forecast = _forecastEngine.Forecast(estimate, request.RatedConsumptions, request.EffectiveDateUtc);
-        var scenarios = _scenarioGenerator.Generate(estimate, forecast);
-        var ranked = _scenarioEvaluator.RankScenarios(scenarios, request.EffectiveDateUtc);
+        var scenarios = _scenarioGenerator.Generate(
+            estimate,
+            forecast,
+            governedConfiguration.Policy,
+            governedConfiguration.Strategy,
+            governedConfiguration.Model);
+        var ranked = _scenarioEvaluator.RankScenarios(
+            scenarios,
+            governedConfiguration.Policy,
+            governedConfiguration.Model,
+            governedConfiguration.Strategy,
+            request.RatedConsumptions,
+            request.EffectiveDateUtc);
         var confidence = _confidenceScorer.Score(estimate, ranked, request.ConfidenceThreshold, request.EffectiveDateUtc);
 
-        var optimizationModel = string.IsNullOrWhiteSpace(request.OptimizationModel)
-            ? "deterministic-v1"
-            : request.OptimizationModel.Trim();
-        var optimizationStrategy = string.IsNullOrWhiteSpace(request.OptimizationStrategy)
-            ? "weighted-threshold"
-            : request.OptimizationStrategy.Trim();
-        var effectivePolicy = consumedConfigurationVersions["policy_catalog"];
+        var optimizationModel = governedConfiguration.Model.ModelCode;
+        var optimizationStrategy = governedConfiguration.Strategy.StrategyCode;
+        var effectivePolicyVersion = consumedConfigurationVersions["policy_catalog"];
 
         var recommendations = _recommendationGenerator.Generate(
             ranked,
@@ -102,7 +158,7 @@ public sealed class SubsidyMaximizerService : ISubsidyMaximizerService
             request.EffectiveDateUtc,
             optimizationModel,
             optimizationStrategy,
-            effectivePolicy);
+            effectivePolicyVersion);
 
         var bundle = RecommendationBundle
             .CreateDraft(
@@ -129,7 +185,9 @@ public sealed class SubsidyMaximizerService : ISubsidyMaximizerService
             ConsumptionEstimate: estimate,
             Forecast: forecast,
             Confidence: confidence,
-            ConsumedConfigurationVersions: consumedConfigurationVersions);
+            ParticipatingConsumptionHistory: activeHistory,
+            ConsumedConfigurationVersions: consumedConfigurationVersions,
+            GovernedConfiguration: governedConfiguration);
     }
 
     private BusinessContext BuildBusinessContext(SubsidyMaximizerRequest request)
@@ -153,19 +211,57 @@ public sealed class SubsidyMaximizerService : ISubsidyMaximizerService
         return _businessContextBuilder.Build(contextRequest).Context;
     }
 
-    private Dictionary<string, string> ResolveConfigurationVersions(SubsidyMaximizerRequest request)
+    private ResolvedSubsidyOptimizerConfiguration ResolveGovernedConfiguration(SubsidyMaximizerRequest request)
     {
-        var resolved = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var resolutionRequest = CreateResolutionRequest(request);
+        var policy = _businessConfigurationCatalog.Resolve<SubsidyPolicyConfiguration>(
+            new ConfigurationKey(ConfigurationAssetKeys["policy_catalog"]),
+            resolutionRequest);
+        var model = _businessConfigurationCatalog.Resolve<OptimizationModelConfiguration>(
+            new ConfigurationKey(ConfigurationAssetKeys["optimization_model_catalog"]),
+            resolutionRequest);
+        var strategy = _businessConfigurationCatalog.Resolve<OptimizationStrategyConfiguration>(
+            new ConfigurationKey(ConfigurationAssetKeys["optimization_strategy_catalog"]),
+            resolutionRequest);
 
-        var resolutionRequest = new ConfigurationResolutionRequest
-        {
-            ModuleId = "subsidyoptimization",
-            TenantId = request.TenantId,
-            PropertyId = request.PropertyId,
-            AsOfUtc = request.EffectiveDateUtc
-        };
+        return new ResolvedSubsidyOptimizerConfiguration(
+            policy.Payload,
+            model.Payload,
+            strategy.Payload,
+            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["policy_catalog"] = $"v{policy.Metadata.Version}",
+                ["optimization_model_catalog"] = $"v{model.Metadata.Version}",
+                ["optimization_strategy_catalog"] = $"v{strategy.Metadata.Version}"
+            },
+            CreateIdentity(ConfigurationAssetKeys["policy_catalog"], policy.Metadata, request),
+            CreateIdentity(ConfigurationAssetKeys["optimization_model_catalog"], model.Metadata, request),
+            CreateIdentity(ConfigurationAssetKeys["optimization_strategy_catalog"], strategy.Metadata, request));
+    }
 
-        foreach (var pair in ConfigurationAssetKeys)
+    private static ResolvedConfigurationIdentity CreateIdentity(
+        string configurationKey,
+        BusinessConfigurationMetadata metadata,
+        SubsidyMaximizerRequest request)
+    {
+        return new ResolvedConfigurationIdentity(
+            configurationKey,
+            metadata.DefinitionId,
+            metadata.Version,
+            metadata.EffectiveFromUtc,
+            metadata.EffectiveToUtc,
+            request.TenantId,
+            request.PropertyId);
+    }
+
+    private Dictionary<string, string> ResolveConfigurationVersions(
+        SubsidyMaximizerRequest request,
+        IReadOnlyDictionary<string, string> governedVersions)
+    {
+        var resolved = new Dictionary<string, string>(governedVersions, StringComparer.OrdinalIgnoreCase);
+        var resolutionRequest = CreateResolutionRequest(request);
+
+        foreach (var pair in ConfigurationAssetKeys.Where(x => !governedVersions.ContainsKey(x.Key)))
         {
             try
             {
@@ -183,5 +279,16 @@ public sealed class SubsidyMaximizerService : ISubsidyMaximizerService
         }
 
         return resolved;
+    }
+
+    private static ConfigurationResolutionRequest CreateResolutionRequest(SubsidyMaximizerRequest request)
+    {
+        return new ConfigurationResolutionRequest
+        {
+            ModuleId = "subsidyoptimization",
+            TenantId = request.TenantId,
+            PropertyId = request.PropertyId,
+            AsOfUtc = request.EffectiveDateUtc
+        };
     }
 }

@@ -1,4 +1,5 @@
 using Masterdom.Modules.Security.Application.Commands;
+using Masterdom.Modules.Security.Application.Queries;
 using Masterdom.Modules.Security.Application.Support;
 using RoleAggregate = Masterdom.Core.Identity.Entities.Role.Role;
 
@@ -15,6 +16,7 @@ internal static class IdentityAdministrationEndpoints
             .RequireAuthorization();
 
         group.MapPost("/", CreateRole);
+        group.MapGet("/{roleCode}", GetRoleByCode);
 
         return app;
     }
@@ -35,6 +37,19 @@ internal static class IdentityAdministrationEndpoints
 
         var response = RoleResponse.From(result.Value);
         return TypedResults.Created($"/api/identity/roles/{response.Id}", response);
+    }
+
+    internal static IResult GetRoleByCode(
+        string roleCode,
+        IQueryHandler<GetRoleByCodeQuery, ExecutionResult<RoleAggregate>> handler)
+    {
+        var result = handler.Handle(new GetRoleByCodeQuery(roleCode));
+        if (!result.IsSuccess || result.Value is null)
+        {
+            return ApiExecutionResults.ToErrorResult(result.ErrorCode, result.ErrorMessage);
+        }
+
+        return TypedResults.Ok(RoleResponse.From(result.Value));
     }
 
     internal sealed record CreateRoleRequest(

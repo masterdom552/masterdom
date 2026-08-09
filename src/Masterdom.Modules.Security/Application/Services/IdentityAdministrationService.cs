@@ -41,4 +41,11 @@ public sealed class IdentityAdministrationService : IIdentityAdministrationServi
 
         return role;
     }
+
+    public RoleAggregate? GetRoleByCode(string roleCode)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(roleCode);
+
+        return _roleRepository.GetByCode(RoleCode.Create(roleCode));
+    }
 }

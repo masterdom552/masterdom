@@ -5,4 +5,7 @@ public sealed record MeteringConsumptionHistoryContract(
     DateOnly PeriodStart,
     DateOnly PeriodEnd,
     decimal TotalConsumptionUnits,
-    DateTime CapturedAtUtc);
+    DateTime CapturedAtUtc,
+    string MeterType,
+    string MeterStatus,
+    decimal? SanctionedLoad);

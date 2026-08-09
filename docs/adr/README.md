@@ -5,7 +5,7 @@
 - Version: [TBD]
 - Status: Draft
 - Owner: [TBD]
-- Last Updated: 2026-07-27
+- Last Updated: 2026-08-08
 - Next Review: [TBD]
 - Related ADRs: [docs/adr/ADR-0001_Modular_Architecture.md](ADR-0001_Modular_Architecture.md)
 - Related Standards: [docs/standards/ENG-001_Engineering_Standards.md](../standards/ENG-001_Engineering_Standards.md)
@@ -31,6 +31,8 @@ Architects, maintainers, reviewers, and contributors making significant technica
 - [docs/adr/ADR-0004_Domain_Boundaries.md](ADR-0004_Domain_Boundaries.md)
 - [docs/adr/ADR-0005_Versioned_Configuration.md](ADR-0005_Versioned_Configuration.md)
 - [docs/adr/ADR-0006_Financial_Ledger_Foundation_Freeze.md](ADR-0006_Financial_Ledger_Foundation_Freeze.md)
+- [docs/adr/ADR-0007_Runtime_Composition_Ownership.md](ADR-0007_Runtime_Composition_Ownership.md)
+- [docs/adr/ADR-0008_Stock_Location_Model.md](ADR-0008_Stock_Location_Model.md)
 
 ## Relationships
 

@@ -10,5 +10,9 @@ public interface IPolicyRepository
 
     Policy? GetById(PolicyId id);
 
-    Policy? GetApplicable(PolicyType policyType, PolicyScope scope, DateOnly asOfDate);
+    Policy? GetApplicable(
+        PolicyType policyType,
+        PolicyScope scope,
+        DateOnly asOfDate,
+        string? policyCode = null);
 }

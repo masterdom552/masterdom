@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSecurityModule(builder.Configuration);
 builder.Services.AddPropertyBusinessCapabilityRuntime();
+builder.Services.AddPolicyFrameworkRuntime();
 
 var connectionString =
     builder.Configuration.GetConnectionString("Masterdom")
@@ -26,6 +27,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapPropertyEndpoints();
+app.MapPolicyFrameworkEndpoints();
+app.MapCrmEndpoints();
 app.MapPeopleEndpoints();
 app.MapLeaseEndpoints();
 app.MapTenancyEndpoints();
@@ -33,8 +36,10 @@ app.MapMeteringEndpoints();
 app.MapMaintenanceEndpoints();
 app.MapInventoryEndpoints();
 app.MapBillingEndpoints();
+app.MapUtilityRatingEndpoints();
 app.MapFinancialLedgerEndpoints();
 app.MapPaymentEndpoints();
+app.MapSubsidyOptimizationEndpoints();
 app.MapIdentityAdministrationEndpoints();
 app.MapReportingEndpoints();
 app.MapNotificationEndpoints();

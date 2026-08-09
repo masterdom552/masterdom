@@ -28,6 +28,24 @@ internal sealed class DefaultCapabilityAuthorizationPolicyProvider : ICapability
             [PropertyCapabilityOperationNames.GetPersonByNumber] = new(PropertyCapabilityOperationNames.GetPersonByNumber, "people.read", false, false, false),
             [PropertyCapabilityOperationNames.SearchPeople] = new(PropertyCapabilityOperationNames.SearchPeople, "people.read", false, false, false),
 
+            [PropertyCapabilityOperationNames.CreateParty] = new(PropertyCapabilityOperationNames.CreateParty, "crm.create", false, false, false),
+            [PropertyCapabilityOperationNames.UpdateParty] = new(PropertyCapabilityOperationNames.UpdateParty, "crm.manage", false, false, false),
+            [PropertyCapabilityOperationNames.DeactivateParty] = new(PropertyCapabilityOperationNames.DeactivateParty, "crm.manage", false, false, false),
+            [PropertyCapabilityOperationNames.AddContactMethod] = new(PropertyCapabilityOperationNames.AddContactMethod, "crm.manage", false, false, false),
+            [PropertyCapabilityOperationNames.RemoveContactMethod] = new(PropertyCapabilityOperationNames.RemoveContactMethod, "crm.manage", false, false, false),
+            [PropertyCapabilityOperationNames.AddAddress] = new(PropertyCapabilityOperationNames.AddAddress, "crm.manage", false, false, false),
+            [PropertyCapabilityOperationNames.RemoveAddress] = new(PropertyCapabilityOperationNames.RemoveAddress, "crm.manage", false, false, false),
+            [PropertyCapabilityOperationNames.CreatePartyRelationship] = new(PropertyCapabilityOperationNames.CreatePartyRelationship, "crm.manage", false, false, false),
+            [PropertyCapabilityOperationNames.RemovePartyRelationship] = new(PropertyCapabilityOperationNames.RemovePartyRelationship, "crm.manage", false, false, false),
+            [PropertyCapabilityOperationNames.AssignPartyRole] = new(PropertyCapabilityOperationNames.AssignPartyRole, "crm.manage", false, false, false),
+            [PropertyCapabilityOperationNames.RemovePartyRole] = new(PropertyCapabilityOperationNames.RemovePartyRole, "crm.manage", false, false, false),
+            [PropertyCapabilityOperationNames.DeactivatePartyRole] = new(PropertyCapabilityOperationNames.DeactivatePartyRole, "crm.manage", false, false, false),
+            [PropertyCapabilityOperationNames.ReactivatePartyRole] = new(PropertyCapabilityOperationNames.ReactivatePartyRole, "crm.manage", false, false, false),
+            [PropertyCapabilityOperationNames.GetPartyRoles] = new(PropertyCapabilityOperationNames.GetPartyRoles, "crm.read", false, false, false),
+            [PropertyCapabilityOperationNames.SearchPartiesByRole] = new(PropertyCapabilityOperationNames.SearchPartiesByRole, "crm.read", false, false, false),
+            [PropertyCapabilityOperationNames.GetPartyById] = new(PropertyCapabilityOperationNames.GetPartyById, "crm.read", false, false, false),
+            [PropertyCapabilityOperationNames.SearchParties] = new(PropertyCapabilityOperationNames.SearchParties, "crm.read", false, false, false),
+
             [PropertyCapabilityOperationNames.CreateLease] = new(PropertyCapabilityOperationNames.CreateLease, "leases.create", true, true, false),
             [PropertyCapabilityOperationNames.ActivateLease] = new(PropertyCapabilityOperationNames.ActivateLease, "leases.manage", true, true, false),
             [PropertyCapabilityOperationNames.RenewLease] = new(PropertyCapabilityOperationNames.RenewLease, "leases.manage", true, true, false),
@@ -61,8 +79,12 @@ internal sealed class DefaultCapabilityAuthorizationPolicyProvider : ICapability
             [PropertyCapabilityOperationNames.GetMaintenanceTicketById] = new(PropertyCapabilityOperationNames.GetMaintenanceTicketById, "maintenance.tickets.read", true, true, false),
 
             [PropertyCapabilityOperationNames.CreateInventoryItem] = new(PropertyCapabilityOperationNames.CreateInventoryItem, "inventory.items.create", true, true, false),
+            [PropertyCapabilityOperationNames.ReceiveInventoryStock] = new(PropertyCapabilityOperationNames.ReceiveInventoryStock, "inventory.items.receive", true, true, false),
+            [PropertyCapabilityOperationNames.AdjustInventoryStock] = new(PropertyCapabilityOperationNames.AdjustInventoryStock, "inventory.items.adjust", true, true, false),
+            [PropertyCapabilityOperationNames.TransferInventoryStock] = new(PropertyCapabilityOperationNames.TransferInventoryStock, "inventory.items.transfer", true, true, false),
 
             [PropertyCapabilityOperationNames.CreateIdentityRole] = new(PropertyCapabilityOperationNames.CreateIdentityRole, "identity.roles.create", false, false, false),
+            [PropertyCapabilityOperationNames.GetIdentityRoleByCode] = new(PropertyCapabilityOperationNames.GetIdentityRoleByCode, "identity.roles.read", false, false, false),
 
             [PropertyCapabilityOperationNames.GenerateBill] = new(PropertyCapabilityOperationNames.GenerateBill, "billing.generate", true, true, false),
             [PropertyCapabilityOperationNames.FinalizeBill] = new(PropertyCapabilityOperationNames.FinalizeBill, "billing.manage", true, true, false),
@@ -96,7 +118,11 @@ internal sealed class DefaultCapabilityAuthorizationPolicyProvider : ICapability
             [PropertyCapabilityOperationNames.PreviewDocument] = new(PropertyCapabilityOperationNames.PreviewDocument, "documents.generate", false, false, false),
             [PropertyCapabilityOperationNames.DownloadDocument] = new(PropertyCapabilityOperationNames.DownloadDocument, "documents.read", false, false, false),
             [PropertyCapabilityOperationNames.RegenerateDocument] = new(PropertyCapabilityOperationNames.RegenerateDocument, "documents.generate", false, false, false),
-            [PropertyCapabilityOperationNames.GetDocumentHistory] = new(PropertyCapabilityOperationNames.GetDocumentHistory, "documents.read", false, false, false)
+            [PropertyCapabilityOperationNames.GetDocumentHistory] = new(PropertyCapabilityOperationNames.GetDocumentHistory, "documents.read", false, false, false),
+
+            [PropertyCapabilityOperationNames.ExecuteSubsidyOptimization] = new(PropertyCapabilityOperationNames.ExecuteSubsidyOptimization, "subsidyoptimization.execute", true, true, true),
+            [PropertyCapabilityOperationNames.ReadSubsidyOptimization] = new(PropertyCapabilityOperationNames.ReadSubsidyOptimization, "subsidyoptimization.read", true, true, true),
+            [PropertyCapabilityOperationNames.ManageSubsidyOptimization] = new(PropertyCapabilityOperationNames.ManageSubsidyOptimization, "subsidyoptimization.manage", true, true, false)
         };
 
     public CapabilityAuthorizationPolicy GetPolicy(string operation)

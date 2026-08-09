@@ -57,6 +57,19 @@ public sealed class UtilityRatingDomainTests
     }
 
     [Fact]
+    public void Rate_ShouldApplyMinimumCharge_WhenCalculatedAmountIsLower()
+    {
+        var rating = UtilityRatingAggregate.Rate(
+            UtilityRatingId.New(),
+            CreateConsumptionSnapshot(1m),
+            CreateTariffSchedule(),
+            DateTime.UtcNow);
+
+        Assert.Equal(40m, rating.RatedAmount.Value);
+        Assert.Equal(40m, rating.RatingResult.Breakdown.Total.Value);
+    }
+
+    [Fact]
     public void Approve_AndArchive_ShouldRaiseLifecycleEvents_WithoutChangingAmount()
     {
         var snapshot = CreateConsumptionSnapshot(100m);

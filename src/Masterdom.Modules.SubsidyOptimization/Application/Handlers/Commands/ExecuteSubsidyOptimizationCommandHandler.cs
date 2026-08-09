@@ -5,23 +5,22 @@ using OptimizationRunAggregate = Masterdom.Modules.SubsidyOptimization.Domain.En
 
 namespace Masterdom.Modules.SubsidyOptimization.Application.Handlers.Commands;
 
-public sealed class CompleteOptimizationCommandHandler : ICommandHandler<CompleteOptimizationCommand, ExecutionResult<OptimizationRunAggregate>>
+public sealed class ExecuteSubsidyOptimizationCommandHandler : ICommandHandler<ExecuteSubsidyOptimizationCommand, ExecutionResult<OptimizationRunAggregate>>
 {
     private readonly ISubsidyOptimizationApplicationService _applicationService;
 
-    public CompleteOptimizationCommandHandler(ISubsidyOptimizationApplicationService applicationService)
+    public ExecuteSubsidyOptimizationCommandHandler(ISubsidyOptimizationApplicationService applicationService)
     {
         _applicationService = applicationService ?? throw new ArgumentNullException(nameof(applicationService));
     }
 
-    public ExecutionResult<OptimizationRunAggregate> Handle(CompleteOptimizationCommand command)
+    public ExecutionResult<OptimizationRunAggregate> Handle(ExecuteSubsidyOptimizationCommand command)
     {
         ArgumentNullException.ThrowIfNull(command);
 
         try
         {
-            var run = _applicationService.CompleteOptimization(command);
-            return ExecutionResult<OptimizationRunAggregate>.Success(run);
+            return ExecutionResult<OptimizationRunAggregate>.Success(_applicationService.ExecuteOptimization(command));
         }
         catch (ArgumentException ex)
         {

@@ -7,8 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Masterdom.Abstractions\Masterdom.Abstractions.csproj" />
         <ProjectReference Include="..\Masterdom.Core\Masterdom.Core.csproj" />
         <ProjectReference Include="..\Masterdom.Platform\Masterdom.Platform.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.CRM\Masterdom.Modules.CRM.csproj" />
         <ProjectReference
             Include="..\Masterdom.Modules.Properties\Masterdom.Modules.Properties.csproj" />
         <ProjectReference
@@ -41,6 +44,10 @@
             Include="..\Masterdom.Modules.Notifications\Masterdom.Modules.Notifications.csproj" />
         <ProjectReference
             Include="..\Masterdom.Modules.Documents\Masterdom.Modules.Documents.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.Settings\Masterdom.Modules.Settings.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.Intelligence\Masterdom.Modules.Intelligence.csproj" />
     </ItemGroup>
 
     <ItemGroup>

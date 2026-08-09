@@ -37,7 +37,11 @@ public sealed class PolicyRepository : IPolicyRepository
             .FirstOrDefault(x => x.Id == id);
     }
 
-    public PolicyAggregate? GetApplicable(PolicyType policyType, PolicyScope scope, DateOnly asOfDate)
+    public PolicyAggregate? GetApplicable(
+        PolicyType policyType,
+        PolicyScope scope,
+        DateOnly asOfDate,
+        string? policyCode = null)
     {
         ArgumentNullException.ThrowIfNull(policyType);
         ArgumentNullException.ThrowIfNull(scope);
@@ -45,6 +49,10 @@ public sealed class PolicyRepository : IPolicyRepository
         return _dbContext.Policies
             .AsEnumerable()
             .Where(x => x.PolicyType == policyType)
+            .Where(x => policyCode is null || string.Equals(
+                x.PolicyReference.PolicyCode,
+                policyCode,
+                StringComparison.OrdinalIgnoreCase))
             .Where(x => x.ResolveApplicableVersion(scope, asOfDate) is not null)
             .OrderByDescending(x => x.CurrentVersion.VersionNumber)
             .FirstOrDefault();

@@ -4,6 +4,8 @@ using Masterdom.Host.Api;
 using Masterdom.Infrastructure.Persistence;
 using Masterdom.Modules.Security;
 using Masterdom.Modules.Security.Application.Commands;
+using Masterdom.Modules.Security.Application.Handlers.Queries;
+using Masterdom.Modules.Security.Application.Queries;
 using Masterdom.Modules.Security.Application.Services;
 using Masterdom.Modules.Security.Application.Support;
 using Masterdom.Modules.Security.Domain.Repositories;
@@ -27,6 +29,7 @@ public sealed class IdentityAdministrationRuntimeTests
         Assert.NotNull(scope.ServiceProvider.GetService<IRoleRepository>());
         Assert.NotNull(scope.ServiceProvider.GetService<IIdentityAdministrationUnitOfWork>());
         Assert.NotNull(scope.ServiceProvider.GetService<ICommandHandler<CreateRoleCommand, ExecutionResult<RoleAggregate>>>());
+        Assert.NotNull(scope.ServiceProvider.GetService<IQueryHandler<GetRoleByCodeQuery, ExecutionResult<RoleAggregate>>>());
     }
 
     [Fact]
@@ -51,7 +54,84 @@ public sealed class IdentityAdministrationRuntimeTests
         Assert.Equal("Operations", json.RootElement.GetProperty("name").GetString());
     }
 
-    private static ServiceProvider BuildProvider()
+    [Fact]
+    public async Task IdentityAdministrationEndpoints_ShouldGetRoleByCode()
+    {
+        using var provider = BuildProvider();
+        using var scope = provider.CreateScope();
+
+        var createHandler = scope.ServiceProvider
+            .GetRequiredService<ICommandHandler<CreateRoleCommand, ExecutionResult<RoleAggregate>>>();
+
+        var createResult = createHandler.Handle(new CreateRoleCommand("ROLE-OPS", "Operations"));
+        Assert.True(createResult.IsSuccess);
+
+        var handler = scope.ServiceProvider
+            .GetRequiredService<IQueryHandler<GetRoleByCodeQuery, ExecutionResult<RoleAggregate>>>();
+
+        var result = IdentityAdministrationEndpoints.GetRoleByCode("ROLE-OPS", handler);
+
+        var response = await ExecuteAsync(result);
+
+        Assert.Equal(StatusCodes.Status200OK, response.StatusCode);
+
+        using var json = JsonDocument.Parse(response.Body!);
+        Assert.Equal("ROLE-OPS", json.RootElement.GetProperty("code").GetString());
+        Assert.Equal("Operations", json.RootElement.GetProperty("name").GetString());
+    }
+
+    [Fact]
+    public async Task IdentityAdministrationEndpoints_ShouldReturnNotFoundForMissingRole()
+    {
+        using var provider = BuildProvider();
+        using var scope = provider.CreateScope();
+
+        var handler = scope.ServiceProvider
+            .GetRequiredService<IQueryHandler<GetRoleByCodeQuery, ExecutionResult<RoleAggregate>>>();
+
+        var result = IdentityAdministrationEndpoints.GetRoleByCode("ROLE-MISSING", handler);
+
+        var response = await ExecuteAsync(result);
+
+        Assert.Equal(StatusCodes.Status404NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task IdentityAdministrationEndpoints_ShouldForbidRoleCreationWithoutPermission()
+    {
+        using var provider = BuildProvider(CreateManagerUser(permissions: Array.Empty<string>()));
+        using var scope = provider.CreateScope();
+
+        var handler = scope.ServiceProvider
+            .GetRequiredService<ICommandHandler<CreateRoleCommand, ExecutionResult<RoleAggregate>>>();
+
+        var result = IdentityAdministrationEndpoints.CreateRole(
+            new IdentityAdministrationEndpoints.CreateRoleRequest("ROLE-OPS", "Operations"),
+            handler);
+
+        var response = await ExecuteAsync(result);
+
+        Assert.Equal(StatusCodes.Status403Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task IdentityAdministrationEndpoints_ShouldReturnConflictForDuplicateRoleCode()
+    {
+        using var provider = BuildProvider();
+        using var scope = provider.CreateScope();
+
+        var handler = scope.ServiceProvider
+            .GetRequiredService<ICommandHandler<CreateRoleCommand, ExecutionResult<RoleAggregate>>>();
+
+        var request = new IdentityAdministrationEndpoints.CreateRoleRequest("ROLE-OPS", "Operations");
+        var firstResponse = await ExecuteAsync(IdentityAdministrationEndpoints.CreateRole(request, handler));
+        var duplicateResponse = await ExecuteAsync(IdentityAdministrationEndpoints.CreateRole(request, handler));
+
+        Assert.Equal(StatusCodes.Status201Created, firstResponse.StatusCode);
+        Assert.Equal(StatusCodes.Status409Conflict, duplicateResponse.StatusCode);
+    }
+
+    private static ServiceProvider BuildProvider(CurrentUser? currentUser = null)
     {
         var services = new ServiceCollection();
 
@@ -68,19 +148,19 @@ public sealed class IdentityAdministrationRuntimeTests
             .Build();
 
         services.AddSecurityModule(configuration);
-        services.AddScoped<ICurrentUserAccessor>(_ => new FixedCurrentUserAccessor(CreateManagerUser()));
+        services.AddScoped<ICurrentUserAccessor>(_ => new FixedCurrentUserAccessor(currentUser ?? CreateManagerUser()));
 
         return services.BuildServiceProvider(validateScopes: true);
     }
 
-    private static CurrentUser CreateManagerUser()
+    private static CurrentUser CreateManagerUser(IReadOnlyCollection<string>? permissions = null)
     {
         return CurrentUser.Authenticated(
             userId: Guid.NewGuid(),
             personId: null,
             username: "identity-manager",
             roles: [MasterdomRoles.Manager],
-            permissions: ["identity.roles.create"],
+            permissions: permissions ?? ["identity.roles.create", "identity.roles.read"],
             propertyScopes: Array.Empty<Guid>(),
             ownedPropertyIds: Array.Empty<Guid>());
     }

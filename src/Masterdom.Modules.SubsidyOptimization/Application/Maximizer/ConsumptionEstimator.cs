@@ -55,7 +55,8 @@ public sealed class ConsumptionEstimator
                 WeightedAverageUnits: baseline,
                 FailedMeterEstimateUnits: baseline,
                 OccupancyAdjustedUnits: baseline * boundedOccupancy,
-                DataCompletenessRatio: 0m);
+                DataCompletenessRatio: 0m,
+                MeterEstimates: []);
         }
 
         var historicalValues = orderedHistory.Select(x => x.TotalConsumptionUnits).ToArray();
@@ -138,6 +139,36 @@ public sealed class ConsumptionEstimator
             WeightedAverageUnits: weightedAverage,
             FailedMeterEstimateUnits: failedMeterEstimate,
             OccupancyAdjustedUnits: occupancyAdjusted,
-            DataCompletenessRatio: completeness);
+            DataCompletenessRatio: completeness,
+            MeterEstimates: BuildMeterEstimates(orderedHistory, occupancyAdjusted));
+    }
+
+    private static IReadOnlyList<SubsidyMeterEstimate> BuildMeterEstimates(
+        IReadOnlyCollection<MeteringConsumptionHistoryContract> history,
+        decimal propertyBaseline)
+    {
+        var raw = history
+            .GroupBy(x => x.MeterId)
+            .Select(group =>
+            {
+                var ordered = group.OrderByDescending(x => x.PeriodEnd).ToArray();
+                var weightedTotal = ordered.Select((input, index) => input.TotalConsumptionUnits * (ordered.Length - index)).Sum();
+                var weightTotal = ordered.Select((_, index) => ordered.Length - index).Sum();
+                var baseline = weightTotal == 0 ? 0m : weightedTotal / weightTotal;
+                return new SubsidyMeterEstimate(group.Key, baseline, ordered[0].SanctionedLoad!.Value);
+            })
+            .OrderBy(x => x.MeterId)
+            .ToArray();
+
+        var rawTotal = raw.Sum(x => x.BaselineUnits);
+        if (rawTotal <= 0m)
+        {
+            var equalShare = raw.Length == 0 ? 0m : propertyBaseline / raw.Length;
+            return raw.Select(x => x with { BaselineUnits = equalShare }).ToArray();
+        }
+
+        return raw
+            .Select(x => x with { BaselineUnits = propertyBaseline * x.BaselineUnits / rawTotal })
+            .ToArray();
     }
 }

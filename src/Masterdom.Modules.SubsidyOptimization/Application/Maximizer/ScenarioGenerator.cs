@@ -1,66 +1,153 @@
+using Masterdom.Modules.SubsidyOptimization.Domain.Entities.SubsidyOptimization;
+
 namespace Masterdom.Modules.SubsidyOptimization.Application.Maximizer;
 
 public sealed class ScenarioGenerator
 {
     public IReadOnlyList<SubsidyOptimizationScenario> Generate(
         SubsidyConsumptionEstimate estimate,
-        SubsidyForecast forecast)
+        SubsidyForecast forecast,
+        SubsidyPolicyConfiguration policy,
+        OptimizationStrategyConfiguration strategy,
+        OptimizationModelConfiguration model)
     {
         ArgumentNullException.ThrowIfNull(estimate);
         ArgumentNullException.ThrowIfNull(forecast);
+        ArgumentNullException.ThrowIfNull(policy);
+        ArgumentNullException.ThrowIfNull(strategy);
+        ArgumentNullException.ThrowIfNull(model);
 
-        var baseline = BuildScenario(
-            scenarioCode: "baseline",
-            scenarioName: "Baseline Stability",
-            estimated: estimate.OccupancyAdjustedUnits,
-            projected: forecast.ProjectedConsumptionUnits,
-            benefitMultiplier: 0.04m,
-            riskMultiplier: 0.02m);
+        var mandatoryCandidates = policy.Slabs
+            .Where(x => x.IsCliff)
+            .SelectMany(boundary => new[]
+            {
+                decimal.Max(0m, boundary.MaximumUnits - model.BoundaryTolerance),
+                boundary.MaximumUnits,
+                boundary.MaximumUnits + model.BoundaryTolerance
+            })
+            .ToHashSet();
+        if (mandatoryCandidates.Count > model.MaximumScenarioCount)
+        {
+            throw new InvalidOperationException("MaximumScenarioCount cannot represent every mandatory subsidy cliff candidate.");
+        }
 
-        var preserve = BuildScenario(
-            scenarioCode: "preserve",
-            scenarioName: "Subsidy Preservation",
-            estimated: estimate.OccupancyAdjustedUnits * 0.98m,
-            projected: forecast.ProjectedConsumptionUnits * 0.95m,
-            benefitMultiplier: 0.08m,
-            riskMultiplier: 0.03m);
+        var optionalCandidates = new HashSet<decimal>
+        {
+            decimal.Round(forecast.ProjectedConsumptionUnits, 4, MidpointRounding.AwayFromZero)
+        };
 
-        var optimize = BuildScenario(
-            scenarioCode: "optimize",
-            scenarioName: "Optimization Push",
-            estimated: estimate.OccupancyAdjustedUnits * 0.94m,
-            projected: forecast.ProjectedConsumptionUnits * 0.90m,
-            benefitMultiplier: 0.11m,
-            riskMultiplier: 0.07m);
+        foreach (var factor in strategy.ConsumptionFactors)
+        {
+            optionalCandidates.Add(decimal.Round(forecast.ProjectedConsumptionUnits * factor, 4, MidpointRounding.AwayFromZero));
+        }
 
-        return [baseline, preserve, optimize];
+        optionalCandidates.ExceptWith(mandatoryCandidates);
+        var optionalLimit = model.MaximumScenarioCount - mandatoryCandidates.Count;
+        var candidates = mandatoryCandidates
+            .Concat(optionalCandidates.OrderBy(x => x).Take(optionalLimit))
+            .Where(x => x >= 0m)
+            .OrderBy(x => x)
+            .ToArray();
+
+        return candidates
+            .Select((projected, index) => BuildScenario(index, estimate, projected, strategy))
+            .ToArray();
     }
 
     private static SubsidyOptimizationScenario BuildScenario(
-        string scenarioCode,
-        string scenarioName,
-        decimal estimated,
+        int index,
+        SubsidyConsumptionEstimate estimate,
         decimal projected,
-        decimal benefitMultiplier,
-        decimal riskMultiplier)
+        OptimizationStrategyConfiguration strategy)
     {
-        var expectedBenefit = Math.Max(estimated - projected, 0m) * benefitMultiplier;
-        var expectedRisk = Math.Abs(projected - estimated) * riskMultiplier;
-        var thresholdDelta = estimated - projected;
-        var preservation = expectedBenefit == 0m
-            ? 0.5m
-            : Math.Clamp((expectedBenefit - expectedRisk) / expectedBenefit, 0m, 1m);
+        var thresholdDelta = estimate.OccupancyAdjustedUnits - projected;
 
         return new SubsidyOptimizationScenario(
-            ScenarioCode: scenarioCode,
-            ScenarioName: scenarioName,
-            EstimatedConsumptionUnits: estimated,
+            ScenarioCode: $"candidate-{index + 1}",
+            ScenarioName: $"Candidate {index + 1}",
+            EstimatedConsumptionUnits: estimate.OccupancyAdjustedUnits,
             ForecastConsumptionUnits: projected,
-            ExpectedBenefit: expectedBenefit,
-            ExpectedRisk: expectedRisk,
+            ExpectedSubsidy: 0m,
+            ExpectedCost: 0m,
+            SanctionedLoadImpact: 0m,
+            ExpectedBenefit: 0m,
+            ExpectedRisk: 0m,
             ThresholdDelta: thresholdDelta,
-            SubsidyPreservationScore: preservation,
-            TradeOffSummary: $"benefit={expectedBenefit:F2};risk={expectedRisk:F2}",
-            RankScore: 0m);
+            SubsidyPreservationScore: 0m,
+            IsFeasible: true,
+            InfeasibilityReason: null,
+            TriggeredBoundary: null,
+            TradeOffSummary: string.Empty,
+            RankScore: 0m,
+            MeterAllocations: BuildAllocations(estimate.MeterEstimates, projected, strategy));
+    }
+
+    private static IReadOnlyList<SubsidyMeterAllocation> BuildAllocations(
+        IReadOnlyList<SubsidyMeterEstimate> meters,
+        decimal projected,
+        OptimizationStrategyConfiguration strategy)
+    {
+        if (meters.Count == 0)
+        {
+            return [];
+        }
+
+        var baselineTotal = meters.Sum(x => x.BaselineUnits);
+        var proportional = new decimal[meters.Count];
+        var assigned = 0m;
+        for (var index = 0; index < meters.Count; index++)
+        {
+            proportional[index] = index == meters.Count - 1
+                ? projected - assigned
+                : decimal.Round(
+                    baselineTotal == 0m ? projected / meters.Count : projected * meters[index].BaselineUnits / baselineTotal,
+                    4,
+                    MidpointRounding.AwayFromZero);
+            assigned += proportional[index];
+        }
+
+        var allocations = proportional.ToArray();
+        if (strategy.PermitCrossMeterMovement)
+        {
+            var remainingMovementBudget = OptimizationAllocationInvariant.CalculateMovementBudget(
+                projected,
+                strategy.MaximumCrossMeterMovementFraction);
+            for (var donorIndex = 0; donorIndex < meters.Count; donorIndex++)
+            {
+                if (remainingMovementBudget <= 0m)
+                {
+                    break;
+                }
+
+                var excess = decimal.Max(0m, allocations[donorIndex] - meters[donorIndex].SanctionedLoad);
+                var movable = decimal.Min(excess, remainingMovementBudget);
+
+                for (var recipientIndex = 0; recipientIndex < meters.Count && movable > 0m; recipientIndex++)
+                {
+                    if (recipientIndex == donorIndex)
+                    {
+                        continue;
+                    }
+
+                    var recipientCapacity = decimal.Max(
+                        0m,
+                        meters[recipientIndex].SanctionedLoad - allocations[recipientIndex]);
+                    var transferred = decimal.Min(movable, recipientCapacity);
+                    allocations[donorIndex] -= transferred;
+                    allocations[recipientIndex] += transferred;
+                    movable -= transferred;
+                    remainingMovementBudget -= transferred;
+                }
+            }
+        }
+
+        return meters
+            .Select((meter, index) => new SubsidyMeterAllocation(
+                meter.MeterId,
+                meter.BaselineUnits,
+                allocations[index],
+                meter.SanctionedLoad,
+                allocations[index] - proportional[index]))
+            .ToArray();
     }
 }

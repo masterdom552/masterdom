@@ -5,7 +5,7 @@
 - Version: 1.0
 - Status: Active
 - Owner: Domain Engineering
-- Last Updated: 2026-08-03
+- Last Updated: 2026-08-10
 - Next Review: [TBD]
 - Related ADRs: [docs/adr/ADR-0002_Configuration_First.md](../adr/ADR-0002_Configuration_First.md), [docs/adr/ADR-0005_Versioned_Configuration.md](../adr/ADR-0005_Versioned_Configuration.md)
 - Related Standards: [docs/standards/ENG-001_Engineering_Standards.md](../standards/ENG-001_Engineering_Standards.md)
@@ -55,14 +55,14 @@ Recommendation, Decision, and Business Transaction are independent concepts.
 
 Recommendation -> Decision -> Business Transaction
 
-## Read-Only Findings
+## Implementation State
 
-- Subsidy references exist in ADR and roadmap-level governance, but no domain implementation currently exists.
+- The Subsidy Optimization domain, governed optimizer, persistence, runtime composition, and authenticated API are implemented under `PKG-CAP-020-SUBSIDY-OPTIMIZATION` and await Architect verification.
 - Utility Rating establishes contract-based, versioned rated consumption output and explicit tariff references.
 - Metering and Billing boundaries explicitly exclude subsidy logic.
-- Configuration, Rules, and Workflow frameworks are version-aware and deterministic, suitable as runtime dependencies.
+- Effective Subsidy Policy, Optimization Model, and Optimization Strategy assets resolve through the version-aware Platform configuration catalog before calculation.
+- Optimization runs preserve metering/rating inputs, configuration identifiers and versions, evaluated scenarios, selected recommendation, and algorithm version for audit and replay.
 - Business documentation folder has no dedicated subsidy specification artifacts yet.
-- Repository memory confirms prior migration and domain-event conventions relevant to this package.
 
 ## Ownership Boundaries
 
@@ -485,6 +485,6 @@ Recommendation and Decision lifecycle persistence are cross-capability architect
 - Upstream published contracts for Metering and Utility Rating should be promoted to shared contract packages.
 - Advisory recommendation generation is intentionally generic and should evolve via configuration/rules catalogs in later packages.
 
-## Recommendation Before PDP-020
+## Verification Gate
 
-Define governed subsidy policy catalogs and explicit contract harmonization with Utility Rating outputs before implementing region-specific optimization strategies.
+Architect verification must confirm governed configuration usage, deterministic cliff-aware scenario evaluation, sanctioned-load constraints, historical reproducibility, authenticated delivery, persistence compatibility, and module boundaries before CAP-020 closure.

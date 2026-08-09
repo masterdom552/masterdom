@@ -4,14 +4,19 @@
 
 This is the canonical execution roadmap for implementation package sequencing.
 
-It is synchronized to repository evidence as of 2026-08-06.
+It is synchronized to repository evidence as of 2026-08-07 and derived from the capability catalog.
 
 ## Current Package State
 
 - Property Business Capability package (4B): Complete.
-- Current package: MT-2.2 Maintenance Close Ticket (Vertical Slice).
-- Current repository state: Closed (MT-2.2).
+- Current capability: CAP-017 Policy Framework.
+- Current repository state: In Progress (CAP-017).
 - Package mode: Implementation.
+
+## Capability Catalog Reference
+
+- Authoritative source: `.masterdom/capabilities/CAPABILITY_CATALOG.json`
+- Next executable capability: `CAP-017` Policy Framework
 
 ## Verified Implementation Baseline
 
@@ -78,6 +83,7 @@ A roadmap step is complete only when:
 
 ## Authoritative Records
 
+- `.masterdom/capabilities/CAPABILITY_CATALOG.json`
 - `.masterdom/MASTERDOM_ROADMAP.md`
 - `.masterdom/implementation/index.json`
 - `.masterdom/implementation/PKG-4B.1-REPOSITORY-SNAPSHOT-PROGRESS-SYNCHRONIZATION.md`

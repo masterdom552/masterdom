@@ -16,6 +16,7 @@ using Masterdom.Modules.PolicyFramework.Domain.Entities.PolicyFramework;
 using Masterdom.Modules.SubsidyOptimization.Domain.Entities.SubsidyOptimization;
 using Masterdom.Modules.UtilityRating.Domain.Entities.UtilityRating;
 using Masterdom.Modules.Billing.Domain.Entities.Billing;
+using Masterdom.Modules.CRM.Domain.Entities.Party;
 using Masterdom.Modules.People.Domain.Entities.Person;
 using Masterdom.Core.Identity.Entities.RefreshToken;
 using Masterdom.Core.Identity.Entities.Relationship;
@@ -34,8 +35,10 @@ using Masterdom.Infrastructure.Persistence.Rules;
 using Masterdom.Infrastructure.Persistence.Workflow;
 using Microsoft.EntityFrameworkCore;
 using BillAggregate = Masterdom.Modules.Billing.Domain.Entities.Billing.Bill;
+using IdentityRelationship = Masterdom.Core.Identity.Entities.Relationship.Relationship;
 using LeaseAggregate = Masterdom.Modules.Lease.Domain.Entities.Lease.Lease;
 using PropertyAggregate = Masterdom.Modules.Properties.Domain.Entities.Property.Property;
+using StockLocationEntity = Masterdom.Modules.Properties.Domain.Entities.Property.StockLocation;
 using TenancyAggregate = Masterdom.Modules.Tenancy.Domain.Entities.Tenancy.Tenancy;
 using InventoryItemAggregate = Masterdom.Modules.Inventory.Domain.Entities.Inventory.InventoryItem;
 using MaintenanceTicketAggregate = Masterdom.Modules.Maintenance.Domain.Entities.Maintenance.MaintenanceTicket;
@@ -68,6 +71,8 @@ public sealed class MasterdomDbContext : DbContext
     /// Gets the properties.
     /// </summary>
     public DbSet<PropertyAggregate> Properties => Set<PropertyAggregate>();
+
+    public DbSet<StockLocationEntity> StockLocations => Set<StockLocationEntity>();
 
     /// <summary>
     /// Gets the leases.
@@ -133,13 +138,15 @@ public sealed class MasterdomDbContext : DbContext
 
     #region Identity Domain
 
+    public DbSet<Party> Parties => Set<Party>();
+
     public DbSet<Person> Persons => Set<Person>();
 
     public DbSet<Organization> Organizations => Set<Organization>();
 
     public DbSet<IdentityProfile> IdentityProfiles => Set<IdentityProfile>();
 
-    public DbSet<Relationship> Relationships => Set<Relationship>();
+    public DbSet<IdentityRelationship> Relationships => Set<IdentityRelationship>();
 
     public DbSet<User> Users => Set<User>();
 

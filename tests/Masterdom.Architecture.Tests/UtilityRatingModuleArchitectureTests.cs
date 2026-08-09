@@ -34,6 +34,19 @@ public sealed class UtilityRatingModuleArchitectureTests
     }
 
     [Fact]
+    public void UtilityRatingModule_ShouldNotReferencePolicyFrameworkSecurityOrSettingsModules()
+    {
+        var references = typeof(UtilityRatingAggregate).Assembly
+            .GetReferencedAssemblies()
+            .Select(x => x.Name)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        Assert.DoesNotContain("Masterdom.Modules.PolicyFramework", references);
+        Assert.DoesNotContain("Masterdom.Modules.Security", references);
+        Assert.DoesNotContain("Masterdom.Modules.Settings", references);
+    }
+
+    [Fact]
     public void UtilityRatingModule_ShouldNotReferenceMeteringAssembly_Directly()
     {
         var references = typeof(UtilityRatingAggregate).Assembly
@@ -83,5 +96,76 @@ public sealed class UtilityRatingModuleArchitectureTests
 
         Assert.DoesNotContain(propertyNamespaces, x => x.StartsWith("Masterdom.Modules.Billing", StringComparison.Ordinal));
         Assert.DoesNotContain(propertyNamespaces, x => x.StartsWith("Masterdom.Modules.Metering", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void UtilityRatingEndpoints_ShouldRequireAuthorization()
+    {
+        var endpointPath = Path.Combine(
+            ResolveRepositoryRoot(),
+            "src",
+            "Masterdom.Host",
+            "Api",
+            "UtilityRatingEndpoints.cs");
+        var endpointSource = File.ReadAllText(endpointPath);
+
+        Assert.Contains(".RequireAuthorization()", endpointSource, StringComparison.Ordinal);
+        Assert.Contains("group.MapPost(\"/\", RateConsumption);", endpointSource, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void RateConsumptionRequest_ShouldNotAcceptAuthoritativeTariffValues()
+    {
+        var endpointSource = File.ReadAllText(Path.Combine(
+            ResolveRepositoryRoot(),
+            "src",
+            "Masterdom.Host",
+            "Api",
+            "UtilityRatingEndpoints.cs"));
+        var requestDeclaration = endpointSource[
+            endpointSource.IndexOf("internal sealed record RateConsumptionRequest", StringComparison.Ordinal)..endpointSource.IndexOf("internal sealed record UtilityRatingResponse", StringComparison.Ordinal)];
+
+        Assert.Contains("string TariffCode", requestDeclaration, StringComparison.Ordinal);
+        Assert.DoesNotContain("FixedCharge", requestDeclaration, StringComparison.Ordinal);
+        Assert.DoesNotContain("VariableCharge", requestDeclaration, StringComparison.Ordinal);
+        Assert.DoesNotContain("MinimumCharge", requestDeclaration, StringComparison.Ordinal);
+        Assert.DoesNotContain("Adjustment", requestDeclaration, StringComparison.Ordinal);
+        Assert.DoesNotContain("TariffVersion", requestDeclaration, StringComparison.Ordinal);
+        Assert.DoesNotContain("TariffEffectiveFrom", requestDeclaration, StringComparison.Ordinal);
+        Assert.DoesNotContain("TariffEffectiveTo", requestDeclaration, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void RateConsumption_ShouldResolveGovernedTariffBeforeDomainCalculation()
+    {
+        var applicationService = File.ReadAllText(Path.Combine(
+            ResolveRepositoryRoot(),
+            "src",
+            "Masterdom.Modules.UtilityRating",
+            "Application",
+            "Services",
+            "UtilityRatingApplicationService.cs"));
+        var resolveIndex = applicationService.IndexOf("ResolveTariffSchedule", StringComparison.Ordinal);
+        var rateIndex = applicationService.IndexOf("UtilityRatingAggregate.Rate", StringComparison.Ordinal);
+
+        Assert.True(resolveIndex >= 0);
+        Assert.True(rateIndex > resolveIndex);
+    }
+
+    private static string ResolveRepositoryRoot()
+    {
+        var current = new DirectoryInfo(AppContext.BaseDirectory);
+
+        while (current is not null)
+        {
+            if (File.Exists(Path.Combine(current.FullName, "Masterdom.slnx")))
+            {
+                return current.FullName;
+            }
+
+            current = current.Parent;
+        }
+
+        throw new DirectoryNotFoundException("Could not resolve repository root from test execution path.");
     }
 }

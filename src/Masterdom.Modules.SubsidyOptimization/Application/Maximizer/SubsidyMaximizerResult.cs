@@ -1,5 +1,6 @@
 using Masterdom.Platform.BusinessContext;
 using Masterdom.Platform.Recommendation;
+using Masterdom.Modules.SubsidyOptimization.Contracts.Metering;
 
 namespace Masterdom.Modules.SubsidyOptimization.Application.Maximizer;
 
@@ -11,4 +12,6 @@ public sealed record SubsidyMaximizerResult(
     SubsidyConsumptionEstimate ConsumptionEstimate,
     SubsidyForecast Forecast,
     RecommendationConfidence Confidence,
-    IReadOnlyDictionary<string, string> ConsumedConfigurationVersions);
+    IReadOnlyList<MeteringConsumptionHistoryContract> ParticipatingConsumptionHistory,
+    IReadOnlyDictionary<string, string> ConsumedConfigurationVersions,
+    ResolvedSubsidyOptimizerConfiguration GovernedConfiguration);
