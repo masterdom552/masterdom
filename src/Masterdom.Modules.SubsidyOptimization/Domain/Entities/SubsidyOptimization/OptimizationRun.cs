@@ -49,6 +49,8 @@ public sealed class OptimizationRun : AggregateRoot<OptimizationRunId>, IHasDoma
 
     public ConsumptionForecast? ConsumptionForecast { get; private set; }
 
+    public OptimizationExecutionEvidence? ExecutionEvidence { get; private set; }
+
     public RecommendationSet? RecommendationSet => _recommendations.Count == 0
         ? null
         : RecommendationSet.Create(_recommendations);
@@ -106,13 +108,15 @@ public sealed class OptimizationRun : AggregateRoot<OptimizationRunId>, IHasDoma
         OptimizationResult optimizationResult,
         ConsumptionForecast consumptionForecast,
         RecommendationSet recommendationSet,
-        DateTime completedAtUtc)
+        DateTime completedAtUtc,
+        OptimizationExecutionEvidence executionEvidence)
     {
         EnsureActive();
 
         ArgumentNullException.ThrowIfNull(optimizationResult);
         ArgumentNullException.ThrowIfNull(consumptionForecast);
         ArgumentNullException.ThrowIfNull(recommendationSet);
+        ArgumentNullException.ThrowIfNull(executionEvidence);
 
         if (completedAtUtc.Kind != DateTimeKind.Utc)
         {
@@ -124,8 +128,11 @@ public sealed class OptimizationRun : AggregateRoot<OptimizationRunId>, IHasDoma
             throw new InvalidOperationException("Optimization completion timestamp cannot be earlier than start timestamp.");
         }
 
+        EnsureCompletionArtifactsMatchEvidence(optimizationResult, recommendationSet, executionEvidence);
+
         OptimizationResult = optimizationResult;
         ConsumptionForecast = consumptionForecast;
+        ExecutionEvidence = executionEvidence;
 
         _recommendations.Clear();
         _recommendations.AddRange(recommendationSet.Items);
@@ -138,7 +145,8 @@ public sealed class OptimizationRun : AggregateRoot<OptimizationRunId>, IHasDoma
             completedAtUtc,
             optimizationResult,
             consumptionForecast,
-            recommendationSet);
+            recommendationSet,
+            executionEvidence);
 
         _snapshots.Add(snapshot);
 
@@ -156,6 +164,34 @@ public sealed class OptimizationRun : AggregateRoot<OptimizationRunId>, IHasDoma
             Scenario.ScenarioId.Value,
             OptimizationVersion.Value,
             completedAtUtc));
+    }
+
+    private static void EnsureCompletionArtifactsMatchEvidence(
+        OptimizationResult optimizationResult,
+        RecommendationSet recommendationSet,
+        OptimizationExecutionEvidence executionEvidence)
+    {
+        var outcome = executionEvidence.Outcome;
+        if (optimizationResult.EstimatedSavings != outcome.EstimatedSavings
+            || optimizationResult.EstimatedCost != outcome.EstimatedCost
+            || !string.Equals(optimizationResult.Summary, outcome.Summary, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Optimization result must match the validated execution evidence.");
+        }
+
+        if (recommendationSet.Items.Count != 1)
+        {
+            throw new InvalidOperationException("Optimization recommendation must match the validated execution evidence.");
+        }
+
+        var recommendation = recommendationSet.Items[0];
+        if (recommendation.RecommendationId.Value != outcome.RecommendationId
+            || !string.Equals(recommendation.Title, outcome.RecommendationTitle, StringComparison.Ordinal)
+            || !string.Equals(recommendation.Details, outcome.RecommendationDetails, StringComparison.Ordinal)
+            || !string.Equals(recommendation.Priority.Value, outcome.RecommendationPriority, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Optimization recommendation must match the validated execution evidence.");
+        }
     }
 
     public OptimizationRun CreateScenarioVersion(
@@ -229,9 +265,16 @@ public sealed class OptimizationRun : AggregateRoot<OptimizationRunId>, IHasDoma
 
     public void ArchiveRun(DateTime archivedAtUtc)
     {
+        EnsureCompleted();
+
         if (archivedAtUtc.Kind != DateTimeKind.Utc)
         {
             throw new InvalidOperationException("Run archive timestamp must be UTC.");
+        }
+
+        if (archivedAtUtc < CompletedAtUtc)
+        {
+            throw new InvalidOperationException("Run archive timestamp cannot be earlier than completion timestamp.");
         }
 
         OptimizationStatus = OptimizationStatus.Archived;
