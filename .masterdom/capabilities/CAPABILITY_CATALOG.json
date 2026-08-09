@@ -6,8 +6,8 @@
     "nextExecutableCapabilityId": null,
     "nextExecutableCapabilityName": null,
     "capabilityStatusCounts": {
-        "COMPLETE": 18,
-        "PARTIAL": 2,
+        "COMPLETE": 19,
+        "PARTIAL": 1,
         "NOT STARTED": 2,
         "SUPERSEDED": 0
     },
@@ -784,7 +784,7 @@
             "capabilityId": "CAP-020",
             "name": "Subsidy Optimization",
             "domain": "Utilities",
-            "status": "PARTIAL",
+            "status": "COMPLETE",
             "dependencies": [
                 "CAP-017",
                 "CAP-014"
@@ -811,10 +811,10 @@
             "implementationPackages": [
                 "PKG-CAP-020-SUBSIDY-OPTIMIZATION"
             ],
-            "verificationStatus": "AWAITING_ARCHITECT_VERIFICATION",
-            "reviewDecision": "Pending",
+            "verificationStatus": "VERIFIED",
+            "reviewDecision": "VERIFIED",
             "reviewAuthority": "Architect",
-            "verificationDateUtc": null
+            "verificationDateUtc": "2026-08-10"
         },
         {
             "capabilityId": "CAP-021",

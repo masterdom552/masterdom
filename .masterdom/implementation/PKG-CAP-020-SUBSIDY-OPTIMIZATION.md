@@ -3,7 +3,7 @@
 ## Metadata
 
 - PKG Number: PKG-CAP-020
-- Status: IMPLEMENTATION COMPLETE — AWAITING ARCHITECT VERIFICATION
+- Status: VERIFIED / CLOSED
 - Milestone: Subsidy Optimization
 - Owner: Architecture and Engineering
 - Architect: Architect
@@ -86,6 +86,12 @@ Excluded:
 
 ## Package Status
 
-**IMPLEMENTATION COMPLETE — AWAITING ARCHITECT VERIFICATION.**
+**VERIFIED / CLOSED.**
 
-`IMPLEMENTATION COMPLETE — AWAITING ARCHITECT VERIFICATION`
+- Architect Decision: VERIFIED
+- Implementation: Complete
+- Package: Closed
+- Final verification: Passed
+- Successor activated: No
+
+`VERIFIED / CLOSED`

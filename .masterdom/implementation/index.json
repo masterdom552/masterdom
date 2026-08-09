@@ -2,11 +2,11 @@
   "snapshotDateUtc": "2026-08-10",
   "sourceOfTruth": "capability-catalog",
   "capabilityCatalogPath": ".masterdom/capabilities/CAPABILITY_CATALOG.json",
-  "activePackage": "PKG-CAP-020-SUBSIDY-OPTIMIZATION",
+  "activePackage": null,
   "currentCapabilityId": "CAP-020",
   "currentCapabilityName": "Subsidy Optimization",
-  "currentCapabilityStatus": "IMPLEMENTATION COMPLETE — AWAITING ARCHITECT VERIFICATION",
-  "currentState": "CAP-020 IMPLEMENTATION COMPLETE — AWAITING ARCHITECT VERIFICATION",
+  "currentCapabilityStatus": "VERIFIED / CLOSED",
+  "currentState": "Repository Investigation Required",
   "completedPackages": [
     {
       "id": "PKG-001",
@@ -235,6 +235,17 @@
       "objective": "Expose governed effective-version tariff rating through the authenticated Host using the existing Utility Rating domain and platform configuration resolver.",
       "outcome": "Implementation Complete",
       "validation": "Architect Decision VERIFIED; configuration-first, domain, architecture, API, targeted tests, build, warning regression, and scope passed",
+      "acceptance": "Package Closed",
+      "remainingDebt": "No package-blocking debt",
+      "successor": null
+    },
+    {
+      "id": "PKG-CAP-020-SUBSIDY-OPTIMIZATION",
+      "title": "Subsidy Optimization",
+      "status": "Closed",
+      "objective": "Complete governed Subsidy Optimization through deterministic scenario generation, evaluation, evidence persistence, authenticated delivery, and aggregate-owned lifecycle enforcement.",
+      "outcome": "Implementation Complete",
+      "validation": "Architect Decision VERIFIED",
       "acceptance": "Package Closed",
       "remainingDebt": "No package-blocking debt",
       "successor": null
