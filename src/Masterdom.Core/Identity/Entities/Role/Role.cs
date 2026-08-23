@@ -14,11 +14,13 @@ public sealed class Role : AggregateRoot<RoleId>
     private Role(
         RoleId id,
         RoleCode code,
-        RoleName name)
+        RoleName name,
+        RoleAuthorityLevel authorityLevel)
         : base(id)
     {
         Code = code;
         Name = name;
+        AuthorityLevel = authorityLevel;
 
         Status = RoleStatus.Active;
 
@@ -36,17 +38,26 @@ public sealed class Role : AggregateRoot<RoleId>
     /// <summary>
     /// Creates a new role.
     /// </summary>
+    /// <param name="code">The role's business code.</param>
+    /// <param name="name">The role's display name.</param>
+    /// <param name="authorityLevel">
+    /// The role's authority-level classification. Required: a role cannot be created
+    /// without an explicit authority level (see ADR-0010).
+    /// </param>
     public static Role Create(
         RoleCode code,
-        RoleName name)
+        RoleName name,
+        RoleAuthorityLevel authorityLevel)
     {
         ArgumentNullException.ThrowIfNull(code);
         ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(authorityLevel);
 
         return new Role(
             RoleId.New(),
             code,
-            name);
+            name,
+            authorityLevel);
     }
 
     /// <summary>
@@ -58,6 +69,12 @@ public sealed class Role : AggregateRoot<RoleId>
     /// Gets the role name.
     /// </summary>
     public RoleName Name { get; private set; }
+
+    /// <summary>
+    /// Gets the role's authority-level classification (see ADR-0010).
+    /// This is the authoritative source consumed by <c>IAuthorityLevelProvider</c>.
+    /// </summary>
+    public RoleAuthorityLevel AuthorityLevel { get; private set; }
 
     /// <summary>
     /// Gets the lifecycle status.
@@ -113,6 +130,23 @@ public sealed class Role : AggregateRoot<RoleId>
             return;
 
         Name = name;
+    }
+
+    /// <summary>
+    /// Changes the role's authority-level classification.
+    ///
+    /// This is a pure Domain state transition. It does not enforce who is permitted
+    /// to reclassify a role -- that is an Application-layer authorization concern
+    /// (see ADR-0010).
+    /// </summary>
+    public void Reclassify(RoleAuthorityLevel authorityLevel)
+    {
+        ArgumentNullException.ThrowIfNull(authorityLevel);
+
+        if (AuthorityLevel == authorityLevel)
+            return;
+
+        AuthorityLevel = authorityLevel;
     }
 
     public void AddPermission(PermissionId permissionId)

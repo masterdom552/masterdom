@@ -25,6 +25,7 @@ public sealed class IdentityAdministrationService : IIdentityAdministrationServi
 
         var roleCode = RoleCode.Create(command.RoleCode);
         var roleName = RoleName.Create(command.RoleName);
+        var authorityLevel = RoleAuthorityLevel.Create(command.AuthorityLevel);
 
         var existingRole = _roleRepository.GetByCode(roleCode);
         if (existingRole is not null)
@@ -32,7 +33,7 @@ public sealed class IdentityAdministrationService : IIdentityAdministrationServi
             throw new InvalidOperationException($"Role code '{roleCode.Value}' already exists.");
         }
 
-        var role = RoleAggregate.Create(roleCode, roleName);
+        var role = RoleAggregate.Create(roleCode, roleName, authorityLevel);
 
         _unitOfWork.Execute(() =>
         {

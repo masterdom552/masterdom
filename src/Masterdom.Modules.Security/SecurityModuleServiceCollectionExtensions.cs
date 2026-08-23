@@ -1,5 +1,8 @@
 using System.Text;
+using Masterdom.Abstractions.Modules.Security;
+using Masterdom.Core.Identity.Entities.DelegatedAuthority;
 using Masterdom.Core.Security;
+using Masterdom.Infrastructure.Persistence.Identity;
 using Masterdom.Infrastructure.Security;
 using Masterdom.Modules.Security.Application.Commands;
 using Masterdom.Modules.Security.Application.Handlers.Commands;
@@ -62,6 +65,7 @@ public static class SecurityModuleServiceCollectionExtensions
         services.AddSecurityInfrastructureRuntime();
 
         AddIdentityAdministrationRuntime(services);
+        AddDelegationManagementRuntime(services);
 
         return services;
     }
@@ -73,5 +77,35 @@ public static class SecurityModuleServiceCollectionExtensions
         services.AddScoped<IIdentityAdministrationService, IdentityAdministrationService>();
         services.AddScoped<ICommandHandler<CreateRoleCommand, ExecutionResult<Masterdom.Core.Identity.Entities.Role.Role>>, CreateRoleCommandHandler>();
         services.AddScoped<IQueryHandler<GetRoleByCodeQuery, ExecutionResult<Masterdom.Core.Identity.Entities.Role.Role>>, GetRoleByCodeQueryHandler>();
+    }
+
+    private static void AddDelegationManagementRuntime(IServiceCollection services)
+    {
+        // Identity model repositories
+        services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+        services.AddScoped<IPermissionRepository, PermissionRepository>();
+
+        // Domain policies and services
+        // IAuthorityLevelProvider is registered here, not by AddSecurityInfrastructureRuntime,
+        // because its production implementation is Role-repository-backed (see ADR-0010) and
+        // IRoleRepository is owned by this module, not by Masterdom.Infrastructure.
+        services.AddScoped<IAuthorityLevelProvider, RoleAuthorityLevelProvider>();
+        services.AddScoped<EffectiveAuthorityResolver>();
+        services.AddScoped<DelegationValidator>();
+
+        // Application authority provider (assembles facts from identity model)
+        services.AddScoped<IDirectAuthorityProvider, DefaultDirectAuthorityProvider>();
+
+        // Repository and Unit of Work
+        services.AddScoped<IDelegatedAuthorityRepository, DelegatedAuthorityRepository>();
+        services.AddScoped<IIdentityAdministrationUnitOfWork, IdentityAdministrationUnitOfWork>();
+
+        // Application service
+        services.AddScoped<IDelegationApplicationService, DelegationApplicationService>();
+
+        // Handlers
+        services.AddScoped<ICommandHandler<CreateDelegationCommand, ExecutionResult<DelegatedAuthority>>, CreateDelegationCommandHandler>();
+        services.AddScoped<ICommandHandler<RevokeDelegationCommand, ExecutionResult<DelegatedAuthority>>, RevokeDelegationCommandHandler>();
+        services.AddScoped<IQueryHandler<GetDelegationByIdQuery, ExecutionResult<DelegatedAuthority>>, GetDelegationByIdQueryHandler>();
     }
 }

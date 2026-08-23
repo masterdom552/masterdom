@@ -43,6 +43,12 @@ public sealed class RoleConfiguration : IEntityTypeConfiguration<Role>
             .HasMaxLength(50)
             .IsRequired();
 
+        builder.Property(x => x.AuthorityLevel)
+            .HasConversion(
+                x => x.Value,
+                x => RoleAuthorityLevel.Create(x))
+            .IsRequired();
+
         builder.Property(x => x.Description)
             .HasMaxLength(1000);
 

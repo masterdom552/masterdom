@@ -42,7 +42,7 @@ public sealed class IdentityAdministrationRuntimeTests
             .GetRequiredService<ICommandHandler<CreateRoleCommand, ExecutionResult<RoleAggregate>>>();
 
         var result = IdentityAdministrationEndpoints.CreateRole(
-            new IdentityAdministrationEndpoints.CreateRoleRequest("ROLE-OPS", "Operations"),
+            new IdentityAdministrationEndpoints.CreateRoleRequest("ROLE-OPS", "Operations", AuthorityLevels.Admin),
             handler);
 
         var response = await ExecuteAsync(result);
@@ -52,6 +52,7 @@ public sealed class IdentityAdministrationRuntimeTests
         using var json = JsonDocument.Parse(response.Body!);
         Assert.Equal("ROLE-OPS", json.RootElement.GetProperty("code").GetString());
         Assert.Equal("Operations", json.RootElement.GetProperty("name").GetString());
+        Assert.Equal(AuthorityLevels.Admin, json.RootElement.GetProperty("authorityLevel").GetInt32());
     }
 
     [Fact]
@@ -63,7 +64,7 @@ public sealed class IdentityAdministrationRuntimeTests
         var createHandler = scope.ServiceProvider
             .GetRequiredService<ICommandHandler<CreateRoleCommand, ExecutionResult<RoleAggregate>>>();
 
-        var createResult = createHandler.Handle(new CreateRoleCommand("ROLE-OPS", "Operations"));
+        var createResult = createHandler.Handle(new CreateRoleCommand("ROLE-OPS", "Operations", AuthorityLevels.Admin));
         Assert.True(createResult.IsSuccess);
 
         var handler = scope.ServiceProvider
@@ -106,7 +107,7 @@ public sealed class IdentityAdministrationRuntimeTests
             .GetRequiredService<ICommandHandler<CreateRoleCommand, ExecutionResult<RoleAggregate>>>();
 
         var result = IdentityAdministrationEndpoints.CreateRole(
-            new IdentityAdministrationEndpoints.CreateRoleRequest("ROLE-OPS", "Operations"),
+            new IdentityAdministrationEndpoints.CreateRoleRequest("ROLE-OPS", "Operations", AuthorityLevels.Admin),
             handler);
 
         var response = await ExecuteAsync(result);
@@ -123,7 +124,7 @@ public sealed class IdentityAdministrationRuntimeTests
         var handler = scope.ServiceProvider
             .GetRequiredService<ICommandHandler<CreateRoleCommand, ExecutionResult<RoleAggregate>>>();
 
-        var request = new IdentityAdministrationEndpoints.CreateRoleRequest("ROLE-OPS", "Operations");
+        var request = new IdentityAdministrationEndpoints.CreateRoleRequest("ROLE-OPS", "Operations", AuthorityLevels.Admin);
         var firstResponse = await ExecuteAsync(IdentityAdministrationEndpoints.CreateRole(request, handler));
         var duplicateResponse = await ExecuteAsync(IdentityAdministrationEndpoints.CreateRole(request, handler));
 

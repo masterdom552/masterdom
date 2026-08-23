@@ -25,4 +25,11 @@ public sealed class RoleRepository : IRoleRepository
 
         return _dbContext.Roles.FirstOrDefault(x => x.Code == roleCode);
     }
+
+    public Role? GetById(RoleId roleId)
+    {
+        ArgumentNullException.ThrowIfNull(roleId);
+
+        return _dbContext.Roles.FirstOrDefault(x => x.Id == roleId);
+    }
 }

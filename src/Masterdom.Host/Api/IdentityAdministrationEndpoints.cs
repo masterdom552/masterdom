@@ -27,7 +27,8 @@ internal static class IdentityAdministrationEndpoints
     {
         var command = new CreateRoleCommand(
             request.RoleCode,
-            request.RoleName);
+            request.RoleName,
+            request.AuthorityLevel);
 
         var result = handler.Handle(command);
         if (!result.IsSuccess || result.Value is null)
@@ -54,13 +55,15 @@ internal static class IdentityAdministrationEndpoints
 
     internal sealed record CreateRoleRequest(
         string RoleCode,
-        string RoleName);
+        string RoleName,
+        int AuthorityLevel);
 
     internal sealed record RoleResponse(
         Guid Id,
         string Code,
         string Name,
-        string Status)
+        string Status,
+        int AuthorityLevel)
     {
         public static RoleResponse From(RoleAggregate role)
         {
@@ -68,7 +71,8 @@ internal static class IdentityAdministrationEndpoints
                 role.Id.Value,
                 role.Code.Value,
                 role.Name.Value,
-                role.Status.Value);
+                role.Status.Value,
+                role.AuthorityLevel.Value);
         }
     }
 }

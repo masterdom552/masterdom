@@ -33,6 +33,8 @@ Architects, maintainers, reviewers, and contributors making significant technica
 - [docs/adr/ADR-0006_Financial_Ledger_Foundation_Freeze.md](ADR-0006_Financial_Ledger_Foundation_Freeze.md)
 - [docs/adr/ADR-0007_Runtime_Composition_Ownership.md](ADR-0007_Runtime_Composition_Ownership.md)
 - [docs/adr/ADR-0008_Stock_Location_Model.md](ADR-0008_Stock_Location_Model.md)
+- [docs/adr/ADR-0009_Finance_Boundary_Deferred.md](ADR-0009_Finance_Boundary_Deferred.md)
+- [docs/adr/ADR-0010_Role_Authority_Level_Source_Of_Truth.md](ADR-0010_Role_Authority_Level_Source_Of_Truth.md)
 
 ## Relationships
 
