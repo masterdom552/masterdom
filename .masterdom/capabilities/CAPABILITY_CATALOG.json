@@ -8,7 +8,7 @@
   "capabilityStatusCounts": {
     "COMPLETE": 19,
     "PARTIAL": 1,
-    "NOT STARTED": 2,
+    "NOT STARTED": 3,
     "SUPERSEDED": 0
   },
   "dependencyGraph": [
@@ -191,6 +191,18 @@
     {
       "from": "CAP-018",
       "to": "CAP-022"
+    },
+    {
+      "from": "CAP-001",
+      "to": "CAP-023"
+    },
+    {
+      "from": "CAP-002",
+      "to": "CAP-023"
+    },
+    {
+      "from": "CAP-018",
+      "to": "CAP-023"
     }
   ],
   "capabilities": [
@@ -893,6 +905,33 @@
           ]
         }
       }
+    },
+    {
+      "capabilityId": "CAP-023",
+      "name": "Authentication",
+      "domain": "Platform",
+      "status": "NOT STARTED",
+      "dependencies": [
+        "CAP-001",
+        "CAP-002",
+        "CAP-018"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.Authentication"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          "src/Masterdom.Modules.Authentication/Masterdom.Modules.Authentication.csproj",
+          "src/Masterdom.Modules.Authentication/Application/Services/AuthenticationCapabilityBehaviorService.cs"
+        ],
+        "tests": [
+          "tests/Masterdom.Platform.Infrastructure.Tests/Authentication"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [],
+      "verificationStatus": "VERIFIED",
+      "verificationDateUtc": "2026-08-23"
     }
   ]
 }

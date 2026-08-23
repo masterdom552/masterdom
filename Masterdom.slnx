@@ -4,6 +4,7 @@
         <Project Path="src/Masterdom.Core/Masterdom.Core.csproj" />
         <Project Path="src/Masterdom.Host/Masterdom.Host.csproj" />
         <Project Path="src/Masterdom.Infrastructure/Masterdom.Infrastructure.csproj" />
+        <Project Path="src/Masterdom.Modules.Authentication/Masterdom.Modules.Authentication.csproj" />
         <Project Path="src/Masterdom.Modules.Billing/Masterdom.Modules.Billing.csproj" />
         <Project Path="src/Masterdom.Modules.CRM/Masterdom.Modules.CRM.csproj" />
         <Project Path="src/Masterdom.Modules.Documents/Masterdom.Modules.Documents.csproj" />

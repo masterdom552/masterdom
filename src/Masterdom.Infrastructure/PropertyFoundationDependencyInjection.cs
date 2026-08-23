@@ -124,6 +124,7 @@ using Masterdom.Modules.Documents.Application.Queries;
 using Masterdom.Modules.Documents.Application.Services;
 using Masterdom.Modules.Settings.Application.Services;
 using Masterdom.Modules.Intelligence.Application.Services;
+using Masterdom.Modules.Authentication.Application.Services;
 using Masterdom.Infrastructure.Persistence.SubsidyOptimization;
 using Masterdom.Modules.SubsidyOptimization.Application.Handlers.Queries;
 using Masterdom.Modules.SubsidyOptimization.Application.Handlers.Commands;
@@ -198,6 +199,7 @@ public static class PropertyFoundationDependencyInjection
         AddSettingsRuntime(services);
         AddIntelligenceRuntime(services);
         AddSubsidyOptimizationRuntime(services);
+        AddAuthenticationRuntime(services);
 
         return services;
     }
@@ -584,6 +586,11 @@ public static class PropertyFoundationDependencyInjection
     private static void AddSettingsRuntime(IServiceCollection services)
     {
         services.AddScoped<SettingsCapabilityBehaviorService>();
+    }
+
+    private static void AddAuthenticationRuntime(IServiceCollection services)
+    {
+        services.AddScoped<AuthenticationCapabilityBehaviorService>();
     }
 
     private static void AddIntelligenceRuntime(IServiceCollection services)

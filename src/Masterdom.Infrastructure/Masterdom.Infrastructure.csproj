@@ -48,6 +48,8 @@
             Include="..\Masterdom.Modules.Settings\Masterdom.Modules.Settings.csproj" />
         <ProjectReference
             Include="..\Masterdom.Modules.Intelligence\Masterdom.Modules.Intelligence.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.Authentication\Masterdom.Modules.Authentication.csproj" />
     </ItemGroup>
 
     <ItemGroup>
