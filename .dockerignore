@@ -1,0 +1,51 @@
+# Build artifacts
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE and development
+.vscode/
+.idea/
+*.sln.iml
+.vs/
+.DS_Store
+
+# Test results
+TestResults/
+coverage/
+
+# Logs
+*.log
+
+# NuGet
+*.nupkg
+
+# Documentation build
+docs/_build/
+
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
+docker-compose.*.yml
+
+# Development artifacts
+*.user
+*.suo
+
+# Node/npm
+node_modules/
+dist/
+
+# Uncommitted/working-tree files
+.masterdom/architect/
+.masterdom/implementation/CAP-*
+.masterdom/validation/
+docs/gate-*

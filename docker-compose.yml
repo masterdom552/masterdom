@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: masterdom-postgres
+    environment:
+      POSTGRES_DB: masterdom
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d masterdom"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    networks:
+      - masterdom-net
+
+  masterdom:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: masterdom-host
+    environment:
+      ASPNETCORE_URLS: http://+:5000
+      ASPNETCORE_ENVIRONMENT: Production
+      Authentication__Bearer__SigningKey: "${AUTH_SIGNING_KEY:-MasterdomTestKeyFor32CharMinLength!}"
+      MASTERDOM_CONNECTION_STRING: "Host=postgres;Port=5432;Database=masterdom;User Id=postgres;Password=postgres"
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - masterdom-net
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  masterdom-net:
+    driver: bridge
