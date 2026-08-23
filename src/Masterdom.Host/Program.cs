@@ -23,6 +23,17 @@ builder.Services.AddDbContext<MasterdomDbContext>(options =>
 
 var app = builder.Build();
 
+if (args.Contains("--migrate"))
+{
+    using var migrationScope = app.Services.CreateScope();
+    var dbContext = migrationScope.ServiceProvider.GetRequiredService<MasterdomDbContext>();
+
+    app.Logger.LogInformation("Applying pending EF Core migrations to the 'Masterdom' database.");
+    await dbContext.Database.MigrateAsync();
+    app.Logger.LogInformation("Migrations applied successfully.");
+    return;
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 

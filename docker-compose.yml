@@ -21,7 +21,25 @@ services:
     networks:
       - masterdom-net
 
+  masterdom-migrate:
+    image: masterdom:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: masterdom-migrate
+    command: ["--migrate"]
+    environment:
+      Authentication__Bearer__SigningKey: "${AUTH_SIGNING_KEY:-MasterdomTestKeyFor32CharMinLength!}"
+      MASTERDOM_CONNECTION_STRING: "Host=postgres;Port=5432;Database=masterdom;User Id=postgres;Password=postgres"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - masterdom-net
+    restart: "no"
+
   masterdom:
+    image: masterdom:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -36,6 +54,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      masterdom-migrate:
+        condition: service_completed_successfully
     networks:
       - masterdom-net
 
