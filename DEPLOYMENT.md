@@ -185,8 +185,8 @@ docker-compose logs postgres
 
 Ensure Docker has internet access to pull base images:
 ```bash
-docker pull mcr.microsoft.com/dotnet/sdk:10
-docker pull mcr.microsoft.com/dotnet/aspnet:10
+docker pull mcr.microsoft.com/dotnet/sdk:10.0
+docker pull mcr.microsoft.com/dotnet/aspnet:10.0
 ```
 
 ## Production Considerations
