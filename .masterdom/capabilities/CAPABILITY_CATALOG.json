@@ -1,870 +1,898 @@
 {
-    "catalogVersion": 1,
-    "generatedAtUtc": "2026-08-09",
-    "authority": "capability-catalog",
-    "sourceOfTruth": "repository-evidence",
-    "nextExecutableCapabilityId": null,
-    "nextExecutableCapabilityName": null,
-    "capabilityStatusCounts": {
-        "COMPLETE": 19,
-        "PARTIAL": 1,
-        "NOT STARTED": 2,
-        "SUPERSEDED": 0
+  "catalogVersion": 1,
+  "generatedAtUtc": "2026-08-09",
+  "authority": "capability-catalog",
+  "sourceOfTruth": "repository-evidence",
+  "nextExecutableCapabilityId": null,
+  "nextExecutableCapabilityName": null,
+  "capabilityStatusCounts": {
+    "COMPLETE": 19,
+    "PARTIAL": 1,
+    "NOT STARTED": 2,
+    "SUPERSEDED": 0
+  },
+  "dependencyGraph": [
+    {
+      "from": "CAP-001",
+      "to": "CAP-002"
     },
-    "dependencyGraph": [
-        {
-            "from": "CAP-001",
-            "to": "CAP-002"
-        },
-        {
-            "from": "CAP-002",
-            "to": "CAP-003"
-        },
-        {
-            "from": "CAP-002",
-            "to": "CAP-004"
-        },
-        {
-            "from": "CAP-001",
-            "to": "CAP-004"
-        },
-        {
-            "from": "CAP-002",
-            "to": "CAP-005"
-        },
-        {
-            "from": "CAP-003",
-            "to": "CAP-005"
-        },
-        {
-            "from": "CAP-004",
-            "to": "CAP-005"
-        },
-        {
-            "from": "CAP-005",
-            "to": "CAP-006"
-        },
-        {
-            "from": "CAP-003",
-            "to": "CAP-006"
-        },
-        {
-            "from": "CAP-004",
-            "to": "CAP-006"
-        },
-        {
-            "from": "CAP-006",
-            "to": "CAP-007"
-        },
-        {
-            "from": "CAP-005",
-            "to": "CAP-007"
-        },
-        {
-            "from": "CAP-007",
-            "to": "CAP-008"
-        },
-        {
-            "from": "CAP-007",
-            "to": "CAP-009"
-        },
-        {
-            "from": "CAP-008",
-            "to": "CAP-009"
-        },
-        {
-            "from": "CAP-001",
-            "to": "CAP-010"
-        },
-        {
-            "from": "CAP-002",
-            "to": "CAP-010"
-        },
-        {
-            "from": "CAP-001",
-            "to": "CAP-011"
-        },
-        {
-            "from": "CAP-002",
-            "to": "CAP-012"
-        },
-        {
-            "from": "CAP-003",
-            "to": "CAP-012"
-        },
-        {
-            "from": "CAP-002",
-            "to": "CAP-013"
-        },
-        {
-            "from": "CAP-003",
-            "to": "CAP-013"
-        },
-        {
-            "from": "CAP-006",
-            "to": "CAP-013"
-        },
-        {
-            "from": "CAP-005",
-            "to": "CAP-013"
-        },
-        {
-            "from": "CAP-002",
-            "to": "CAP-014"
-        },
-        {
-            "from": "CAP-007",
-            "to": "CAP-014"
-        },
-        {
-            "from": "CAP-008",
-            "to": "CAP-014"
-        },
-        {
-            "from": "CAP-009",
-            "to": "CAP-014"
-        },
-        {
-            "from": "CAP-002",
-            "to": "CAP-015"
-        },
-        {
-            "from": "CAP-003",
-            "to": "CAP-015"
-        },
-        {
-            "from": "CAP-015",
-            "to": "CAP-016"
-        },
-        {
-            "from": "CAP-002",
-            "to": "CAP-016"
-        },
-        {
-            "from": "CAP-001",
-            "to": "CAP-016"
-        },
-        {
-            "from": "CAP-001",
-            "to": "CAP-017"
-        },
-        {
-            "from": "CAP-017",
-            "to": "CAP-018"
-        },
-        {
-            "from": "CAP-001",
-            "to": "CAP-018"
-        },
-        {
-            "from": "CAP-018",
-            "to": "CAP-019"
-        },
-        {
-            "from": "CAP-015",
-            "to": "CAP-019"
-        },
-        {
-            "from": "CAP-007",
-            "to": "CAP-019"
-        },
-        {
-            "from": "CAP-017",
-            "to": "CAP-020"
-        },
-        {
-            "from": "CAP-014",
-            "to": "CAP-020"
-        },
-        {
-            "from": "CAP-001",
-            "to": "CAP-021"
-        },
-        {
-            "from": "CAP-018",
-            "to": "CAP-021"
-        },
-        {
-            "from": "CAP-014",
-            "to": "CAP-022"
-        },
-        {
-            "from": "CAP-018",
-            "to": "CAP-022"
+    {
+      "from": "CAP-002",
+      "to": "CAP-003"
+    },
+    {
+      "from": "CAP-002",
+      "to": "CAP-004"
+    },
+    {
+      "from": "CAP-001",
+      "to": "CAP-004"
+    },
+    {
+      "from": "CAP-002",
+      "to": "CAP-005"
+    },
+    {
+      "from": "CAP-003",
+      "to": "CAP-005"
+    },
+    {
+      "from": "CAP-004",
+      "to": "CAP-005"
+    },
+    {
+      "from": "CAP-005",
+      "to": "CAP-006"
+    },
+    {
+      "from": "CAP-003",
+      "to": "CAP-006"
+    },
+    {
+      "from": "CAP-004",
+      "to": "CAP-006"
+    },
+    {
+      "from": "CAP-006",
+      "to": "CAP-007"
+    },
+    {
+      "from": "CAP-005",
+      "to": "CAP-007"
+    },
+    {
+      "from": "CAP-007",
+      "to": "CAP-008"
+    },
+    {
+      "from": "CAP-007",
+      "to": "CAP-009"
+    },
+    {
+      "from": "CAP-008",
+      "to": "CAP-009"
+    },
+    {
+      "from": "CAP-001",
+      "to": "CAP-010"
+    },
+    {
+      "from": "CAP-002",
+      "to": "CAP-010"
+    },
+    {
+      "from": "CAP-001",
+      "to": "CAP-011"
+    },
+    {
+      "from": "CAP-002",
+      "to": "CAP-012"
+    },
+    {
+      "from": "CAP-003",
+      "to": "CAP-012"
+    },
+    {
+      "from": "CAP-002",
+      "to": "CAP-013"
+    },
+    {
+      "from": "CAP-003",
+      "to": "CAP-013"
+    },
+    {
+      "from": "CAP-006",
+      "to": "CAP-013"
+    },
+    {
+      "from": "CAP-005",
+      "to": "CAP-013"
+    },
+    {
+      "from": "CAP-002",
+      "to": "CAP-014"
+    },
+    {
+      "from": "CAP-007",
+      "to": "CAP-014"
+    },
+    {
+      "from": "CAP-008",
+      "to": "CAP-014"
+    },
+    {
+      "from": "CAP-009",
+      "to": "CAP-014"
+    },
+    {
+      "from": "CAP-002",
+      "to": "CAP-015"
+    },
+    {
+      "from": "CAP-003",
+      "to": "CAP-015"
+    },
+    {
+      "from": "CAP-015",
+      "to": "CAP-016"
+    },
+    {
+      "from": "CAP-002",
+      "to": "CAP-016"
+    },
+    {
+      "from": "CAP-001",
+      "to": "CAP-016"
+    },
+    {
+      "from": "CAP-001",
+      "to": "CAP-017"
+    },
+    {
+      "from": "CAP-017",
+      "to": "CAP-018"
+    },
+    {
+      "from": "CAP-001",
+      "to": "CAP-018"
+    },
+    {
+      "from": "CAP-018",
+      "to": "CAP-019"
+    },
+    {
+      "from": "CAP-015",
+      "to": "CAP-019"
+    },
+    {
+      "from": "CAP-007",
+      "to": "CAP-019"
+    },
+    {
+      "from": "CAP-017",
+      "to": "CAP-020"
+    },
+    {
+      "from": "CAP-014",
+      "to": "CAP-020"
+    },
+    {
+      "from": "CAP-001",
+      "to": "CAP-021"
+    },
+    {
+      "from": "CAP-018",
+      "to": "CAP-021"
+    },
+    {
+      "from": "CAP-014",
+      "to": "CAP-022"
+    },
+    {
+      "from": "CAP-018",
+      "to": "CAP-022"
+    }
+  ],
+  "capabilities": [
+    {
+      "capabilityId": "CAP-001",
+      "name": "Identity",
+      "domain": "Platform",
+      "status": "COMPLETE",
+      "dependencies": [],
+      "implementedModules": [
+        "src/Masterdom.Core",
+        "src/Masterdom.Infrastructure/Security",
+        "src/Masterdom.Host"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          ".masterdom/implementation/PKG-001-IDENTITY-AGGREGATE-AUDIT.md",
+          ".masterdom/implementation/PKG-006-IDENTITY-INFRASTRUCTURE-ALIGNMENT.md",
+          ".masterdom/MASTERDOM_ROADMAP.md"
+        ],
+        "tests": [
+          "tests/Masterdom.Architecture.Tests",
+          "tests/Masterdom.Platform.Infrastructure.Tests"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [
+        "PKG-001",
+        "PKG-002",
+        "PKG-003",
+        "PKG-004",
+        "PKG-005",
+        "PKG-006",
+        "ID-2.1"
+      ],
+      "verificationStatus": "VERIFIED",
+      "verificationDateUtc": "2026-08-07"
+    },
+    {
+      "capabilityId": "CAP-002",
+      "name": "Property",
+      "domain": "Property",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-001"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.Properties",
+        "src/Masterdom.Host/Api/PropertyEndpoints.cs",
+        "src/Masterdom.Infrastructure/PropertyFoundationDependencyInjection.cs"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          ".masterdom/implementation/PKG-4B.1-REPOSITORY-SNAPSHOT-PROGRESS-SYNCHRONIZATION.md",
+          "src/Masterdom.Host/Api/PropertyEndpoints.cs",
+          "tests/Masterdom.Core.Tests/Property",
+          "tests/Masterdom.Platform.Infrastructure.Tests/Property"
+        ],
+        "tests": [
+          "tests/Masterdom.Core.Tests/Property",
+          "tests/Masterdom.Platform.Infrastructure.Tests/Property"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [
+        "PKG-4B",
+        "PKG-4B.1"
+      ],
+      "verificationStatus": "VERIFIED",
+      "verificationDateUtc": "2026-08-07"
+    },
+    {
+      "capabilityId": "CAP-003",
+      "name": "Unit",
+      "domain": "Property",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-002"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.Properties/Domain/Entities/Property/Unit.cs",
+        "src/Masterdom.Modules.Properties/Application/Commands/CreateUnitCommand.cs",
+        "src/Masterdom.Host/Api/PropertyEndpoints.cs"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          "src/Masterdom.Modules.Properties/Domain/Entities/Property/Unit.cs",
+          "src/Masterdom.Modules.Properties/Application/Handlers/Commands/CreateUnitCommandHandler.cs",
+          "src/Masterdom.Modules.Properties/Infrastructure/Persistence/Configurations/UnitConfiguration.cs"
+        ],
+        "tests": [
+          "tests/Masterdom.Core.Tests/Property"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [
+        "PKG-4B"
+      ],
+      "verificationStatus": "VERIFIED",
+      "verificationDateUtc": "2026-08-07"
+    },
+    {
+      "capabilityId": "CAP-004",
+      "name": "People",
+      "domain": "Property",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-001",
+        "CAP-002"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.People",
+        "src/Masterdom.Infrastructure/PropertyFoundationDependencyInjection.cs"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          ".masterdom/MASTERDOM_ROADMAP.md",
+          "tests/Masterdom.Core.Tests/CRM/PartyDomainTests.cs",
+          "tests/Masterdom.Core.Tests/CRM/PartyApplicationHandlersTests.cs"
+        ],
+        "tests": [
+          "tests/Masterdom.Core.Tests/Person"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [
+        "PKG-4B"
+      ],
+      "verificationStatus": "VERIFIED",
+      "verificationDateUtc": "2026-08-07"
+    },
+    {
+      "capabilityId": "CAP-005",
+      "name": "Lease",
+      "domain": "Property",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-002",
+        "CAP-003",
+        "CAP-004"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.Lease",
+        "src/Masterdom.Infrastructure/PropertyFoundationDependencyInjection.cs"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          "tests/Masterdom.Core.Tests/Lease",
+          "src/Masterdom.Modules.Lease/Domain/Entities/Lease"
+        ],
+        "tests": [
+          "tests/Masterdom.Core.Tests/Lease"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [
+        "PKG-4B"
+      ],
+      "verificationStatus": "VERIFIED",
+      "verificationDateUtc": "2026-08-07"
+    },
+    {
+      "capabilityId": "CAP-006",
+      "name": "Tenancy",
+      "domain": "Property",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-005",
+        "CAP-003"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.Tenancy",
+        "src/Masterdom.Infrastructure/Persistence/Tenancy",
+        "src/Masterdom.Host/Api/TenancyEndpoints.cs"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          "tests/Masterdom.Core.Tests/Tenancy/TenancyDomainTests.cs",
+          "tests/Masterdom.Core.Tests/Tenancy/TenancyApplicationHandlersTests.cs",
+          ".masterdom/implementation/index.json"
+        ],
+        "tests": [
+          "tests/Masterdom.Core.Tests/Tenancy"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [
+        "PKG-4B"
+      ],
+      "verificationStatus": "VERIFIED",
+      "verificationDateUtc": "2026-08-07"
+    },
+    {
+      "capabilityId": "CAP-007",
+      "name": "Billing",
+      "domain": "Finance",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-006",
+        "CAP-005"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.Billing",
+        "src/Masterdom.Infrastructure/Persistence/Billing"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          ".masterdom/implementation/PKG-4B.1-REPOSITORY-SNAPSHOT-PROGRESS-SYNCHRONIZATION.md",
+          "src/Masterdom.Modules.Billing/Masterdom.Modules.Billing.csproj"
+        ],
+        "tests": [
+          "tests/Masterdom.Platform.BusinessIntegration.Tests"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [
+        "PKG-4B.1"
+      ],
+      "verificationStatus": "VERIFIED",
+      "verificationDateUtc": "2026-08-07"
+    },
+    {
+      "capabilityId": "CAP-008",
+      "name": "Payment",
+      "domain": "Finance",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-007"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.Payment",
+        "src/Masterdom.Infrastructure/Persistence/Payment"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          "src/Masterdom.Modules.Payment/Masterdom.Modules.Payment.csproj",
+          "src/Masterdom.Infrastructure/Persistence/Payment/PaymentUnitOfWork.cs"
+        ],
+        "tests": [
+          "tests/Masterdom.Platform.BusinessIntegration.Tests"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [
+        "PKG-4B.1"
+      ],
+      "verificationStatus": "VERIFIED",
+      "verificationDateUtc": "2026-08-07"
+    },
+    {
+      "capabilityId": "CAP-009",
+      "name": "Financial Ledger",
+      "domain": "Finance",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-007",
+        "CAP-008"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.FinancialLedger",
+        "src/Masterdom.Infrastructure/Persistence/FinancialLedger",
+        "src/Masterdom.Infrastructure/Migrations/MasterdomDbContextModelSnapshot.cs"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          ".masterdom/implementation/PKG-4B.1-REPOSITORY-SNAPSHOT-PROGRESS-SYNCHRONIZATION.md",
+          "src/Masterdom.Infrastructure/Migrations/MasterdomDbContextModelSnapshot.cs"
+        ],
+        "tests": [
+          "tests/Masterdom.Platform.BusinessIntegration.Tests"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [
+        "PKG-4B.1"
+      ],
+      "verificationStatus": "VERIFIED",
+      "verificationDateUtc": "2026-08-07"
+    },
+    {
+      "capabilityId": "CAP-010",
+      "name": "Documents",
+      "domain": "Platform",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-001",
+        "CAP-002"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.Documents",
+        "src/Masterdom.Host/Api/DocumentsEndpoints.cs"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          ".masterdom/implementation/history/2026-08-02_REPOSITORY_SNAPSHOT.md",
+          ".masterdom/roadmap/ROADMAP.md"
+        ],
+        "tests": [
+          "tests/Masterdom.Platform.Infrastructure.Tests"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [
+        "PKG-4B.1"
+      ],
+      "verificationStatus": "VERIFIED",
+      "verificationDateUtc": "2026-08-07"
+    },
+    {
+      "capabilityId": "CAP-011",
+      "name": "Notifications",
+      "domain": "Platform",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-001"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.Notifications",
+        "src/Masterdom.Host/Api/NotificationsEndpoints.cs"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          ".masterdom/implementation/history/2026-08-02_REPOSITORY_SNAPSHOT.md",
+          ".masterdom/MASTERDOM_ROADMAP.md"
+        ],
+        "tests": [
+          "tests/Masterdom.Platform.Infrastructure.Tests"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [
+        "PKG-4B.1"
+      ],
+      "verificationStatus": "VERIFIED",
+      "verificationDateUtc": "2026-08-07"
+    },
+    {
+      "capabilityId": "CAP-012",
+      "name": "Inventory",
+      "domain": "Operations",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-002",
+        "CAP-003"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.Inventory",
+        "src/Masterdom.Infrastructure/Persistence/Inventory"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          ".masterdom/implementation/INV-2.0-INVENTORY-FOUNDATION-FIRST-VERTICAL-SLICE.md",
+          ".masterdom/implementation/index.json"
+        ],
+        "tests": [
+          "tests/Masterdom.Core.Tests"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [
+        "INV-2.0",
+        "INV-2.1",
+        "INV-2.2",
+        "INV-2.3"
+      ],
+      "verificationStatus": "VERIFIED",
+      "verificationDateUtc": "2026-08-09"
+    },
+    {
+      "capabilityId": "CAP-013",
+      "name": "Maintenance",
+      "domain": "Operations",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-002",
+        "CAP-003",
+        "CAP-005",
+        "CAP-006"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.Maintenance",
+        "src/Masterdom.Infrastructure/Persistence/Maintenance"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          ".masterdom/implementation/MT-2.0-MAINTENANCE-FOUNDATION-FIRST-VERTICAL-SLICE.md",
+          ".masterdom/implementation/MT-2.1-MAINTENANCE-ASSIGN-TICKET-VERTICAL-SLICE.md",
+          ".masterdom/implementation/MT-2.2-MAINTENANCE-CLOSE-TICKET-VERTICAL-SLICE.md"
+        ],
+        "tests": [
+          "tests/Masterdom.Core.Tests",
+          "tests/Masterdom.Platform.Infrastructure.Tests"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [
+        "MT-2.0",
+        "MT-2.1",
+        "MT-2.2"
+      ],
+      "verificationStatus": "VERIFIED",
+      "verificationDateUtc": "2026-08-07"
+    },
+    {
+      "capabilityId": "CAP-014",
+      "name": "Reporting",
+      "domain": "Platform",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-009",
+        "CAP-007",
+        "CAP-008",
+        "CAP-002"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.Reporting",
+        "src/Masterdom.Host/Api/ReportingEndpoints.cs"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          ".masterdom/implementation/PKG-4B.1-REPOSITORY-SNAPSHOT-PROGRESS-SYNCHRONIZATION.md",
+          ".masterdom/roadmap/ROADMAP.md"
+        ],
+        "tests": [
+          "tests/Masterdom.Platform.Infrastructure.Tests"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [
+        "PKG-4B.1"
+      ],
+      "verificationStatus": "VERIFIED",
+      "verificationDateUtc": "2026-08-07"
+    },
+    {
+      "capabilityId": "CAP-015",
+      "name": "Metering",
+      "domain": "Utilities",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-002",
+        "CAP-003"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.Metering",
+        "src/Masterdom.Infrastructure/Persistence/Metering"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          ".masterdom/MASTERDOM_ROADMAP.md",
+          "src/Masterdom.Infrastructure/Persistence/Configurations/Metering/MeterConfiguration.cs"
+        ],
+        "tests": [
+          "tests/Masterdom.Platform.BusinessIntegration.Tests"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [],
+      "verificationStatus": "VERIFIED",
+      "verificationDateUtc": "2026-08-07"
+    },
+    {
+      "capabilityId": "CAP-016",
+      "name": "CRM",
+      "domain": "Customer",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-001",
+        "CAP-002",
+        "CAP-004"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.CRM",
+        "src/Masterdom.Infrastructure/Persistence/CRM",
+        "src/Masterdom.Host/Api/CrmEndpoints.cs"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          "src/Masterdom.Modules.CRM/Application/Services/PartyApplicationService.cs",
+          "src/Masterdom.Host/Api/CrmEndpoints.cs",
+          "tests/Masterdom.Core.Tests/CRM/PartyDomainTests.cs",
+          "tests/Masterdom.Core.Tests/CRM/PartyApplicationHandlersTests.cs",
+          "tests/Masterdom.Core.Tests/CRM/PartyRoleApplicationHandlersTests.cs"
+        ],
+        "tests": [
+          "tests/Masterdom.Core.Tests/CRM",
+          "tests/Masterdom.Platform.Infrastructure.Tests/CRM"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [],
+      "verificationStatus": "VERIFIED",
+      "verificationDateUtc": "2026-08-07"
+    },
+    {
+      "capabilityId": "CAP-017",
+      "name": "Policy Framework",
+      "domain": "Platform",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-001"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.PolicyFramework",
+        "src/Masterdom.Infrastructure/Persistence/PolicyFramework"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          ".masterdom/implementation/index.json",
+          ".masterdom/MASTERDOM_ROADMAP.md"
+        ],
+        "tests": [
+          "tests/Masterdom.Platform.Infrastructure.Tests"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [
+        "CAP-017"
+      ],
+      "verificationStatus": "VERIFIED",
+      "reviewDecision": "Accepted",
+      "reviewAuthority": "Architect",
+      "verificationDateUtc": "2026-08-09"
+    },
+    {
+      "capabilityId": "CAP-018",
+      "name": "Security",
+      "domain": "Platform",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-001",
+        "CAP-017"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.Security",
+        "src/Masterdom.Infrastructure/Security",
+        "src/Masterdom.Host"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          ".masterdom/implementation/index.json",
+          ".masterdom/MASTERDOM_ROADMAP.md"
+        ],
+        "tests": [
+          "tests/Masterdom.Architecture.Tests",
+          "tests/Masterdom.Platform.Infrastructure.Tests"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [
+        "ID-2.1",
+        "PKG-CAP-018-SECURITY-FOUNDATION"
+      ],
+      "verificationStatus": "VERIFIED",
+      "reviewDecision": "VERIFIED",
+      "reviewAuthority": "Architect",
+      "verificationDateUtc": "2026-08-09"
+    },
+    {
+      "capabilityId": "CAP-019",
+      "name": "Utility Rating",
+      "domain": "Utilities",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-015",
+        "CAP-007"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.UtilityRating",
+        "src/Masterdom.Infrastructure/Persistence/UtilityRating"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          ".masterdom/implementation/index.json",
+          "src/Masterdom.Infrastructure/Persistence/Configurations/UtilityRating/UtilityRatingConfiguration.cs"
+        ],
+        "tests": [
+          "tests/Masterdom.Platform.BusinessIntegration.Tests"
+        ],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [
+        "PKG-CAP-019-UTILITY-RATING"
+      ],
+      "verificationStatus": "VERIFIED",
+      "reviewDecision": "VERIFIED",
+      "reviewAuthority": "Architect",
+      "verificationDateUtc": "2026-08-10"
+    },
+    {
+      "capabilityId": "CAP-020",
+      "name": "Subsidy Optimization",
+      "domain": "Utilities",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-017",
+        "CAP-014"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.SubsidyOptimization",
+        "src/Masterdom.Infrastructure/Persistence/SubsidyOptimization",
+        "src/Masterdom.Host/Api/SubsidyOptimizationEndpoints.cs"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          ".masterdom/implementation/PKG-CAP-020-SUBSIDY-OPTIMIZATION.md",
+          "src/Masterdom.Modules.SubsidyOptimization/Application/Maximizer/SubsidyMaximizerService.cs",
+          "src/Masterdom.Infrastructure/Persistence/Configurations/SubsidyOptimization/OptimizationRunConfiguration.cs",
+          "src/Masterdom.Host/Api/SubsidyOptimizationEndpoints.cs"
+        ],
+        "tests": [
+          "tests/Masterdom.Core.Tests/SubsidyOptimization",
+          "tests/Masterdom.Platform.Infrastructure.Tests/SubsidyOptimization",
+          "tests/Masterdom.Architecture.Tests/SubsidyOptimizationModuleArchitectureTests.cs"
+        ],
+        "build": "dotnet build src/Masterdom.Host/Masterdom.Host.csproj"
+      },
+      "implementationPackages": [
+        "PKG-CAP-020-SUBSIDY-OPTIMIZATION"
+      ],
+      "verificationStatus": "VERIFIED",
+      "reviewDecision": "VERIFIED",
+      "reviewAuthority": "Architect",
+      "verificationDateUtc": "2026-08-10"
+    },
+    {
+      "capabilityId": "CAP-021",
+      "name": "Settings",
+      "domain": "Platform",
+      "status": "COMPLETE",
+      "dependencies": [
+        "CAP-001",
+        "CAP-018"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.Settings"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          "src/Masterdom.Modules.Settings/Masterdom.Modules.Settings.csproj"
+        ],
+        "tests": [],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [
+        "PKG-CAP-021-SETTINGS"
+      ],
+      "verificationStatus": "VERIFIED",
+      "reviewDecision": "VERIFIED",
+      "reviewAuthority": "Architect",
+      "verificationDateUtc": "2026-08-10"
+    },
+    {
+      "capabilityId": "CAP-022",
+      "name": "Intelligence",
+      "domain": "Platform",
+      "status": "NOT STARTED",
+      "dependencies": [
+        "CAP-014",
+        "CAP-018"
+      ],
+      "implementedModules": [
+        "src/Masterdom.Modules.Intelligence"
+      ],
+      "repositoryEvidence": {
+        "sourceFiles": [
+          "src/Masterdom.Modules.Intelligence/Masterdom.Modules.Intelligence.csproj"
+        ],
+        "tests": [],
+        "build": "dotnet build Masterdom.slnx"
+      },
+      "implementationPackages": [],
+      "verificationStatus": "VERIFIED",
+      "reviewDecision": "Accepted",
+      "reviewAuthority": "Architect",
+      "verificationDateUtc": "2026-08-08",
+      "architectDecisions": {
+        "D1_CapabilityPurpose": "APPROVED",
+        "D2_ArchitecturalPrinciples": "APPROVED",
+        "D3_FirstExecutableSlice": "APPROVED_WITH_SCOPE_CONSTRAINT",
+        "approvedDate": "2026-08-23",
+        "implementationAuthorized": false,
+        "packageCreationAuthorized": false,
+        "conditionalAuthorization": {
+          "decision": "C — AUTHORIZED SUBJECT TO EXPLICIT PRECONDITIONS",
+          "decisionDate": "2026-08-23",
+          "scope": "Limited to a future, narrowly-scoped authority-enforcement package. Does NOT authorize the existing uncommitted 14-file Intelligence implementation as-is, and does NOT constitute implementation or completion.",
+          "authorizedPackage": "PKG-CAP-022-AUTHORITY-ENFORCEMENT",
+          "authorizedPackageStatus": "future — not started",
+          "authoritySource": "EffectiveAuthorityResolver (Masterdom.Core.Security), per ADR-0010; no new authorization mechanism",
+          "preconditions": [
+            "GetPropertyPerformanceAnalyticsQueryHandler must resolve the requesting user's effective authority for the requested propertyId",
+            "Access must be rejected when authority does not grant access to the requested property",
+            "Rejection must occur before Reporting data is fetched or returned",
+            "Enforcement must live in the Application-layer handler, not solely the HTTP endpoint",
+            "PropertyPerformanceAnalyticsService remains scoped to computation only",
+            "Authority resolution must fail closed on unresolvable or insufficient authority",
+            "Scope is limited to property-level performance analytics — no persistence, aggregate, or Reporting redesign",
+            "Tests must prove authorized-success, unauthorized-rejection, and correct 403 error mapping"
+          ]
         }
-    ],
-    "capabilities": [
-        {
-            "capabilityId": "CAP-001",
-            "name": "Identity",
-            "domain": "Platform",
-            "status": "COMPLETE",
-            "dependencies": [],
-            "implementedModules": [
-                "src/Masterdom.Core",
-                "src/Masterdom.Infrastructure/Security",
-                "src/Masterdom.Host"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    ".masterdom/implementation/PKG-001-IDENTITY-AGGREGATE-AUDIT.md",
-                    ".masterdom/implementation/PKG-006-IDENTITY-INFRASTRUCTURE-ALIGNMENT.md",
-                    ".masterdom/MASTERDOM_ROADMAP.md"
-                ],
-                "tests": [
-                    "tests/Masterdom.Architecture.Tests",
-                    "tests/Masterdom.Platform.Infrastructure.Tests"
-                ],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [
-                "PKG-001",
-                "PKG-002",
-                "PKG-003",
-                "PKG-004",
-                "PKG-005",
-                "PKG-006",
-                "ID-2.1"
-            ],
-            "verificationStatus": "VERIFIED",
-            "verificationDateUtc": "2026-08-07"
-        },
-        {
-            "capabilityId": "CAP-002",
-            "name": "Property",
-            "domain": "Property",
-            "status": "COMPLETE",
-            "dependencies": [
-                "CAP-001"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.Properties",
-                "src/Masterdom.Host/Api/PropertyEndpoints.cs",
-                "src/Masterdom.Infrastructure/PropertyFoundationDependencyInjection.cs"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    ".masterdom/implementation/PKG-4B.1-REPOSITORY-SNAPSHOT-PROGRESS-SYNCHRONIZATION.md",
-                    "src/Masterdom.Host/Api/PropertyEndpoints.cs",
-                    "tests/Masterdom.Core.Tests/Property",
-                    "tests/Masterdom.Platform.Infrastructure.Tests/Property"
-                ],
-                "tests": [
-                    "tests/Masterdom.Core.Tests/Property",
-                    "tests/Masterdom.Platform.Infrastructure.Tests/Property"
-                ],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [
-                "PKG-4B",
-                "PKG-4B.1"
-            ],
-            "verificationStatus": "VERIFIED",
-            "verificationDateUtc": "2026-08-07"
-        },
-        {
-            "capabilityId": "CAP-003",
-            "name": "Unit",
-            "domain": "Property",
-            "status": "COMPLETE",
-            "dependencies": [
-                "CAP-002"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.Properties/Domain/Entities/Property/Unit.cs",
-                "src/Masterdom.Modules.Properties/Application/Commands/CreateUnitCommand.cs",
-                "src/Masterdom.Host/Api/PropertyEndpoints.cs"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    "src/Masterdom.Modules.Properties/Domain/Entities/Property/Unit.cs",
-                    "src/Masterdom.Modules.Properties/Application/Handlers/Commands/CreateUnitCommandHandler.cs",
-                    "src/Masterdom.Modules.Properties/Infrastructure/Persistence/Configurations/UnitConfiguration.cs"
-                ],
-                "tests": [
-                    "tests/Masterdom.Core.Tests/Property"
-                ],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [
-                "PKG-4B"
-            ],
-            "verificationStatus": "VERIFIED",
-            "verificationDateUtc": "2026-08-07"
-        },
-        {
-            "capabilityId": "CAP-004",
-            "name": "People",
-            "domain": "Property",
-            "status": "COMPLETE",
-            "dependencies": [
-                "CAP-001",
-                "CAP-002"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.People",
-                "src/Masterdom.Infrastructure/PropertyFoundationDependencyInjection.cs"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    ".masterdom/MASTERDOM_ROADMAP.md",
-                    "tests/Masterdom.Core.Tests/CRM/PartyDomainTests.cs",
-                    "tests/Masterdom.Core.Tests/CRM/PartyApplicationHandlersTests.cs"
-                ],
-                "tests": [
-                    "tests/Masterdom.Core.Tests/Person"
-                ],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [
-                "PKG-4B"
-            ],
-            "verificationStatus": "VERIFIED",
-            "verificationDateUtc": "2026-08-07"
-        },
-        {
-            "capabilityId": "CAP-005",
-            "name": "Lease",
-            "domain": "Property",
-            "status": "COMPLETE",
-            "dependencies": [
-                "CAP-002",
-                "CAP-003",
-                "CAP-004"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.Lease",
-                "src/Masterdom.Infrastructure/PropertyFoundationDependencyInjection.cs"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    "tests/Masterdom.Core.Tests/Lease",
-                    "src/Masterdom.Modules.Lease/Domain/Entities/Lease"
-                ],
-                "tests": [
-                    "tests/Masterdom.Core.Tests/Lease"
-                ],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [
-                "PKG-4B"
-            ],
-            "verificationStatus": "VERIFIED",
-            "verificationDateUtc": "2026-08-07"
-        },
-        {
-            "capabilityId": "CAP-006",
-            "name": "Tenancy",
-            "domain": "Property",
-            "status": "COMPLETE",
-            "dependencies": [
-                "CAP-005",
-                "CAP-003"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.Tenancy",
-                "src/Masterdom.Infrastructure/Persistence/Tenancy",
-                "src/Masterdom.Host/Api/TenancyEndpoints.cs"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    "tests/Masterdom.Core.Tests/Tenancy/TenancyDomainTests.cs",
-                    "tests/Masterdom.Core.Tests/Tenancy/TenancyApplicationHandlersTests.cs",
-                    ".masterdom/implementation/index.json"
-                ],
-                "tests": [
-                    "tests/Masterdom.Core.Tests/Tenancy"
-                ],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [
-                "PKG-4B"
-            ],
-            "verificationStatus": "VERIFIED",
-            "verificationDateUtc": "2026-08-07"
-        },
-        {
-            "capabilityId": "CAP-007",
-            "name": "Billing",
-            "domain": "Finance",
-            "status": "COMPLETE",
-            "dependencies": [
-                "CAP-006",
-                "CAP-005"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.Billing",
-                "src/Masterdom.Infrastructure/Persistence/Billing"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    ".masterdom/implementation/PKG-4B.1-REPOSITORY-SNAPSHOT-PROGRESS-SYNCHRONIZATION.md",
-                    "src/Masterdom.Modules.Billing/Masterdom.Modules.Billing.csproj"
-                ],
-                "tests": [
-                    "tests/Masterdom.Platform.BusinessIntegration.Tests"
-                ],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [
-                "PKG-4B.1"
-            ],
-            "verificationStatus": "VERIFIED",
-            "verificationDateUtc": "2026-08-07"
-        },
-        {
-            "capabilityId": "CAP-008",
-            "name": "Payment",
-            "domain": "Finance",
-            "status": "COMPLETE",
-            "dependencies": [
-                "CAP-007"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.Payment",
-                "src/Masterdom.Infrastructure/Persistence/Payment"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    "src/Masterdom.Modules.Payment/Masterdom.Modules.Payment.csproj",
-                    "src/Masterdom.Infrastructure/Persistence/Payment/PaymentUnitOfWork.cs"
-                ],
-                "tests": [
-                    "tests/Masterdom.Platform.BusinessIntegration.Tests"
-                ],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [
-                "PKG-4B.1"
-            ],
-            "verificationStatus": "VERIFIED",
-            "verificationDateUtc": "2026-08-07"
-        },
-        {
-            "capabilityId": "CAP-009",
-            "name": "Financial Ledger",
-            "domain": "Finance",
-            "status": "COMPLETE",
-            "dependencies": [
-                "CAP-007",
-                "CAP-008"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.FinancialLedger",
-                "src/Masterdom.Infrastructure/Persistence/FinancialLedger",
-                "src/Masterdom.Infrastructure/Migrations/MasterdomDbContextModelSnapshot.cs"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    ".masterdom/implementation/PKG-4B.1-REPOSITORY-SNAPSHOT-PROGRESS-SYNCHRONIZATION.md",
-                    "src/Masterdom.Infrastructure/Migrations/MasterdomDbContextModelSnapshot.cs"
-                ],
-                "tests": [
-                    "tests/Masterdom.Platform.BusinessIntegration.Tests"
-                ],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [
-                "PKG-4B.1"
-            ],
-            "verificationStatus": "VERIFIED",
-            "verificationDateUtc": "2026-08-07"
-        },
-        {
-            "capabilityId": "CAP-010",
-            "name": "Documents",
-            "domain": "Platform",
-            "status": "COMPLETE",
-            "dependencies": [
-                "CAP-001",
-                "CAP-002"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.Documents",
-                "src/Masterdom.Host/Api/DocumentsEndpoints.cs"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    ".masterdom/implementation/history/2026-08-02_REPOSITORY_SNAPSHOT.md",
-                    ".masterdom/roadmap/ROADMAP.md"
-                ],
-                "tests": [
-                    "tests/Masterdom.Platform.Infrastructure.Tests"
-                ],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [
-                "PKG-4B.1"
-            ],
-            "verificationStatus": "VERIFIED",
-            "verificationDateUtc": "2026-08-07"
-        },
-        {
-            "capabilityId": "CAP-011",
-            "name": "Notifications",
-            "domain": "Platform",
-            "status": "COMPLETE",
-            "dependencies": [
-                "CAP-001"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.Notifications",
-                "src/Masterdom.Host/Api/NotificationsEndpoints.cs"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    ".masterdom/implementation/history/2026-08-02_REPOSITORY_SNAPSHOT.md",
-                    ".masterdom/MASTERDOM_ROADMAP.md"
-                ],
-                "tests": [
-                    "tests/Masterdom.Platform.Infrastructure.Tests"
-                ],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [
-                "PKG-4B.1"
-            ],
-            "verificationStatus": "VERIFIED",
-            "verificationDateUtc": "2026-08-07"
-        },
-        {
-            "capabilityId": "CAP-012",
-            "name": "Inventory",
-            "domain": "Operations",
-            "status": "COMPLETE",
-            "dependencies": [
-                "CAP-002",
-                "CAP-003"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.Inventory",
-                "src/Masterdom.Infrastructure/Persistence/Inventory"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    ".masterdom/implementation/INV-2.0-INVENTORY-FOUNDATION-FIRST-VERTICAL-SLICE.md",
-                    ".masterdom/implementation/index.json"
-                ],
-                "tests": [
-                    "tests/Masterdom.Core.Tests"
-                ],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [
-                "INV-2.0",
-                "INV-2.1",
-                "INV-2.2",
-                "INV-2.3"
-            ],
-            "verificationStatus": "VERIFIED",
-            "verificationDateUtc": "2026-08-09"
-        },
-        {
-            "capabilityId": "CAP-013",
-            "name": "Maintenance",
-            "domain": "Operations",
-            "status": "COMPLETE",
-            "dependencies": [
-                "CAP-002",
-                "CAP-003",
-                "CAP-005",
-                "CAP-006"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.Maintenance",
-                "src/Masterdom.Infrastructure/Persistence/Maintenance"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    ".masterdom/implementation/MT-2.0-MAINTENANCE-FOUNDATION-FIRST-VERTICAL-SLICE.md",
-                    ".masterdom/implementation/MT-2.1-MAINTENANCE-ASSIGN-TICKET-VERTICAL-SLICE.md",
-                    ".masterdom/implementation/MT-2.2-MAINTENANCE-CLOSE-TICKET-VERTICAL-SLICE.md"
-                ],
-                "tests": [
-                    "tests/Masterdom.Core.Tests",
-                    "tests/Masterdom.Platform.Infrastructure.Tests"
-                ],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [
-                "MT-2.0",
-                "MT-2.1",
-                "MT-2.2"
-            ],
-            "verificationStatus": "VERIFIED",
-            "verificationDateUtc": "2026-08-07"
-        },
-        {
-            "capabilityId": "CAP-014",
-            "name": "Reporting",
-            "domain": "Platform",
-            "status": "COMPLETE",
-            "dependencies": [
-                "CAP-009",
-                "CAP-007",
-                "CAP-008",
-                "CAP-002"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.Reporting",
-                "src/Masterdom.Host/Api/ReportingEndpoints.cs"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    ".masterdom/implementation/PKG-4B.1-REPOSITORY-SNAPSHOT-PROGRESS-SYNCHRONIZATION.md",
-                    ".masterdom/roadmap/ROADMAP.md"
-                ],
-                "tests": [
-                    "tests/Masterdom.Platform.Infrastructure.Tests"
-                ],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [
-                "PKG-4B.1"
-            ],
-            "verificationStatus": "VERIFIED",
-            "verificationDateUtc": "2026-08-07"
-        },
-        {
-            "capabilityId": "CAP-015",
-            "name": "Metering",
-            "domain": "Utilities",
-            "status": "COMPLETE",
-            "dependencies": [
-                "CAP-002",
-                "CAP-003"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.Metering",
-                "src/Masterdom.Infrastructure/Persistence/Metering"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    ".masterdom/MASTERDOM_ROADMAP.md",
-                    "src/Masterdom.Infrastructure/Persistence/Configurations/Metering/MeterConfiguration.cs"
-                ],
-                "tests": [
-                    "tests/Masterdom.Platform.BusinessIntegration.Tests"
-                ],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [],
-            "verificationStatus": "VERIFIED",
-            "verificationDateUtc": "2026-08-07"
-        },
-        {
-            "capabilityId": "CAP-016",
-            "name": "CRM",
-            "domain": "Customer",
-            "status": "COMPLETE",
-            "dependencies": [
-                "CAP-001",
-                "CAP-002",
-                "CAP-004"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.CRM",
-                "src/Masterdom.Infrastructure/Persistence/CRM",
-                "src/Masterdom.Host/Api/CrmEndpoints.cs"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    "src/Masterdom.Modules.CRM/Application/Services/PartyApplicationService.cs",
-                    "src/Masterdom.Host/Api/CrmEndpoints.cs",
-                    "tests/Masterdom.Core.Tests/CRM/PartyDomainTests.cs",
-                    "tests/Masterdom.Core.Tests/CRM/PartyApplicationHandlersTests.cs",
-                    "tests/Masterdom.Core.Tests/CRM/PartyRoleApplicationHandlersTests.cs"
-                ],
-                "tests": [
-                    "tests/Masterdom.Core.Tests/CRM",
-                    "tests/Masterdom.Platform.Infrastructure.Tests/CRM"
-                ],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [],
-            "verificationStatus": "VERIFIED",
-            "verificationDateUtc": "2026-08-07"
-        },
-        {
-            "capabilityId": "CAP-017",
-            "name": "Policy Framework",
-            "domain": "Platform",
-            "status": "COMPLETE",
-            "dependencies": [
-                "CAP-001"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.PolicyFramework",
-                "src/Masterdom.Infrastructure/Persistence/PolicyFramework"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    ".masterdom/implementation/index.json",
-                    ".masterdom/MASTERDOM_ROADMAP.md"
-                ],
-                "tests": [
-                    "tests/Masterdom.Platform.Infrastructure.Tests"
-                ],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [
-                "CAP-017"
-            ],
-            "verificationStatus": "VERIFIED",
-            "reviewDecision": "Accepted",
-            "reviewAuthority": "Architect",
-            "verificationDateUtc": "2026-08-09"
-        },
-        {
-            "capabilityId": "CAP-018",
-            "name": "Security",
-            "domain": "Platform",
-            "status": "COMPLETE",
-            "dependencies": [
-                "CAP-001",
-                "CAP-017"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.Security",
-                "src/Masterdom.Infrastructure/Security",
-                "src/Masterdom.Host"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    ".masterdom/implementation/index.json",
-                    ".masterdom/MASTERDOM_ROADMAP.md"
-                ],
-                "tests": [
-                    "tests/Masterdom.Architecture.Tests",
-                    "tests/Masterdom.Platform.Infrastructure.Tests"
-                ],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [
-                "ID-2.1",
-                "PKG-CAP-018-SECURITY-FOUNDATION"
-            ],
-            "verificationStatus": "VERIFIED",
-            "reviewDecision": "VERIFIED",
-            "reviewAuthority": "Architect",
-            "verificationDateUtc": "2026-08-09"
-        },
-        {
-            "capabilityId": "CAP-019",
-            "name": "Utility Rating",
-            "domain": "Utilities",
-            "status": "COMPLETE",
-            "dependencies": [
-                "CAP-015",
-                "CAP-007"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.UtilityRating",
-                "src/Masterdom.Infrastructure/Persistence/UtilityRating"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    ".masterdom/implementation/index.json",
-                    "src/Masterdom.Infrastructure/Persistence/Configurations/UtilityRating/UtilityRatingConfiguration.cs"
-                ],
-                "tests": [
-                    "tests/Masterdom.Platform.BusinessIntegration.Tests"
-                ],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [
-                "PKG-CAP-019-UTILITY-RATING"
-            ],
-            "verificationStatus": "VERIFIED",
-            "reviewDecision": "VERIFIED",
-            "reviewAuthority": "Architect",
-            "verificationDateUtc": "2026-08-10"
-        },
-        {
-            "capabilityId": "CAP-020",
-            "name": "Subsidy Optimization",
-            "domain": "Utilities",
-            "status": "COMPLETE",
-            "dependencies": [
-                "CAP-017",
-                "CAP-014"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.SubsidyOptimization",
-                "src/Masterdom.Infrastructure/Persistence/SubsidyOptimization",
-                "src/Masterdom.Host/Api/SubsidyOptimizationEndpoints.cs"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    ".masterdom/implementation/PKG-CAP-020-SUBSIDY-OPTIMIZATION.md",
-                    "src/Masterdom.Modules.SubsidyOptimization/Application/Maximizer/SubsidyMaximizerService.cs",
-                    "src/Masterdom.Infrastructure/Persistence/Configurations/SubsidyOptimization/OptimizationRunConfiguration.cs",
-                    "src/Masterdom.Host/Api/SubsidyOptimizationEndpoints.cs"
-                ],
-                "tests": [
-                    "tests/Masterdom.Core.Tests/SubsidyOptimization",
-                    "tests/Masterdom.Platform.Infrastructure.Tests/SubsidyOptimization",
-                    "tests/Masterdom.Architecture.Tests/SubsidyOptimizationModuleArchitectureTests.cs"
-                ],
-                "build": "dotnet build src/Masterdom.Host/Masterdom.Host.csproj"
-            },
-            "implementationPackages": [
-                "PKG-CAP-020-SUBSIDY-OPTIMIZATION"
-            ],
-            "verificationStatus": "VERIFIED",
-            "reviewDecision": "VERIFIED",
-            "reviewAuthority": "Architect",
-            "verificationDateUtc": "2026-08-10"
-        },
-        {
-            "capabilityId": "CAP-021",
-            "name": "Settings",
-            "domain": "Platform",
-            "status": "NOT STARTED",
-            "dependencies": [
-                "CAP-001",
-                "CAP-018"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.Settings"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    "src/Masterdom.Modules.Settings/Masterdom.Modules.Settings.csproj"
-                ],
-                "tests": [],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [],
-            "verificationStatus": "VERIFIED",
-            "reviewDecision": "Accepted",
-            "reviewAuthority": "Architect",
-            "verificationDateUtc": "2026-08-07"
-        },
-        {
-            "capabilityId": "CAP-022",
-            "name": "Intelligence",
-            "domain": "Platform",
-            "status": "NOT STARTED",
-            "dependencies": [
-                "CAP-014",
-                "CAP-018"
-            ],
-            "implementedModules": [
-                "src/Masterdom.Modules.Intelligence"
-            ],
-            "repositoryEvidence": {
-                "sourceFiles": [
-                    "src/Masterdom.Modules.Intelligence/Masterdom.Modules.Intelligence.csproj"
-                ],
-                "tests": [],
-                "build": "dotnet build Masterdom.slnx"
-            },
-            "implementationPackages": [],
-            "verificationStatus": "VERIFIED",
-            "reviewDecision": "Accepted",
-            "reviewAuthority": "Architect",
-            "verificationDateUtc": "2026-08-08"
-        }
-    ]
+      }
+    }
+  ]
 }

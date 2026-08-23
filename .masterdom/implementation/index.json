@@ -200,10 +200,10 @@
             "title": "Intelligence",
             "status": "NOT STARTED",
             "objective": "Establish the smallest executable Intelligence capability behavior supported by repository evidence while preserving existing architectural boundaries.",
-            "outcome": "Implementation Not Authorized",
-            "validation": "Architect Decision VERIFIED for D1/D2/D3 scope only (capability purpose, architectural principles, first-slice candidate); implementation and package creation were NOT authorized (see CAPABILITY_CATALOG.json architectDecisions.implementationAuthorized)",
-            "acceptance": "Not Closed — Implementation Not Authorized",
-            "remainingDebt": "Implementation authorization required from Architect; existing uncommitted code has an admitted, unresolved authority-enforcement gap that must also be resolved before any future implementation authorization",
+            "outcome": "Implementation Conditionally Authorized — Not Implemented",
+            "validation": "Architect Decision VERIFIED for D1/D2/D3 scope (capability purpose, architectural principles, first-slice candidate); implementation and package creation for the existing uncommitted 14-file slice remain NOT authorized as-is (implementationAuthorized: false, packageCreationAuthorized: false). A conditional authorization was recorded on 2026-08-23 limited to a future, narrowly-scoped PKG-CAP-022-AUTHORITY-ENFORCEMENT package (see CAPABILITY_CATALOG.json architectDecisions.conditionalAuthorization for decision, scope, and preconditions)",
+            "acceptance": "Not Closed — Conditionally Authorized, Not Implemented",
+            "remainingDebt": "PKG-CAP-022-AUTHORITY-ENFORCEMENT (future, not started) must be implemented and validated — wiring EffectiveAuthorityResolver into GetPropertyPerformanceAnalyticsQueryHandler with fail-closed, Application-layer, property-scoped enforcement — before CAP-022 can be considered complete; the existing uncommitted 14-file slice remains uncommitted, not authorized as-is, and its authority-enforcement gap remains unresolved",
             "successor": null
         },
         {
