@@ -1,6 +1,4 @@
-using Masterdom.Core.Security;
-
-namespace Masterdom.Modules.Security.Application.Services;
+namespace Masterdom.Core.Security;
 
 /// <summary>
 /// Provides the direct authority facts for an authenticated user.

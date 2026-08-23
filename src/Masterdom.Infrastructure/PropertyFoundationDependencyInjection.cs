@@ -588,7 +588,23 @@ public static class PropertyFoundationDependencyInjection
 
     private static void AddIntelligenceRuntime(IServiceCollection services)
     {
+        // Capability behavior service (runtime composition verification)
         services.AddScoped<IntelligenceCapabilityBehaviorService>();
+
+        // Authority-enforcement seam (Core-owned contract; backed by the existing delegation repository)
+        services.AddScoped<
+            Masterdom.Core.Security.IActiveDelegationsProvider,
+            Masterdom.Infrastructure.Security.ActiveDelegationsProvider>();
+
+        // Property Performance Analytics services
+        services.AddScoped<Masterdom.Modules.Intelligence.Application.Services.PropertyPerformanceAnalyticsService>();
+
+        // Property Performance Analytics query handler
+        services.AddScoped<
+            Masterdom.Modules.Intelligence.Application.Support.IQueryHandler<
+                Masterdom.Modules.Intelligence.Application.Queries.GetPropertyPerformanceAnalyticsQuery,
+                Masterdom.Modules.Intelligence.Application.Support.ExecutionResult<Masterdom.Modules.Intelligence.Application.Models.PropertyPerformanceAnalyticsResult>>,
+            Masterdom.Modules.Intelligence.Application.Handlers.GetPropertyPerformanceAnalyticsQueryHandler>();
     }
 
     private static void AddSubsidyOptimizationRuntime(IServiceCollection services)

@@ -2,12 +2,15 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Masterdom.Core\Masterdom.Core.csproj" />
+        <ProjectReference
+            Include="..\Masterdom.Modules.Reporting\Masterdom.Modules.Reporting.csproj" />
     </ItemGroup>
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
 </Project>

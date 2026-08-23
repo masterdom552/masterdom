@@ -43,6 +43,7 @@ app.MapSubsidyOptimizationEndpoints();
 app.MapIdentityAdministrationEndpoints();
 app.MapDelegationEndpoints();
 app.MapReportingEndpoints();
+app.MapIntelligenceEndpoints();
 app.MapNotificationEndpoints();
 app.MapDocumentEndpoints();
 
