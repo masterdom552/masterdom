@@ -88,7 +88,7 @@ public sealed class PropertyRepository : IPropertyRepository
             return query.Where(_ => false);
         }
 
-        if (currentUser.IsInRole(MasterdomRoles.SuperUser))
+        if (currentUser.IsInherentSuperUser)
         {
             return query;
         }

@@ -22,7 +22,7 @@ public sealed class NotificationAuthorizationService : INotificationAuthorizatio
             throw new InvalidOperationException("Notification request requires an authenticated user.");
         }
 
-        if (user.IsInRole(MasterdomRoles.SuperUser))
+        if (user.IsInherentSuperUser)
         {
             return;
         }

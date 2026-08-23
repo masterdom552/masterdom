@@ -41,6 +41,7 @@ app.MapFinancialLedgerEndpoints();
 app.MapPaymentEndpoints();
 app.MapSubsidyOptimizationEndpoints();
 app.MapIdentityAdministrationEndpoints();
+app.MapDelegationEndpoints();
 app.MapReportingEndpoints();
 app.MapNotificationEndpoints();
 app.MapDocumentEndpoints();

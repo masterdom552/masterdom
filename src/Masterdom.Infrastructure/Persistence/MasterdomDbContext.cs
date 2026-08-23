@@ -1,4 +1,5 @@
 using Masterdom.Core.Identity.Entities.ApiKey;
+using Masterdom.Core.Identity.Entities.DelegatedAuthority;
 using Masterdom.Core.Identity.Entities.EmailVerification;
 using Masterdom.Core.Identity.Entities.ExternalLogin;
 using Masterdom.Core.Identity.Entities.IdentityProfile;
@@ -157,6 +158,8 @@ public sealed class MasterdomDbContext : DbContext
     public DbSet<UserRole> UserRoles => Set<UserRole>();
 
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+
+    public DbSet<DelegatedAuthority> DelegatedAuthorities => Set<DelegatedAuthority>();
 
     public DbSet<UserSession> UserSessions => Set<UserSession>();
 

@@ -395,7 +395,8 @@ public sealed class PropertyCapabilityRuntimeCompositionTests
             roles: [MasterdomRoles.SuperUser],
             permissions: Array.Empty<string>(),
             propertyScopes: Array.Empty<Guid>(),
-            ownedPropertyIds: Array.Empty<Guid>());
+            ownedPropertyIds: Array.Empty<Guid>(),
+            isInherentSuperUser: true);
     }
 
     private static async Task<(int StatusCode, string? Body)> ExecuteAsync(IResult result)

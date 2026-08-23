@@ -21,7 +21,7 @@ public sealed class ReportPermissionService : IReportPermissionService
             return false;
         }
 
-        if (user.IsInRole(MasterdomRoles.SuperUser))
+        if (user.IsInherentSuperUser)
         {
             return true;
         }

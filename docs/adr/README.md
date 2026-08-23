@@ -35,6 +35,7 @@ Architects, maintainers, reviewers, and contributors making significant technica
 - [docs/adr/ADR-0008_Stock_Location_Model.md](ADR-0008_Stock_Location_Model.md)
 - [docs/adr/ADR-0009_Finance_Boundary_Deferred.md](ADR-0009_Finance_Boundary_Deferred.md)
 - [docs/adr/ADR-0010_Role_Authority_Level_Source_Of_Truth.md](ADR-0010_Role_Authority_Level_Source_Of_Truth.md)
+- [docs/adr/ADR-0011_Delegated_Authority_Model.md](ADR-0011_Delegated_Authority_Model.md)
 
 ## Relationships
 

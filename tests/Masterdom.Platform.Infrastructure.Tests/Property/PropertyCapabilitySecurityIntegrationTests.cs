@@ -53,8 +53,24 @@ public sealed class PropertyCapabilitySecurityIntegrationTests
     }
 
     [Fact]
-    public async Task SuperUser_Request_ShouldSucceed()
+    public async Task SuperUser_RoleClaimAlone_DoesNotGrantUnrestrictedAccess()
     {
+        // SECURITY CORRECTION (Gate 2 Closure):
+        // SuperUser role claim alone does NOT grant unrestricted access.
+        //
+        // JWT contains: SuperUser role claim
+        // HttpContextCurrentUserAccessor projection:
+        //   - IsInRole(SuperUser) = true (claim is present)
+        //   - IsInherentSuperUser = false (HTTP accessor cannot establish inherent Primary from claim alone)
+        //
+        // PropertyCapabilityAuthorizationService:
+        //   - Checks: if (currentUser.IsInherentSuperUser) → unrestricted
+        //   - Since false, applies normal authorization
+        //   - User has no property scope → FORBIDDEN
+        //
+        // This is CORRECT fail-closed behavior.
+        // Production Primary authority requires authoritative evidence (future Application layer).
+
         await using var factory = new PropertyCapabilityApplicationFactory();
         using var client = factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = CreateAuthorizationHeader(
@@ -62,7 +78,8 @@ public sealed class PropertyCapabilitySecurityIntegrationTests
 
         var response = await client.GetAsync("/api/properties/search");
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        // SECURITY: SuperUser role claim alone does not bypass authorization
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
     [Fact]

@@ -289,6 +289,60 @@ public sealed class UserRole : AggregateRoot<UserRoleId>
     }
 
     /// <summary>
+    /// Validates whether making this role primary would violate the temporal uniqueness invariant.
+    ///
+    /// Domain Invariant: A user may have multiple roles over time, but MUST NOT have more than
+    /// one EFFECTIVE (temporally valid) PrimaryRole at any point in time.
+    ///
+    /// This method checks if any existing primary role assignments would have overlapping
+    /// effective date ranges with this role assignment.
+    /// </summary>
+    /// <param name="userRoleToMakePrimary">The role assignment being promoted to primary.</param>
+    /// <param name="existingPrimaryRoles">All existing primary role assignments for the same user.</param>
+    /// <returns>
+    /// True if the role can be made primary (no overlapping effective intervals).
+    /// False if making it primary would violate the temporal uniqueness invariant.
+    /// </returns>
+    public static bool CanMakePrimary(UserRole userRoleToMakePrimary, IEnumerable<UserRole> existingPrimaryRoles)
+    {
+        ArgumentNullException.ThrowIfNull(userRoleToMakePrimary);
+        ArgumentNullException.ThrowIfNull(existingPrimaryRoles);
+
+        if (!userRoleToMakePrimary.IsPrimaryRole)
+        {
+            // Check for overlaps with existing primary roles
+            return !existingPrimaryRoles.Any(existingRole =>
+                HasOverlappingEffectiveInterval(userRoleToMakePrimary, existingRole));
+        }
+
+        // Already primary, no change needed
+        return true;
+    }
+
+    /// <summary>
+    /// Determines if two UserRole assignments have overlapping effective date intervals.
+    /// Two intervals overlap if:
+    ///   start1 <= end2 AND start2 <= end1
+    /// where open-ended intervals (null EffectiveToUtc) are treated as extending to infinity.
+    /// </summary>
+    private static bool HasOverlappingEffectiveInterval(UserRole role1, UserRole role2)
+    {
+        // Only check active roles
+        if (role1.Status != UserRoleStatus.Active || role2.Status != UserRoleStatus.Active)
+            return false;
+
+        var start1 = role1.EffectiveFromUtc;
+        var end1 = role1.EffectiveToUtc ?? DateTime.MaxValue;
+
+        var start2 = role2.EffectiveFromUtc;
+        var end2 = role2.EffectiveToUtc ?? DateTime.MaxValue;
+
+        // Ranges [start1, end1] and [start2, end2] overlap if:
+        // start1 <= end2 AND start2 <= end1
+        return start1 <= end2 && start2 <= end1;
+    }
+
+    /// <summary>
     /// Marks this as the user's primary role.
     /// </summary>
     public void MakePrimary()

@@ -348,7 +348,8 @@ public sealed class SubsidyOptimizationRuntimeCompositionTests
                 [MasterdomRoles.SuperUser],
                 [],
                 [],
-                [])));
+                [],
+                isInherentSuperUser: true)));
         var configurationRepository = new InMemoryConfigurationRepository(
             configurations ?? SubsidyOptimizationTestConfiguration.CreateRecords());
         services.AddSingleton(configurationRepository);

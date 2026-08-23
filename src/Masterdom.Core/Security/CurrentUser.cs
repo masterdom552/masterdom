@@ -18,7 +18,8 @@ public sealed class CurrentUser
         IReadOnlyCollection<string> roles,
         IReadOnlyCollection<string> permissions,
         IReadOnlyCollection<Guid> propertyScopes,
-        IReadOnlyCollection<Guid> ownedPropertyIds)
+        IReadOnlyCollection<Guid> ownedPropertyIds,
+        bool isInherentSuperUser = false)
     {
         IsAuthenticated = isAuthenticated;
         UserId = userId;
@@ -28,6 +29,7 @@ public sealed class CurrentUser
         Permissions = permissions;
         PropertyScopes = propertyScopes;
         OwnedPropertyIds = ownedPropertyIds;
+        IsInherentSuperUser = isInherentSuperUser;
     }
 
     public static CurrentUser Anonymous { get; } = new(
@@ -38,7 +40,8 @@ public sealed class CurrentUser
         roles: EmptyStrings,
         permissions: EmptyStrings,
         propertyScopes: EmptyGuids,
-        ownedPropertyIds: EmptyGuids);
+        ownedPropertyIds: EmptyGuids,
+        isInherentSuperUser: false);
 
     public bool IsAuthenticated { get; }
 
@@ -56,6 +59,12 @@ public sealed class CurrentUser
 
     public IReadOnlyCollection<Guid> OwnedPropertyIds { get; }
 
+    /// <summary>
+    /// Gets whether this user has an inherent SuperUser role (not delegated).
+    /// This is used to determine if unrestricted authorization bypasses apply.
+    /// </summary>
+    public bool IsInherentSuperUser { get; }
+
     public static CurrentUser Authenticated(
         Guid? userId,
         Guid? personId,
@@ -63,7 +72,8 @@ public sealed class CurrentUser
         IReadOnlyCollection<string>? roles,
         IReadOnlyCollection<string>? permissions,
         IReadOnlyCollection<Guid>? propertyScopes,
-        IReadOnlyCollection<Guid>? ownedPropertyIds)
+        IReadOnlyCollection<Guid>? ownedPropertyIds,
+        bool isInherentSuperUser = false)
     {
         return new CurrentUser(
             isAuthenticated: true,
@@ -73,7 +83,8 @@ public sealed class CurrentUser
             roles ?? EmptyStrings,
             permissions ?? EmptyStrings,
             propertyScopes ?? EmptyGuids,
-            ownedPropertyIds ?? EmptyGuids);
+            ownedPropertyIds ?? EmptyGuids,
+            isInherentSuperUser);
     }
 
     public bool IsInRole(string role)

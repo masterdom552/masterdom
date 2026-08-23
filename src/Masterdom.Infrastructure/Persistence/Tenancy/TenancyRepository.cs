@@ -57,7 +57,7 @@ public sealed class TenancyRepository : ITenancyRepository
             return query.Where(_ => false);
         }
 
-        if (currentUser.IsInRole(MasterdomRoles.SuperUser))
+        if (currentUser.IsInherentSuperUser)
         {
             return query;
         }

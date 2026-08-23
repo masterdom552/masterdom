@@ -31,7 +31,8 @@ internal sealed class PropertyCapabilityAuthorizationService : IPropertyCapabili
 
         var policy = _policyProvider.GetPolicy(context.Operation);
 
-        if (currentUser.IsInRole(MasterdomRoles.SuperUser))
+        // Only inherent SuperUser (not delegated) gets unrestricted bypass
+        if (currentUser.IsInherentSuperUser)
         {
             return AuthorizationResult.Allowed();
         }

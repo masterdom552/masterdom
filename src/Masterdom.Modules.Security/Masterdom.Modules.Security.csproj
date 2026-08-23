@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
+        <ProjectReference Include="..\Masterdom.Abstractions\Masterdom.Abstractions.csproj" />
         <ProjectReference Include="..\Masterdom.Core\Masterdom.Core.csproj" />
         <ProjectReference Include="..\Masterdom.Infrastructure\Masterdom.Infrastructure.csproj" />
     </ItemGroup>

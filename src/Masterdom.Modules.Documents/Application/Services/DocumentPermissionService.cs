@@ -21,7 +21,7 @@ public sealed class DocumentPermissionService : IDocumentPermissionService
             throw new InvalidOperationException("Document generation requires authentication.");
         }
 
-        if (user.IsInRole(MasterdomRoles.SuperUser) || user.HasPermission("documents.generate"))
+        if (user.IsInherentSuperUser || user.HasPermission("documents.generate"))
         {
             return;
         }
@@ -39,7 +39,7 @@ public sealed class DocumentPermissionService : IDocumentPermissionService
             throw new InvalidOperationException("Document download requires authentication.");
         }
 
-        if (user.IsInRole(MasterdomRoles.SuperUser) || user.HasPermission("documents.read"))
+        if (user.IsInherentSuperUser || user.HasPermission("documents.read"))
         {
             return;
         }

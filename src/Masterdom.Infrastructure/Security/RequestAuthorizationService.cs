@@ -215,7 +215,7 @@ internal sealed class RequestAuthorizationService : IRequestAuthorizationService
             return AuthorizationResult.Challenge();
         }
 
-        if (!currentUser.IsInRole(MasterdomRoles.SuperUser)
+        if (!currentUser.IsInherentSuperUser
             && (!Guid.TryParse(command.Request.PropertyId, out _)
                 || (command.Request.UserId is not null
                     && (!Guid.TryParse(command.Request.UserId, out var requestedUserId)
