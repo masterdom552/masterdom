@@ -145,6 +145,7 @@ using Masterdom.Platform.Recommendation;
 using Masterdom.Platform.ReadModels;
 using Masterdom.Platform.Rules;
 using Masterdom.Platform.Workflow;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using LeaseAggregate = Masterdom.Modules.Lease.Domain.Entities.Lease.Lease;
@@ -591,6 +592,51 @@ public static class PropertyFoundationDependencyInjection
     private static void AddAuthenticationRuntime(IServiceCollection services)
     {
         services.AddScoped<AuthenticationCapabilityBehaviorService>();
+
+        services.AddScoped<
+            Masterdom.Core.Security.IUserRepository,
+            Masterdom.Infrastructure.Persistence.Identity.UserRepository>();
+        services.AddScoped<
+            Masterdom.Core.Security.ICredentialRepository,
+            Masterdom.Infrastructure.Persistence.Identity.CredentialRepository>();
+        services.AddScoped<
+            Masterdom.Core.Security.IPropertyOwnershipProvider,
+            Masterdom.Infrastructure.Security.PropertyOwnershipProvider>();
+        services.AddScoped<
+            Masterdom.Core.Security.IPasswordHasher,
+            Masterdom.Modules.Authentication.Application.Services.PasswordHasher>();
+
+        services.AddSingleton(serviceProvider =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+
+            var signingKey = configuration["Authentication:Bearer:SigningKey"]
+                ?? Environment.GetEnvironmentVariable("MASTERDOM_AUTHENTICATION_SIGNING_KEY");
+            if (string.IsNullOrWhiteSpace(signingKey))
+            {
+                throw new InvalidOperationException(
+                    "Authentication:Bearer:SigningKey must be configured for token issuance.");
+            }
+
+            return new Masterdom.Modules.Authentication.Application.Services.JwtTokenIssuerOptions
+            {
+                SigningKey = signingKey,
+                Issuer = configuration["Authentication:Bearer:Issuer"]
+                    ?? Environment.GetEnvironmentVariable("MASTERDOM_AUTHENTICATION_ISSUER"),
+                Audience = configuration["Authentication:Bearer:Audience"]
+                    ?? Environment.GetEnvironmentVariable("MASTERDOM_AUTHENTICATION_AUDIENCE"),
+            };
+        });
+        services.AddScoped<
+            Masterdom.Modules.Authentication.Application.Services.IJwtTokenIssuer,
+            Masterdom.Modules.Authentication.Application.Services.JwtTokenIssuer>();
+
+        services.AddScoped<
+            Masterdom.Modules.Authentication.Application.Support.ICommandHandler<
+                Masterdom.Modules.Authentication.Application.Commands.LoginCommand,
+                Masterdom.Modules.Authentication.Application.Support.ExecutionResult<
+                    Masterdom.Modules.Authentication.Application.Models.LoginResult>>,
+            Masterdom.Modules.Authentication.Application.Handlers.LoginCommandHandler>();
     }
 
     private static void AddIntelligenceRuntime(IServiceCollection services)

@@ -15,6 +15,14 @@ public interface IPropertyRepository
 
     IReadOnlyCollection<Property> Search(string? codeContains, int take);
 
+    /// <summary>
+    /// Lists properties directly owned by the given owner, unconditionally
+    /// -- not subject to the caller's own read-access filter. Intended for
+    /// server-side scope derivation (e.g. at authentication time), not for
+    /// general request-time reads.
+    /// </summary>
+    IReadOnlyCollection<Property> ListOwnedBy(Guid ownerId);
+
     void Add(Property property);
 
     void Update(Property property);

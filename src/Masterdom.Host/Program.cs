@@ -37,6 +37,7 @@ if (args.Contains("--migrate"))
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapAuthenticationEndpoints();
 app.MapPropertyEndpoints();
 app.MapPolicyFrameworkEndpoints();
 app.MapCrmEndpoints();

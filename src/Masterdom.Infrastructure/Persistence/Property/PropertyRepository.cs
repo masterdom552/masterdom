@@ -68,6 +68,13 @@ public sealed class PropertyRepository : IPropertyRepository
             .ToList();
     }
 
+    public IReadOnlyCollection<PropertyAggregate> ListOwnedBy(Guid ownerId)
+    {
+        return _dbContext.Properties
+            .Where(x => x.OwnerId == ownerId)
+            .ToList();
+    }
+
     public void Add(PropertyAggregate property)
     {
         ArgumentNullException.ThrowIfNull(property);

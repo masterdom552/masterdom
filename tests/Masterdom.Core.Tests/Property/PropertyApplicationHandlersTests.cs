@@ -269,6 +269,11 @@ public sealed class PropertyApplicationHandlersTests
             return query.Take(effectiveTake).ToList();
         }
 
+        public IReadOnlyCollection<PropertyAggregate> ListOwnedBy(Guid ownerId)
+        {
+            return _properties.Values.Where(x => x.OwnerId == ownerId).ToList();
+        }
+
         public void Add(PropertyAggregate property)
         {
             _properties[property.Id.Value] = property;

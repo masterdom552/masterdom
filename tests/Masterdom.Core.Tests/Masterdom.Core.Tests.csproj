@@ -47,6 +47,8 @@
             Include="..\..\src\Masterdom.Modules.Notifications\Masterdom.Modules.Notifications.csproj" />
         <ProjectReference
             Include="..\..\src\Masterdom.Modules.Documents\Masterdom.Modules.Documents.csproj" />
+        <ProjectReference
+            Include="..\..\src\Masterdom.Modules.Authentication\Masterdom.Modules.Authentication.csproj" />
         <ProjectReference Include="..\Masterdom.TestKit\Masterdom.TestKit.csproj" />
     </ItemGroup>
 
