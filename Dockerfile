@@ -22,6 +22,7 @@ COPY ./src/Masterdom.Host/ ./src/Masterdom.Host/
 
 # Copy business modules (committed state only)
 COPY ./src/Masterdom.Modules.Security/ ./src/Masterdom.Modules.Security/
+COPY ./src/Masterdom.Modules.Authentication/ ./src/Masterdom.Modules.Authentication/
 COPY ./src/Masterdom.Modules.UtilityRating/ ./src/Masterdom.Modules.UtilityRating/
 COPY ./src/Masterdom.Modules.CRM/ ./src/Masterdom.Modules.CRM/
 COPY ./src/Masterdom.Modules.Properties/ ./src/Masterdom.Modules.Properties/
