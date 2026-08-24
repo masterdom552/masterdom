@@ -432,3 +432,122 @@ governing investigation, none silently dropped.
 - **This package's Approved status does not itself authorize implementation
   to begin.** A separate, explicit authorization is required before any
   source code, test, migration, DI, or endpoint change is made.
+
+## 14. Implementation Notes
+
+Implementation followed Sections 2A–2E as designed, with one
+implementation-discovered seam not anticipated by this record, and one
+test-infrastructure limitation, both documented honestly below rather than
+silently worked around.
+
+- **`IAuthenticationUnitOfWork` (new seam, not in the original Section 2E
+  file list).** Section 2A/2D's text assumed persistence would be
+  "committed via one `SaveChangesAsync()` (the established shared-scoped-
+  DbContext pattern ... no new transaction abstraction)" — implicitly
+  assuming `Masterdom.Modules.Authentication` handlers have direct access to
+  `MasterdomDbContext`, the way `BootstrapProvisioningService` does. Direct
+  inspection of `Masterdom.Modules.Authentication.csproj` at implementation
+  time (per Section 5's own required re-verification) showed this assumption
+  was incorrect: the module references only `Masterdom.Core`, with no path
+  to `MasterdomDbContext`, and `LoginCommandHandler` — the only existing
+  handler in this module — never needed to persist anything, so the gap had
+  never surfaced before. Rather than adding a bespoke, one-off mechanism,
+  implementation found that **every other module in this codebase already
+  solves exactly this problem** via a per-module `I{Module}UnitOfWork`
+  interface (`Application/Support/`) backed by an EF Core implementation in
+  `Masterdom.Infrastructure/Persistence/{Module}/` — a pattern used by
+  Property, Person, Party, Lease, Tenancy, Metering, Billing, Inventory,
+  Maintenance, Payment, PolicyFramework, FinancialLedger,
+  SubsidyOptimization, and IdentityAdministration (13 existing instances).
+  `IAuthenticationUnitOfWork`/`AuthenticationUnitOfWork` (a single
+  `Task SaveChangesAsync(CancellationToken)` method, no explicit transaction
+  wrapper needed since each handler performs exactly one `SaveChangesAsync`
+  call, which EF Core already commits atomically) applies that identical,
+  already-established convention to this module — it is not a new kind of
+  abstraction in this codebase, grants no new capability beyond what 2A/2B/2C
+  already fully specified, requires no new project reference (`Masterdom.
+  Infrastructure` already references `Masterdom.Modules.Authentication`),
+  and touches none of the 13 architectural invariants. This is judged an
+  implementation-discovered seam to document, not a scope expansion
+  requiring a STOP.
+- **`ExecuteUpdateAsync` is not supported by EF Core's InMemory provider**
+  (confirmed empirically: it throws `InvalidOperationException`
+  unconditionally, not only under concurrency). `PasswordResetRepository.
+  TryCompleteAsync` is implemented exactly as designed in 2D and is correct
+  against Npgsql (the real, production provider); this is a test-
+  infrastructure limitation, not a design defect, and mirrors this
+  repository's already-accepted `WebApplicationFactory` gap. Repository-level
+  tests (`PasswordResetRepositoryTests`) cover the query methods only;
+  `TryCompleteAsync`'s single-use/no-lost-update behavior (Acceptance
+  Criteria 7 and 9) is instead proven at the handler level via a lock-guarded
+  fake `IPasswordResetRepository` in `CompletePasswordResetCommandHandlerTests`,
+  including a genuine two-thread concurrent-redemption race.
+- Request/response DTOs and route wiring in `AuthenticationEndpoints.cs`
+  follow the existing `Login`/`LoginRequest`/`LoginResponse` shape exactly:
+  `ChangePasswordRequest`, `RequestPasswordResetRequest`/
+  `RequestPasswordResetResponse`, `CompletePasswordResetRequest`.
+- The administrator-forbidden case (2B) is split into two distinct failure
+  codes, not one: an unauthenticated caller receives `unauthorized` (401)
+  and an authenticated-but-non-`IsInherentSuperUser` caller receives
+  `forbidden` (403). Section 9's summary table names only the latter; this
+  split is required by, and consistent with, this same package's own
+  Acceptance Criterion 4 ("any other authenticated caller receives
+  `forbidden` (403); an unauthenticated caller receives `401`").
+- Reset lifetime constant: 15 minutes, matching the existing access-token
+  lifetime order of magnitude referenced in 2B.
+- New password minimum length: 8 characters, applied identically in both
+  self-service change (2A) and redemption (2C), checked only after the
+  redemption path's username/token/expiry checks succeed (so a validation
+  failure can never be used to infer token or account validity).
+
+## 15. Validation Results
+
+- `dotnet build Masterdom.slnx`: succeeded, 0 errors (pre-existing `CS1591`/
+  nullability warnings only, unrelated to this package).
+- New tests: `ChangePasswordCommandHandlerTests` (5), `RequestPasswordReset
+  CommandHandlerTests` (6), `CompletePasswordResetCommandHandlerTests` (9,
+  including the concurrent-redemption race), `ResetTokenHasherTests` (5),
+  `PasswordResetRepositoryTests` (2, query methods only — see Section 14) —
+  all passed.
+- Full regression, classified PASS / PRE-EXISTING / NEW FAILURE, with every
+  PRE-EXISTING claim independently reproduced against unmodified `main`
+  (HEAD `352ea8d`) via `git stash -u` before/after comparison:
+  - `Masterdom.Core.Tests`: 501/501 PASS (up from 474 pre-package; includes
+    all new tests above).
+  - `Masterdom.Platform.Tests`: 250/250 PASS.
+  - `Masterdom.Platform.BusinessIntegration.Tests`: 9/9 PASS.
+  - `Masterdom.Platform.Infrastructure.Tests`: 149/179 PASS; 30
+    PRE-EXISTING (`AuthenticationEndpointIntegrationTests`,
+    `DelegationEndpointIntegrationTests`, `PropertyCapabilitySecurity
+    IntegrationTests` — the documented `WebApplicationFactory`
+    test-infrastructure defect, explicitly out of scope per Section 4).
+    Reproduced identically (147/177, same 30 failing tests by name) on
+    unmodified `main` before restoring this package's changes.
+  - `Masterdom.Architecture.Tests`: 139/141 PASS; 2 PRE-EXISTING
+    (`GenericCalculationReuseArchitectureTests.SubsidyOptimization
+    MigratedCalculationSlices...`, `ContractOwnershipArchitectureTests.
+    LocalDtos_ShouldNotBeConsumedCrossModule` — unrelated to Authentication).
+    Reproduced identically on unmodified `main`.
+  - Zero new failures anywhere.
+- `git diff --check`: clean.
+- Migration decision re-verified: no new migration created; `PasswordResets`
+  and `Credentials` schema used exactly as already migrated. Confirms
+  Section 7's decision was correct.
+
+## 16. Explicitly Unvalidated
+
+- **Live HTTP/deployment validation was not performed and is reported as a
+  genuine, honest gap, not silently skipped.** Docker was not running on
+  this machine at implementation time (`docker ps` failed to reach the
+  daemon), and — independent of that — the persistent deployment's bootstrap
+  `PrimarySuperUser` credential's password was intentionally never retained
+  after the CAP-001 package's own validation, so no legitimate way exists to
+  obtain an authenticated `IsInherentSuperUser` session against that
+  deployment to exercise the admin-mediated reset endpoint (2B) end-to-end —
+  the exact chicken-and-egg case this package's own investigation
+  anticipated. Per this package's own instruction, this gap is reported
+  honestly rather than resolved by inventing a credential, starting
+  infrastructure to force the issue, weakening the bootstrap guard, or using
+  ad hoc SQL. All other acceptance criteria are validated at the repository
+  level (Section 15); only genuine live-HTTP/deployment confirmation is
+  unvalidated.

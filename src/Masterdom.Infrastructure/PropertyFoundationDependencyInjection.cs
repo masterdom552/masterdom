@@ -605,6 +605,15 @@ public static class PropertyFoundationDependencyInjection
         services.AddScoped<
             Masterdom.Core.Security.IPasswordHasher,
             Masterdom.Modules.Authentication.Application.Services.PasswordHasher>();
+        services.AddScoped<
+            Masterdom.Core.Security.IPasswordResetRepository,
+            Masterdom.Infrastructure.Persistence.Identity.PasswordResetRepository>();
+        services.AddScoped<
+            Masterdom.Modules.Authentication.Application.Services.IResetTokenHasher,
+            Masterdom.Modules.Authentication.Application.Services.ResetTokenHasher>();
+        services.AddScoped<
+            Masterdom.Modules.Authentication.Application.Support.IAuthenticationUnitOfWork,
+            Masterdom.Infrastructure.Persistence.Identity.AuthenticationUnitOfWork>();
 
         services.AddSingleton(serviceProvider =>
         {
@@ -637,6 +646,22 @@ public static class PropertyFoundationDependencyInjection
                 Masterdom.Modules.Authentication.Application.Support.ExecutionResult<
                     Masterdom.Modules.Authentication.Application.Models.LoginResult>>,
             Masterdom.Modules.Authentication.Application.Handlers.LoginCommandHandler>();
+        services.AddScoped<
+            Masterdom.Modules.Authentication.Application.Support.ICommandHandler<
+                Masterdom.Modules.Authentication.Application.Commands.ChangePasswordCommand,
+                Masterdom.Modules.Authentication.Application.Support.ExecutionResult>,
+            Masterdom.Modules.Authentication.Application.Handlers.ChangePasswordCommandHandler>();
+        services.AddScoped<
+            Masterdom.Modules.Authentication.Application.Support.ICommandHandler<
+                Masterdom.Modules.Authentication.Application.Commands.RequestPasswordResetCommand,
+                Masterdom.Modules.Authentication.Application.Support.ExecutionResult<
+                    Masterdom.Modules.Authentication.Application.Models.RequestPasswordResetResult>>,
+            Masterdom.Modules.Authentication.Application.Handlers.RequestPasswordResetCommandHandler>();
+        services.AddScoped<
+            Masterdom.Modules.Authentication.Application.Support.ICommandHandler<
+                Masterdom.Modules.Authentication.Application.Commands.CompletePasswordResetCommand,
+                Masterdom.Modules.Authentication.Application.Support.ExecutionResult>,
+            Masterdom.Modules.Authentication.Application.Handlers.CompletePasswordResetCommandHandler>();
     }
 
     private static void AddIntelligenceRuntime(IServiceCollection services)
