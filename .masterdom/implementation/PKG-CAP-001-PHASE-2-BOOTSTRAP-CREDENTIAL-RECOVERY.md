@@ -480,6 +480,71 @@ Compose change, and does not access or modify the persistent deployment or
 any credential. A separate, explicit implementation authorization is
 required before any of Sections 6–14 may be built.
 
+## 20. Implementation Results
+
+Implementation followed Sections 6–14 exactly, with no material deviation
+from the approved design. Recovery secret minimum length was fixed at 16
+characters (Section 9 left this as an implementation-time decision).
+
+- `src/Masterdom.Host/Bootstrap/BootstrapCredentialRecoveryService.cs`
+  (new): `BootstrapCredentialRecoveryRequest`/`BootstrapCredentialRecoveryResult`,
+  `BootstrapCredentialRecoveryService` with exactly the four-dependency
+  constructor Section 6 specified. `IsPrimarySuperUserAsync` loads
+  `UserRoles`/`Roles` unfiltered via `AsNoTracking().ToListAsync()` and
+  filters client-side (LINQ-to-Objects), deliberately mirroring
+  `IsAlreadyBootstrappedAsync`'s own unfiltered-load style rather than
+  pushing a `Contains` predicate against value-converted `RoleId`/`UserId`
+  types to SQL — avoiding a known EF Core translation risk for that pattern,
+  not present in the original design record but a straightforward
+  application of its own "reuse established precedent" principle.
+- `src/Masterdom.Host/Program.cs` (modified): one new
+  `builder.Services.AddScoped<BootstrapCredentialRecoveryService>();` line
+  beside the existing Bootstrap registration, and one new
+  `args.Contains("--recover-bootstrap-credential")` branch, placed
+  immediately after the `--bootstrap` branch and before
+  `app.UseAuthentication()` — structurally identical to `--bootstrap`
+  (`Environment.Exit(0|1)`, never reaches `app.Run()`, no route ever
+  registered). Configuration keys/environment variables exactly as Section 9
+  specified (`BootstrapRecovery:Username`/`MASTERDOM_BOOTSTRAP_RECOVERY_USERNAME`,
+  `BootstrapRecovery:NewPassword`/`MASTERDOM_BOOTSTRAP_RECOVERY_NEW_PASSWORD`,
+  `BootstrapRecovery:Secret`/`MASTERDOM_BOOTSTRAP_RECOVERY_SECRET`), each
+  defaulting to `string.Empty` with no fallback to any other secret.
+- `BootstrapProvisioningService.cs` was **not modified** — the idempotency
+  guard is untouched, confirmed both by the unchanged file and by a
+  dedicated new test.
+
+**Migration:** none created or required, confirming Section 13's prediction —
+no new entity, property, index, or `DbSet` was introduced.
+
+**Tests:** `tests/Masterdom.Platform.Infrastructure.Tests/Bootstrap/
+BootstrapCredentialRecoveryServiceTests.cs` (new, 12 tests, real
+`MasterdomDbContext`/EF InMemory, real `UserRepository`/`CredentialRepository`/
+`PasswordHasher`/`LoginCommandHandler` — no hand-written fakes for any
+production seam), covering every scenario in Section 14 plus the real-login
+round trip and the post-recovery `--bootstrap` idempotency re-check. All 12
+pass. Existing `BootstrapProvisioningServiceTests.cs` (10 tests) re-run
+unchanged and still pass (22/22 combined).
+
+**Regression** (classified PASS / PRE-EXISTING / NEW FAILURE, PRE-EXISTING
+independently reproduced via `git stash -u` against unmodified `main` before
+restoring this package's changes):
+- `Masterdom.Core.Tests`: 501/501 PASS.
+- `Masterdom.Platform.Infrastructure.Tests`: 161/191 PASS; 30 PRE-EXISTING
+  (`AuthenticationEndpointIntegrationTests`, `DelegationEndpointIntegrationTests`,
+  `PropertyCapabilitySecurityIntegrationTests` — the documented
+  `WebApplicationFactory` defect). Reproduced identically (149/179, same 30
+  failing tests by name) on unmodified `main`. Zero new failures.
+- `Masterdom.Platform.Tests`: 250/250 PASS.
+- `Masterdom.Platform.BusinessIntegration.Tests`: 9/9 PASS.
+- `Masterdom.Architecture.Tests`: 139/141 PASS; 2 PRE-EXISTING
+  (`GenericCalculationReuseArchitectureTests`, `ContractOwnershipArchitectureTests`
+  — unrelated to Authentication/Bootstrap), unchanged from baseline.
+- `git diff --check`: clean.
+
+**Live deployment validation:** not performed as part of implementation —
+authorized separately, per Section 15 and this package's own governance
+gate; not attempted in this pass.
+
 ## Governance State
 
 This record does not modify `CAPABILITY_CATALOG.json` or

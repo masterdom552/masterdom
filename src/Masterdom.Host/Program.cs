@@ -11,6 +11,7 @@ builder.Services.AddSecurityModule(builder.Configuration);
 builder.Services.AddPropertyBusinessCapabilityRuntime();
 builder.Services.AddPolicyFrameworkRuntime();
 builder.Services.AddScoped<BootstrapProvisioningService>();
+builder.Services.AddScoped<BootstrapCredentialRecoveryService>();
 
 var connectionString =
     builder.Configuration.GetConnectionString("Masterdom")
@@ -65,6 +66,36 @@ if (args.Contains("--bootstrap"))
     }
 
     app.Logger.LogError("Bootstrap failed: {Message}", result.Message);
+    Environment.Exit(1);
+    return;
+}
+
+if (args.Contains("--recover-bootstrap-credential"))
+{
+    using var recoveryScope = app.Services.CreateScope();
+    var recoveryService = recoveryScope.ServiceProvider.GetRequiredService<BootstrapCredentialRecoveryService>();
+
+    var recoveryRequest = new BootstrapCredentialRecoveryRequest(
+        Username: app.Configuration["BootstrapRecovery:Username"]
+            ?? Environment.GetEnvironmentVariable("MASTERDOM_BOOTSTRAP_RECOVERY_USERNAME")
+            ?? string.Empty,
+        NewPassword: app.Configuration["BootstrapRecovery:NewPassword"]
+            ?? Environment.GetEnvironmentVariable("MASTERDOM_BOOTSTRAP_RECOVERY_NEW_PASSWORD")
+            ?? string.Empty,
+        RecoverySecret: app.Configuration["BootstrapRecovery:Secret"]
+            ?? Environment.GetEnvironmentVariable("MASTERDOM_BOOTSTRAP_RECOVERY_SECRET")
+            ?? string.Empty);
+
+    app.Logger.LogInformation("Running bootstrap credential recovery.");
+    var recoveryResult = await recoveryService.RecoverAsync(recoveryRequest);
+
+    if (recoveryResult.Success)
+    {
+        app.Logger.LogInformation("Bootstrap credential recovery completed successfully.");
+        Environment.Exit(0);
+    }
+
+    app.Logger.LogError("Bootstrap credential recovery failed: {Message}", recoveryResult.Message);
     Environment.Exit(1);
     return;
 }
