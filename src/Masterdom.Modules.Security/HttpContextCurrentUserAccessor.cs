@@ -48,28 +48,15 @@ internal sealed class HttpContextCurrentUserAccessor : ICurrentUserAccessor
 
         // SECURITY CRITICAL:
         // IsInherentSuperUser must represent: user possesses inherent Primary authority
-        // NOT: user has a SuperUser role claim
+        // NOT: user has a SuperUser role claim.
         //
-        // These are NOT equivalent:
-        // - SuperUser role claim ≠ inherent Primary authority
-        // - Delegated SuperUser ≠ inherent Primary authority
-        //
-        // Current JWT cannot safely establish inherent Primary authority:
-        // - Role claims are orthogonal to authority level
-        // - Delegations are in database, not JWT
-        // - We cannot distinguish direct Primary from Secondary with SuperUser role
-        //
-        // FAIL CLOSED: Cannot establish inherent Primary from JWT claims alone.
-        // Without authoritative evidence (e.g., explicit authority-level claim,
-        // database verification, or future authentication service confirmation),
-        // default to false.
-        //
-        // Production: Authentication service must verify user's primary authority
-        // in database BEFORE issuing token, then include explicit authority evidence
-        // (e.g., "authority_level": "primary") in JWT if needed.
-        //
-        // This deferred to Application Security implementation (future).
-        var isInherentSuperUser = false;
+        // The masterdom:authority_level claim is populated exclusively by CAP-023's
+        // LoginCommandHandler, which resolves it via EffectiveAuthorityResolver against
+        // persisted database state at login time (see ILoginAuthorityResolver) -- it is
+        // never client-supplied. A token lacking the claim (e.g. one issued before this
+        // change, or for a user with no active primary role) fails closed to false.
+        var authorityLevel = TryParseInt(principal.FindFirstValue(MasterdomClaimTypes.AuthorityLevel));
+        var isInherentSuperUser = authorityLevel == AuthorityLevels.PrimarySuperUser;
 
         return CurrentUser.Authenticated(
             userId: ResolveUserId(principal),
@@ -97,5 +84,10 @@ internal sealed class HttpContextCurrentUserAccessor : ICurrentUserAccessor
     private static Guid? TryParseGuid(string? value)
     {
         return Guid.TryParse(value, out var result) ? result : null;
+    }
+
+    private static int? TryParseInt(string? value)
+    {
+        return int.TryParse(value, out var result) ? result : null;
     }
 }

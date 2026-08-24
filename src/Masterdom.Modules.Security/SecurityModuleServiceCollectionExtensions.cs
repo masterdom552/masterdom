@@ -96,6 +96,9 @@ public static class SecurityModuleServiceCollectionExtensions
         // Application authority provider (assembles facts from identity model)
         services.AddScoped<IDirectAuthorityProvider, DefaultDirectAuthorityProvider>();
 
+        // Login-time authority resolution (CAP-023 Phase 2: server-derived JWT authority claims)
+        services.AddScoped<ILoginAuthorityResolver, LoginAuthorityResolver>();
+
         // Repository and Unit of Work
         services.AddScoped<IDelegatedAuthorityRepository, DelegatedAuthorityRepository>();
         services.AddScoped<IIdentityAdministrationUnitOfWork, IdentityAdministrationUnitOfWork>();

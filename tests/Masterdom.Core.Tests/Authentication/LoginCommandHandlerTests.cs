@@ -81,8 +81,32 @@ public sealed class LoginCommandHandlerTests
         Assert.Equal(["AccessToken", "ExpiresAtUtc"], properties);
     }
 
+    [Fact]
+    public async Task HandleAsync_WithResolvedAuthority_ShouldEmbedItInTheIssuedToken()
+    {
+        var (handler, user, _) = CreateHandlerWithSeededUser(
+            "correct-password",
+            authorityClaims: new LoginAuthorityClaims(
+                RoleCodes: ["SUPERUSER"],
+                Permissions: [],
+                PropertyScopes: [],
+                AuthorityLevel: AuthorityLevels.PrimarySuperUser));
+
+        var result = await handler.HandleAsync(new LoginCommand(user.Username.Value, "correct-password"));
+
+        Assert.True(result.IsSuccess);
+        var token = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler()
+            .ReadJwtToken(result.Value!.AccessToken);
+
+        Assert.Contains(
+            token.Claims,
+            c => c.Type == MasterdomClaimTypes.AuthorityLevel
+                && c.Value == AuthorityLevels.PrimarySuperUser.ToString());
+    }
+
     private static (LoginCommandHandler Handler, User User, FakeUserRepository UserRepository) CreateHandlerWithSeededUser(
-        string password)
+        string password,
+        LoginAuthorityClaims? authorityClaims = null)
     {
         var identityProfileId = IdentityProfileId.New();
         var user = User.Create(
@@ -96,6 +120,7 @@ public sealed class LoginCommandHandlerTests
         var userRepository = new FakeUserRepository(user);
         var credentialRepository = new FakeCredentialRepository(credential);
         var propertyOwnershipProvider = new FakePropertyOwnershipProvider();
+        var loginAuthorityResolver = new FakeLoginAuthorityResolver(authorityClaims);
         var jwtTokenIssuer = new JwtTokenIssuer(new JwtTokenIssuerOptions
         {
             SigningKey = "test-signing-key-that-is-sufficiently-long",
@@ -106,6 +131,7 @@ public sealed class LoginCommandHandlerTests
             credentialRepository,
             passwordHasher,
             propertyOwnershipProvider,
+            loginAuthorityResolver,
             jwtTokenIssuer);
 
         return (handler, user, userRepository);
@@ -162,6 +188,24 @@ public sealed class LoginCommandHandlerTests
             CancellationToken cancellationToken = default)
         {
             return Task.FromResult<IReadOnlyCollection<Guid>>([]);
+        }
+    }
+
+    private sealed class FakeLoginAuthorityResolver : ILoginAuthorityResolver
+    {
+        private readonly LoginAuthorityClaims? _fixedClaims;
+
+        public FakeLoginAuthorityResolver(LoginAuthorityClaims? fixedClaims = null)
+        {
+            _fixedClaims = fixedClaims;
+        }
+
+        public Task<LoginAuthorityClaims> ResolveAsync(
+            Guid userId,
+            IReadOnlyCollection<Guid> directPropertyScopes,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(_fixedClaims ?? LoginAuthorityClaims.None(directPropertyScopes));
         }
     }
 }

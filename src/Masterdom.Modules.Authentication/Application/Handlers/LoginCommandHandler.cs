@@ -16,6 +16,7 @@ public sealed class LoginCommandHandler : ICommandHandler<LoginCommand, Executio
     private readonly ICredentialRepository _credentialRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IPropertyOwnershipProvider _propertyOwnershipProvider;
+    private readonly ILoginAuthorityResolver _loginAuthorityResolver;
     private readonly IJwtTokenIssuer _jwtTokenIssuer;
 
     public LoginCommandHandler(
@@ -23,12 +24,14 @@ public sealed class LoginCommandHandler : ICommandHandler<LoginCommand, Executio
         ICredentialRepository credentialRepository,
         IPasswordHasher passwordHasher,
         IPropertyOwnershipProvider propertyOwnershipProvider,
+        ILoginAuthorityResolver loginAuthorityResolver,
         IJwtTokenIssuer jwtTokenIssuer)
     {
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         _credentialRepository = credentialRepository ?? throw new ArgumentNullException(nameof(credentialRepository));
         _passwordHasher = passwordHasher ?? throw new ArgumentNullException(nameof(passwordHasher));
         _propertyOwnershipProvider = propertyOwnershipProvider ?? throw new ArgumentNullException(nameof(propertyOwnershipProvider));
+        _loginAuthorityResolver = loginAuthorityResolver ?? throw new ArgumentNullException(nameof(loginAuthorityResolver));
         _jwtTokenIssuer = jwtTokenIssuer ?? throw new ArgumentNullException(nameof(jwtTokenIssuer));
     }
 
@@ -76,11 +79,17 @@ public sealed class LoginCommandHandler : ICommandHandler<LoginCommand, Executio
 
         var personId = await _userRepository.GetLinkedPersonIdAsync(user.Id, cancellationToken);
 
+        var authorityClaims = await _loginAuthorityResolver.ResolveAsync(
+            user.Id.Value,
+            ownedPropertyIds,
+            cancellationToken);
+
         var loginResult = _jwtTokenIssuer.Issue(
             user.Id.Value,
             user.Username.Value,
             personId,
-            ownedPropertyIds);
+            ownedPropertyIds,
+            authorityClaims);
 
         return ExecutionResult<LoginResult>.Success(loginResult);
     }

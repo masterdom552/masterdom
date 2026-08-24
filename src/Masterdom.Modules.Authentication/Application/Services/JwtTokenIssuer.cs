@@ -26,10 +26,12 @@ public sealed class JwtTokenIssuer : IJwtTokenIssuer
         Guid userId,
         string username,
         Guid? personId,
-        IReadOnlyCollection<Guid> ownedPropertyIds)
+        IReadOnlyCollection<Guid> ownedPropertyIds,
+        LoginAuthorityClaims authority)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(username);
         ArgumentNullException.ThrowIfNull(ownedPropertyIds);
+        ArgumentNullException.ThrowIfNull(authority);
 
         var now = DateTime.UtcNow;
         var expiresAtUtc = now.Add(_options.AccessTokenLifetime);
@@ -46,10 +48,31 @@ public sealed class JwtTokenIssuer : IJwtTokenIssuer
             claims.Add(new Claim(MasterdomClaimTypes.PersonId, personId.Value.ToString()));
         }
 
+        // OwnedProperty reflects literal Property.OwnerId ownership only.
         foreach (var propertyId in ownedPropertyIds)
         {
-            claims.Add(new Claim(MasterdomClaimTypes.PropertyScope, propertyId.ToString()));
             claims.Add(new Claim(MasterdomClaimTypes.OwnedProperty, propertyId.ToString()));
+        }
+
+        // PropertyScope reflects the server-resolved effective scope (owned + active delegations).
+        foreach (var propertyId in authority.PropertyScopes)
+        {
+            claims.Add(new Claim(MasterdomClaimTypes.PropertyScope, propertyId.ToString()));
+        }
+
+        foreach (var roleCode in authority.RoleCodes)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, roleCode));
+        }
+
+        foreach (var permission in authority.Permissions)
+        {
+            claims.Add(new Claim(MasterdomClaimTypes.Permission, permission));
+        }
+
+        if (authority.AuthorityLevel.HasValue)
+        {
+            claims.Add(new Claim(MasterdomClaimTypes.AuthorityLevel, authority.AuthorityLevel.Value.ToString()));
         }
 
         var signingCredentials = new SigningCredentials(

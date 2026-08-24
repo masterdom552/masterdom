@@ -86,6 +86,7 @@ public sealed class BootstrapProvisioningServiceTests
             new CredentialRepository(dbContext),
             new PasswordHasher(),
             new NoOwnedPropertiesProvider(),
+            new NoAuthorityResolver(),
             new JwtTokenIssuer(new JwtTokenIssuerOptions
             {
                 SigningKey = "test-signing-key-that-is-sufficiently-long",
@@ -111,6 +112,7 @@ public sealed class BootstrapProvisioningServiceTests
             new CredentialRepository(dbContext),
             new PasswordHasher(),
             new NoOwnedPropertiesProvider(),
+            new NoAuthorityResolver(),
             new JwtTokenIssuer(new JwtTokenIssuerOptions
             {
                 SigningKey = "test-signing-key-that-is-sufficiently-long",
@@ -230,6 +232,17 @@ public sealed class BootstrapProvisioningServiceTests
             CancellationToken cancellationToken = default)
         {
             return Task.FromResult<IReadOnlyCollection<Guid>>([]);
+        }
+    }
+
+    private sealed class NoAuthorityResolver : ILoginAuthorityResolver
+    {
+        public Task<LoginAuthorityClaims> ResolveAsync(
+            Guid userId,
+            IReadOnlyCollection<Guid> directPropertyScopes,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(LoginAuthorityClaims.None(directPropertyScopes));
         }
     }
 }

@@ -1,3 +1,4 @@
+using Masterdom.Core.Security;
 using Masterdom.Modules.Authentication.Application.Models;
 
 namespace Masterdom.Modules.Authentication.Application.Services;
@@ -8,5 +9,6 @@ public interface IJwtTokenIssuer
         Guid userId,
         string username,
         Guid? personId,
-        IReadOnlyCollection<Guid> ownedPropertyIds);
+        IReadOnlyCollection<Guid> ownedPropertyIds,
+        LoginAuthorityClaims authority);
 }
