@@ -1,4 +1,5 @@
 using Masterdom.Core.Identity.Entities.DelegatedAuthority;
+using Masterdom.Core.Identity.Entities.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace Masterdom.Infrastructure.Persistence.Identity;
@@ -28,7 +29,7 @@ public sealed class DelegatedAuthorityRepository : IDelegatedAuthorityRepository
         DateTime utcNow)
     {
         return await _dbContext.DelegatedAuthorities
-            .Where(x => x.DelegatedToUserId.Value == delegatedToUserId)
+            .Where(x => x.DelegatedToUserId == UserId.From(delegatedToUserId))
             .Where(x => x.Status != DelegatedAuthorityStatus.Revoked)
             .Where(x => x.EffectiveFromUtc <= utcNow)
             .Where(x => x.EffectiveToUtc == null || x.EffectiveToUtc >= utcNow)
@@ -39,7 +40,7 @@ public sealed class DelegatedAuthorityRepository : IDelegatedAuthorityRepository
         Guid delegatorUserId)
     {
         return await _dbContext.DelegatedAuthorities
-            .Where(x => x.DelegatorUserId.Value == delegatorUserId)
+            .Where(x => x.DelegatorUserId == UserId.From(delegatorUserId))
             .ToListAsync();
     }
 

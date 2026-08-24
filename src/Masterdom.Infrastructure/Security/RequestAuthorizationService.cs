@@ -1,5 +1,12 @@
 using Masterdom.Core.Security;
 using Masterdom.Infrastructure.Persistence;
+using Masterdom.Modules.Billing.Domain.Entities.Billing;
+using Masterdom.Modules.Inventory.Domain.Entities.Inventory;
+using Masterdom.Modules.Lease.Domain.Entities.Lease;
+using Masterdom.Modules.Maintenance.Domain.Entities.Maintenance;
+using Masterdom.Modules.Metering.Domain.Entities.Metering;
+using Masterdom.Modules.Properties.Domain.Entities.Property;
+using Masterdom.Modules.Tenancy.Domain.Entities.Tenancy;
 using Masterdom.Modules.CRM.Application.Commands;
 using Masterdom.Modules.CRM.Application.Queries;
 using Masterdom.Modules.Lease.Application.Commands;
@@ -275,45 +282,60 @@ internal sealed class RequestAuthorizationService : IRequestAuthorizationService
 
     private Guid? ResolvePropertyId(string propertyCode)
     {
-        return _dbContext.Properties
+        var propertyId = _dbContext.Properties
             .AsNoTracking()
-            .Where(x => x.Code.Value == propertyCode)
-            .Select(x => (Guid?)x.Id.Value)
+            .Where(x => x.Code == new PropertyCode(propertyCode))
+            .Select(x => x.Id)
             .FirstOrDefault();
+
+        return propertyId?.Value;
     }
 
     private Guid? ResolveLeasePropertyId(Guid leaseId)
     {
-        return _dbContext.Leases
+        var property = _dbContext.Leases
             .AsNoTracking()
-            .Where(x => x.Id.Value == leaseId)
-            .Select(x => (Guid?)x.Property.PropertyId)
+            .Where(x => x.Id == LeaseId.From(leaseId))
+            .Select(x => x.Property)
             .FirstOrDefault();
+
+        return property?.PropertyId;
     }
 
     private Guid? ResolveLeasePropertyId(string leaseNumber)
     {
-        return _dbContext.Leases
+        var property = _dbContext.Leases
             .AsNoTracking()
-            .Where(x => x.Number.Value == leaseNumber)
-            .Select(x => (Guid?)x.Property.PropertyId)
+            .Where(x => x.Number == LeaseNumber.Create(leaseNumber))
+            .Select(x => x.Property)
             .FirstOrDefault();
+
+        return property?.PropertyId;
     }
 
     private Guid? ResolveTenancyPropertyId(Guid tenancyId)
     {
-        return _dbContext.Tenancies
+        var property = _dbContext.Tenancies
             .AsNoTracking()
-            .Where(x => x.Id.Value == tenancyId)
-            .Select(x => (Guid?)x.Property.PropertyId)
+            .Where(x => x.Id == TenancyId.From(tenancyId))
+            .Select(x => x.Property)
             .FirstOrDefault();
+
+        return property?.PropertyId;
     }
 
+    // ResolveMeterPropertyId is intentionally NOT relationally query-shaped like the
+    // other Resolve*PropertyId methods above: Meter.MeterLocationReference is mapped
+    // as an opaque JSONB blob (see MeterConfiguration.cs), not a simple converted
+    // property, so neither the original `.Value` shape nor a whole-value-comparison
+    // fix can translate a query into its nested PropertyId. This mirrors the
+    // ResolveSubsidyRunContext/ResolveLatestSubsidyRunContext exclusion documented in
+    // the governing package record -- left unfixed and out of this package's scope.
     private Guid? ResolveMeterPropertyId(Guid meterId)
     {
         return _dbContext.Meters
             .AsNoTracking()
-            .Where(x => x.Id.Value == meterId)
+            .Where(x => x.Id == MeterId.From(meterId))
             .Select(x => (Guid?)x.MeterLocationReference.PropertyId)
             .FirstOrDefault();
     }
@@ -322,34 +344,38 @@ internal sealed class RequestAuthorizationService : IRequestAuthorizationService
     {
         return _dbContext.Meters
             .AsNoTracking()
-            .Where(x => x.MeterNumber.Value == meterNumber)
+            .Where(x => x.MeterNumber == MeterNumber.Create(meterNumber))
             .Select(x => (Guid?)x.MeterLocationReference.PropertyId)
             .FirstOrDefault();
     }
 
     private Guid? ResolveBillPropertyId(Guid billId)
     {
-        return _dbContext.Bills
+        var property = _dbContext.Bills
             .AsNoTracking()
-            .Where(x => x.Id.Value == billId)
-            .Select(x => (Guid?)x.PropertyReference.PropertyId)
+            .Where(x => x.Id == BillId.From(billId))
+            .Select(x => x.PropertyReference)
             .FirstOrDefault();
+
+        return property?.PropertyId;
     }
 
     private Guid? ResolveBillPropertyId(string billNumber)
     {
-        return _dbContext.Bills
+        var property = _dbContext.Bills
             .AsNoTracking()
-            .Where(x => x.BillNumber.Value == billNumber)
-            .Select(x => (Guid?)x.PropertyReference.PropertyId)
+            .Where(x => x.BillNumber == BillNumber.Create(billNumber))
+            .Select(x => x.PropertyReference)
             .FirstOrDefault();
+
+        return property?.PropertyId;
     }
 
     private Guid? ResolveMaintenanceTicketPropertyId(Guid maintenanceTicketId)
     {
         return _dbContext.MaintenanceTickets
             .AsNoTracking()
-            .Where(x => x.Id.Value == maintenanceTicketId)
+            .Where(x => x.Id == MaintenanceTicketId.From(maintenanceTicketId))
             .Select(x => (Guid?)x.PropertyId)
             .FirstOrDefault();
     }
@@ -358,7 +384,7 @@ internal sealed class RequestAuthorizationService : IRequestAuthorizationService
     {
         return _dbContext.InventoryItems
             .AsNoTracking()
-            .Where(x => x.Id.Value == inventoryItemId)
+            .Where(x => x.Id == InventoryItemId.From(inventoryItemId))
             .Select(x => (Guid?)x.PropertyId)
             .FirstOrDefault();
     }

@@ -646,3 +646,254 @@ directed to do):
   `.masterdom/implementation/index.json`.
 - Any deployment access of any kind.
 - Marking CAP-001 or CAP-023 COMPLETE.
+
+## 23. Implementation Results
+
+Implementation is complete for the approved scope. This section documents
+what was actually done, including two material discoveries not anticipated
+by the design — both disclosed honestly rather than silently absorbed or
+hidden.
+
+### 23A. Production Changes Made
+
+- **`DelegatedAuthorityRepository.cs`** — `GetActiveDelegationsAsync`/
+  `GetDelegationsByDelegatorAsync`: `x.DelegatedToUserId.Value ==
+  delegatedToUserId` → `x.DelegatedToUserId == UserId.From(delegatedToUserId)`
+  (and the equivalent for `DelegatorUserId`), exactly as designed.
+- **`PropertyCapabilityAuthorizationService.cs`** — `OwnsResolvedProperty`:
+  `x.Id.Value == propertyId.Value` → `x.Id == new PropertyId(propertyId.Value)`.
+  `PropertyId` has no `.From(Guid)` factory (unlike `UserId`/`LeaseId`/etc.)
+  — confirmed by inspection before use; the bare record constructor is this
+  type's only Guid-construction path, matching `PropertyConfiguration.cs`'s
+  own converter (`value => new PropertyId(value)`).
+- **`BillingChargeCompositionReadService.cs`** — `GetRentChargeReadModel`:
+  `x.Id.Value == leaseId` → `x.Id == LeaseId.From(leaseId)`;
+  `x.Id.Value == tenancyId` → `x.Id == TenancyId.From(tenancyId)`. **Plus a
+  discovery-driven fix beyond the original design** (Section 23C):
+  `x.Tenancy.TenancyId == tenancyId` / `x.Property.PropertyId == propertyId`
+  / `x.Unit.UnitId == unitId` → `x.Tenancy == LeaseTenancyReference
+  .Create(tenancyId)` / `x.Property == LeasePropertyReference.Create(propertyId)`
+  / `x.Unit == LeaseUnitReference.Create(unitId)`.
+- **`RequestAuthorizationService.cs`** — of the ten originally-scoped
+  methods:
+  - **Fixed (8):** `ResolvePropertyId`, `ResolveLeasePropertyId`×2,
+    `ResolveTenancyPropertyId`, `ResolveBillPropertyId`×2,
+    `ResolveMaintenanceTicketPropertyId`, `ResolveInventoryItemPropertyId`.
+    Each `Where` clause uses the same whole-value-comparison convention.
+    **Plus a discovery-driven fix beyond the original design** (Section
+    23C): `ResolvePropertyId`, `ResolveLeasePropertyId`×2,
+    `ResolveTenancyPropertyId`, `ResolveBillPropertyId`×2 also had their
+    `Select` clauses corrected — each previously did
+    `.Select(x => (Guid?)x.Property.PropertyId)`-shaped member access on a
+    converted reference property, changed to `.Select(x => x.Property)
+    .FirstOrDefault()?.PropertyId` (materialize the whole converted value,
+    then extract client-side, after the query has already executed).
+    `ResolveMaintenanceTicketPropertyId`/`ResolveInventoryItemPropertyId`'s
+    `Select` clauses needed no change — `MaintenanceTicket.PropertyId`/
+    `InventoryItem.PropertyId` are plain, unconverted `Guid` columns,
+    confirmed by inspecting their EF configurations before assuming so.
+  - **Excluded, unchanged (2 originally + 2 newly discovered = 4 total):**
+    `ResolveSubsidyRunContext`, `ResolveLatestSubsidyRunContext` (JSON-blob
+    query, per the original design) — **plus `ResolveMeterPropertyId`×2**,
+    a discovery made during implementation (Section 23C):
+    `Meter.MeterLocationReference` is mapped as an opaque JSONB blob
+    (`MeterConfiguration.cs`), identical in category to
+    `OptimizationRun.Scenario`/`.ExecutionEvidence` — a whole-value
+    comparison cannot fix this, and none was attempted. Left exactly as it
+    was before this package, with an explanatory code comment added
+    pointing to this record.
+
+### 23B. Whole-Value-Comparison Convention — Confirmed
+
+Every fix in Section 23A follows the identical shape proven by
+`UserRoleRepository.GetPrimaryRoleAsync`: compare the *whole* converted
+value-object/entity-ID property (`x.SomeProperty == SomeType.Create(...)`
+or `== SomeType.From(...)` or `== new SomeType(...)`, matching whichever
+construction path that specific type actually exposes — verified per-type
+before use, never assumed), never a `.Value`/`.SubProperty` member access
+mid-predicate. No exceptions were made to this convention anywhere in the
+fixed scope.
+
+### 23C. Material Discoveries During Implementation (disclosed, not hidden)
+
+**Discovery 1 — the defect class is broader than a `.Value`-named
+property.** The approved package's audit (and the governing investigation's
+own audit before it) searched specifically for `.Value ==` and correctly
+found and fixed every such occurrence in scope. During implementation, a
+real-SQLite test of the corrected `BillingChargeCompositionReadService`
+still failed to translate — not because the `.Value` fix was wrong, but
+because `x.Tenancy.TenancyId == tenancyId` (a *different* property name,
+`.TenancyId`, not `.Value`) is the **identical anti-pattern**: `Lease.Tenancy`
+is mapped via `HasConversion(value => value.TenancyId, ...)` — the whole
+`TenancyReference` object converts to one `tenancy_id` column, so accessing
+`.TenancyId` on it mid-predicate is exactly the same "member access on a
+converted model-side property" translation failure as `.Value` was, just
+under a different name. This was empirically proven (a real SQLite query
+threw the identical `InvalidOperationException` class) and then fixed using
+the same technique. The same investigation was extended to
+`RequestAuthorizationService`'s `Select` clauses (`x.Property.PropertyId`
+etc.), which share the identical shape and were fixed identically — see
+23A. **This means the original package's scope (defined by a `.Value ==`
+grep) under-counted the true defect surface even within its own four
+approved files** — corrected here, within the same files, using the same
+approved repair technique, not a scope expansion into new files.
+
+**Discovery 2 — the same defect class exists well beyond this package's
+four files.** Using a broadened re-sweep (not just `.Value ==`, but any
+`.Where`/`.Select`/`.FirstOrDefault`/`.Any`/`.OrderBy` accessing a
+sub-property of a converted reference-type property, against a live
+`IQueryable<T>`), the following **additional, out-of-scope** files were
+found to contain the same defect class, confirmed by direct inspection of
+their EF configurations (not fixed, not touched):
+
+- `src/Masterdom.Infrastructure/Persistence/Tenancy/TenancyRepository.cs`
+  (lines ~71, ~82) — `x.Property.PropertyId` inside `.Where(...Contains(...))`.
+- `src/Masterdom.Infrastructure/Persistence/Lease/LeaseRepository.cs`
+  (lines ~80, ~91) — same shape.
+- `src/Masterdom.Infrastructure/Persistence/Property/PropertyRepository.cs`
+  (line ~117) — `x.Id.Value` inside `.Where(...Contains(...))`.
+- `src/Masterdom.Infrastructure/Security/PropertyOwnershipProvider.cs`
+  (line ~22) — `.Select(x => x.Id.Value)`.
+
+These are genuinely outside this package's approved boundary — none was
+evidenced in the governing investigation or the package's own audit, both
+of which pre-date this discovery. **This package does not fix them.**
+Given their reach (`TenancyRepository`/`LeaseRepository`/`PropertyRepository`
+back core property-ownership-scope resolution used across most business
+modules, not just the authentication/authorization path this package
+targets), a dedicated, separately-scoped follow-up investigation and
+package — analogous to how this package itself originated from the CAP-023
+Phase 2 investigation — is recommended to audit and close this defect
+class repository-wide. This record makes that recommendation; it does not
+authorize or perform that work.
+
+### 23D. Relational Test Infrastructure
+
+`Microsoft.EntityFrameworkCore.Sqlite` (version `10.0.10`, matching every
+other EF Core package's centrally-managed version) was added to
+`Directory.Packages.props` and referenced in
+`tests/Masterdom.Platform.Infrastructure.Tests/Masterdom.Platform.Infrastructure.Tests.csproj`
+— the only new dependency this package introduces, and confined entirely
+to the test project (no production project references it).
+
+**Discovered NuGet advisory (disclosed, not chased):** adding this package
+pulled in a transitive dependency, `SQLitePCLRaw.lib.e_sqlite3` 2.1.11,
+which carries a known high-severity advisory
+(`GHSA-2m69-gcr7-jv3q`, NuGet warning `NU1903`). This is a test-only
+dependency (never reaches any shipped production binary) and resolving the
+advisory (e.g. by pinning a newer transitive version, if one exists and is
+compatible) was judged outside this package's scope — noted here for
+visibility, not silently ignored.
+
+### 23E. Relational Tests Added
+
+Four new files, all under `tests/Masterdom.Platform.Infrastructure.Tests/`,
+using a held-open in-memory SQLite connection
+(`DataSource=:memory:`, `EnsureCreated()`), mirroring
+`BootstrapProvisioningServiceTests.cs`'s established `CreateDbContext()`
+pattern with the provider swapped:
+
+- **`Security/DelegatedAuthorityRepositoryRelationalTests.cs`** (7 tests) —
+  the full Section 11.A/B matrix from the package design: matching-user
+  returns the delegation; unrelated user excluded; revoked excluded;
+  expired excluded; not-yet-effective excluded; matching delegator returns
+  records; unrelated delegator excluded. All against the real
+  `DelegatedAuthorityRepository`.
+- **`Security/PropertyCapabilityAuthorizationServiceRelationalTests.cs`**
+  (2 tests) — owner-owns-property allows; owner-does-not-own-property
+  forbids. Resolved through the real, production-registered
+  `IPropertyCapabilityAuthorizationService` via a real `IServiceCollection`
+  built with `AddSecurityInfrastructureRuntime()` (the concrete class is
+  `internal` to `Masterdom.Infrastructure`; its interface is public — this
+  mirrors `LoginAuthorityResolverTests`' own established pattern of testing
+  through real DI rather than a hand-written fake or direct construction).
+- **`Billing/BillingChargeCompositionReadServiceRelationalTests.cs`**
+  (2 tests) — matching lease/tenancy/property/unit returns the full read
+  model (asserting `IsLeaseActive`, `IsTenancyActive`, `RentAmount`, and all
+  four identifiers); a non-matching `leaseId` returns `null`. `Lease`/
+  `Tenancy` entities are constructed using the exact proven pattern already
+  established in this test project by
+  `Property/PropertyCapabilityRepositoryTests.cs`.
+
+**`RequestAuthorizationService` — no dedicated relational test, disclosed
+gap, not silently claimed covered.** Both the concrete class and its own
+interface (`IRequestAuthorizationService`) are `internal` to
+`Masterdom.Infrastructure`, with no `InternalsVisibleTo` grant to the test
+project — confirmed by an actual build failure when a test attempted direct
+construction. Granting one would itself be a production-configuration
+change outside this package's approved four-file boundary, so none was
+added. The identical fix pattern this file uses is proven correct,
+independently, by the other three test files above (four distinct entity
+types: `UserId`, `PropertyId`, `LeaseId`/`TenancyId`) and by the throwaway
+diagnostic (not committed) described in 23C's Discovery 1 confirming
+`Tenancy.Property`'s identical converter shape. This is a real, disclosed
+test-coverage gap for this one file specifically, not a claim of full
+automated coverage.
+
+### 23F. SQLite Relational Validation Results
+
+All 11 new relational tests pass against real SQLite (genuine LINQ-to-SQL
+translation and execution, not EF Core's InMemory provider, which performs
+no translation at all and would not have caught this defect class).
+
+**Explicit statement: PostgreSQL/Npgsql was NOT validated by this
+package.** SQLite was used as the smallest available real relational
+provider (Section 11 of the package record explains why); the governing
+investigation's own root-cause analysis established this defect class is
+provider-generic, not Npgsql-specific, which is why SQLite is judged
+evidence-sufficient — but this package does not claim, and this record
+does not claim, that the fix has been executed against the actual
+production Npgsql provider or the persistent deployment. That remains
+separately-authorized, unperformed work.
+
+### 23G. Migration Decision — Confirmed
+
+No migration was created or required. Verified: `git status` against
+`src/Masterdom.Infrastructure/Migrations/` shows no new or modified file.
+The fix is confined to LINQ predicate/projection expressions inside
+repository/service method bodies — no entity, property, index, or `DbSet`
+change of any kind.
+
+### 23H. Post-Implementation Re-Sweep Results
+
+A broadened re-sweep (Section 23C, Discovery 2) superseded the original
+`.Value ==`-only sweep. Within the four approved files, every occurrence of
+the defect class (under any property name) is now either fixed or
+explicitly excluded with a documented reason (JSON-blob mapping). Outside
+the four approved files, the defect class was found to be present in at
+least four additional repositories/providers, explicitly not fixed and
+explicitly recommended for a separate follow-up (23C, Discovery 2). No
+occurrence within the approved scope was missed or silently left broken.
+
+### 23I. Regression Results
+
+Full suite, classified PASS / PRE-EXISTING / NEW FAILURE, with every
+PRE-EXISTING claim independently reproduced against unmodified `main` via
+`git stash -u` before/after comparison:
+
+- `Masterdom.Core.Tests`: 501/501 PASS.
+- `Masterdom.Platform.Tests`: 250/250 PASS.
+- `Masterdom.Platform.BusinessIntegration.Tests`: 9/9 PASS.
+- `Masterdom.Platform.Infrastructure.Tests`: 172/202 PASS; 30 PRE-EXISTING
+  (`AuthenticationEndpointIntegrationTests`, `DelegationEndpointIntegrationTests`,
+  `PropertyCapabilitySecurityIntegrationTests` — the documented
+  `WebApplicationFactory` defect, explicitly out of scope). Reproduced
+  identically (161/191, same 30 failing tests by name) on unmodified `main`
+  before restoring this package's changes. The +11 passing beyond baseline
+  are exactly the new relational tests.
+- `Masterdom.Architecture.Tests`: 139/141 PASS; 2 PRE-EXISTING
+  (`GenericCalculationReuseArchitectureTests`,
+  `ContractOwnershipArchitectureTests` — unrelated to this package).
+  Reproduced identically on unmodified `main`.
+- Zero new failures anywhere.
+- `git diff --check`: clean.
+
+### 23J. Deployment / Governance Confirmation
+
+No persistent deployment was accessed at any point during implementation —
+no `docker`, `docker compose`, `psql`, or HTTP command was run.
+`CAPABILITY_CATALOG.json` and `.masterdom/implementation/index.json` remain
+unchanged (verified via `git status`). Neither CAP-001 nor CAP-023 is
+marked complete by this package. No endpoint, `Program.cs`, Dockerfile, or
+Compose file was touched. The `WebApplicationFactory` defect was not
+modified.

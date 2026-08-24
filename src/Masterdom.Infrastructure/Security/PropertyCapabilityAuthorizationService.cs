@@ -1,5 +1,6 @@
 using Masterdom.Core.Security;
 using Masterdom.Infrastructure.Persistence;
+using Masterdom.Modules.Properties.Domain.Entities.Property;
 
 namespace Masterdom.Infrastructure.Security;
 
@@ -83,7 +84,7 @@ internal sealed class PropertyCapabilityAuthorizationService : IPropertyCapabili
     {
         if (propertyId.HasValue)
         {
-            return _dbContext.Properties.Any(x => x.Id.Value == propertyId.Value && x.OwnerId == userId);
+            return _dbContext.Properties.Any(x => x.Id == new PropertyId(propertyId.Value) && x.OwnerId == userId);
         }
 
         return _dbContext.Properties.Any(x => x.OwnerId == userId);
