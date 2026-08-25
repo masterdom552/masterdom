@@ -33,6 +33,8 @@ public sealed class BillStatus : ValueObject
         };
     }
 
+    public override string ToString() => Value;
+
     protected override IEnumerable<object?> GetEqualityComponents()
     {
         yield return Value.ToUpperInvariant();

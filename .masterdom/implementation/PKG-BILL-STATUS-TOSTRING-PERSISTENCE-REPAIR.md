@@ -332,16 +332,62 @@ Deployment validation is limited to the running local Docker deployment (`http:/
 
 ---
 
-## 17. Implementation Results (Placeholder)
+## 17. Implementation Results
 
-> To be filled in upon authorized implementation.
+### Repair applied
 
-- Commit hash: —
-- Commit subject: —
-- Files changed: —
-- Tests added: —
-- Test results: —
-- Deployment validation result: —
+Added `public override string ToString() => Value;` to `BillStatus`, positioned before `GetEqualityComponents()`, consistent with `BillNumber` structure.
+
+### Production file changed
+
+- `src/Masterdom.Modules.Billing/Domain/Entities/Billing/BillStatus.cs` — one method added
+
+### Test file added
+
+- `tests/Masterdom.Core.Tests/Billing/BillStatusTests.cs` — 8 tests covering all four static status values via `Assert.Equal` and `Assert.True` (varchar(50) length guard)
+
+### Build result
+
+`dotnet build Masterdom.slnx` — **0 errors**, 7028 pre-existing warnings (unchanged)
+
+### Test results
+
+| Project | Passed | Failed |
+|---|---|---|
+| `Masterdom.Core.Tests` | 509 (+8 new) | 0 |
+| `Masterdom.Platform.Tests` | 250 | 0 |
+| `Masterdom.Platform.BusinessIntegration.Tests` | 9 | 0 |
+| `Masterdom.Architecture.Tests` | 139 | 2 (pre-existing) |
+| `Masterdom.Platform.Infrastructure.Tests` | 190 | 30 (pre-existing, require DB connection string) |
+
+Pre-existing failure count: 32 (30 Infrastructure + 2 Architecture). Matches baseline from PKG-CAP-023 repair. Zero new failures introduced.
+
+### BillStatus.ToString() verification
+
+| Call | Result | Length | ≤50 chars |
+|---|---|---|---|
+| `BillStatus.Generated.ToString()` | `"Generated"` | 9 | ✓ |
+| `BillStatus.Draft.ToString()` | `"Draft"` | 5 | ✓ |
+| `BillStatus.Finalized.ToString()` | `"Finalized"` | 9 | ✓ |
+| `BillStatus.Voided.ToString()` | `"Voided"` | 6 | ✓ |
+
+### Migration confirmation
+
+No migration created. No schema change. No EF mapping change. The `bills.status character varying(50)` column is unchanged.
+
+### Shared abstractions
+
+- `ValueObject.cs` — unchanged
+- `ValueObjectValueConverter.cs` — unchanged
+
+### Deployment validation
+
+Not accessed. Separate authorization required for live workflow re-validation.
+
+### Commit
+
+- Hash: see §25 final report
+- Subject: `fix(billing): persist BillStatus using its value`
 
 ---
 
