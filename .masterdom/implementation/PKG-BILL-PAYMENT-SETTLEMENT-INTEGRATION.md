@@ -617,7 +617,7 @@ If a `BillSettlement` row does not exist for a reversed allocation (e.g., the ev
 
 | Item | Detail |
 |---|---|
-| Commit SHA | TBD (pending commit) |
+| Commit SHA | 0944592 |
 | Files created | `src/Masterdom.Infrastructure/Persistence/Settlement/BillSettlement.cs`; `src/Masterdom.Infrastructure/Persistence/Configurations/Settlement/BillSettlementConfiguration.cs`; `src/Masterdom.Infrastructure/EventHandlers/PaymentAllocatedIntegrationHandler.cs`; `src/Masterdom.Infrastructure/EventHandlers/PaymentReversedIntegrationHandler.cs`; `tests/Masterdom.Platform.Infrastructure.Tests/Persistence/Settlement/BillSettlementIntegrationTests.cs` |
 | Files modified | `src/Masterdom.Infrastructure/Persistence/MasterdomDbContext.cs` (added `DbSet<BillSettlement>`); `src/Masterdom.Infrastructure/PropertyFoundationDependencyInjection.cs` (factory-based `IEventRegistry` registration with handler wiring) |
 | Migration name | `20260825183029_AddBillSettlementsTable` (auto-generated) |
