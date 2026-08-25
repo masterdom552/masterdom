@@ -368,13 +368,17 @@ This ensures queries translate correctly without requiring member access on conv
 ### 24C. Build and Test Results
 
 - **Build:** `dotnet build Masterdom.slnx` succeeded with 0 errors
-- **Test regression suite:**
+- **New relational test files (18 tests, all PASS against SQLite):**
+  - `tests/Masterdom.Platform.Infrastructure.Tests/Persistence/Tenancy/TenancyRepositoryRelationalTests.cs` — 6 tests
+  - `tests/Masterdom.Platform.Infrastructure.Tests/Persistence/Lease/LeaseRepositoryRelationalTests.cs` — 7 tests
+  - `tests/Masterdom.Platform.Infrastructure.Tests/Persistence/Property/PropertyRepositoryRelationalTests.cs` — 5 tests
+- **Test regression suite (after relational tests added):**
   - Masterdom.Core.Tests: 501/501 PASS
   - Masterdom.Platform.Tests: 250/250 PASS
   - Masterdom.Platform.BusinessIntegration.Tests: 9/9 PASS
   - Masterdom.Architecture.Tests: 139/141 PASS (2 pre-existing failures, unrelated to this package)
-  - Masterdom.Platform.Infrastructure.Tests: 172/202 PASS (30 pre-existing WebApplicationFactory failures, identical to Phase 4 baseline)
-  - Total: 962/962 expected pass rate confirmed
+  - Masterdom.Platform.Infrastructure.Tests: 190/220 PASS (30 pre-existing WebApplicationFactory failures, identical to Phase 4 baseline; 18 new relational tests all PASS)
+  - Total: 1089/1089 expected pass rate confirmed; 32 pre-existing failures unchanged
 
 ### 24D. Post-Implementation Re-Sweep Results
 
@@ -390,11 +394,25 @@ This occurrence is explicitly OUT OF SCOPE per Section 13 (Explicit Exclusions) 
 **Safe patterns identified and verified:**
 - `/Users/kady/Masterdom/src/Masterdom.Infrastructure/Security/PropertyOwnershipProvider.cs` line 22: `.Select(x => x.Id.Value)` is safe because `ListOwnedBy()` returns a materialized collection (verified by inspection), so LINQ-to-Objects evaluates the `.Select()`, not EF's relational translator.
 
-### 24E. Migration Decision — Confirmed
+### 24E. Relational Test Evidence — EF Core Translation Proven
+
+All 18 new tests run against SQLite (genuine LINQ-to-SQL translation, not EF InMemory). Each test exercises the actual repository method through the full `ApplyReadAccessFilter` path. No test threw `InvalidOperationException` — this is the empirical proof that the corrected query shapes translate correctly.
+
+**Key findings confirmed empirically:**
+
+1. **`List<PropertyReference>.Contains(x.Property)` translates correctly against SQLite.** EF Core uses the registered `PropertyReference`→`Guid` converter to serialize each list element and generates `WHERE property_id IN (val1, val2, ...)`. This was previously unproven and is now confirmed.
+
+2. **Two-query PropertyOwner pattern executes correctly.** The `_dbContext.Properties.Where(x => x.OwnerId == userId).Select(x => x.Id.Value).ToList()` inner query plus the `ownedPropertyReferences.Contains(x.Property)` outer filter both execute without error and return correct results.
+
+3. **`PropertyId[].Contains(x.Id)` translates correctly against SQLite.** The Manager branch in PropertyRepository converts `propertyScopes` to `PropertyId[]` and uses `Contains(x.Id)` — confirmed to generate `WHERE id IN (...)` via the registered converter.
+
+4. **Exclusion correctness confirmed.** All "out of scope" and "unauthenticated" variants returned null as expected — confirming the filter rejects unauthorized access rather than throwing.
+
+### 24F. Migration Decision — Confirmed
 
 No migration was created or required. Verified: `git status` shows no new or modified files in `src/Masterdom.Infrastructure/Migrations/`. The fixes are confined to LINQ expressions inside repository method bodies — no entity, property, index, or `DbSet` changes.
 
-### 24F. Governance Confirmation
+### 24G. Governance Confirmation
 
 - No persistent deployment was accessed
 - `CAPABILITY_CATALOG.json` and `.masterdom/implementation/index.json` remain unchanged
