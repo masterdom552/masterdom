@@ -75,9 +75,9 @@ public sealed class LeaseRepository : ILeaseRepository
         {
             var ownedPropertyIds = _dbContext.Properties
                 .Where(x => x.OwnerId == currentUser.UserId.Value)
-                .Select(x => x.Id.Value);
+                .Select(x => x.Id);
 
-            return query.Where(x => ownedPropertyIds.Contains(x.Property.PropertyId));
+            return query.Where(x => ownedPropertyIds.Contains(x.Property));
         }
 
         if (currentUser.IsInRole(MasterdomRoles.Manager))
@@ -88,7 +88,7 @@ public sealed class LeaseRepository : ILeaseRepository
                 return query.Where(_ => false);
             }
 
-            return query.Where(x => propertyScopes.Contains(x.Property.PropertyId));
+            return query.Where(x => propertyScopes.Contains(x.Property));
         }
 
         return query.Where(_ => false);
