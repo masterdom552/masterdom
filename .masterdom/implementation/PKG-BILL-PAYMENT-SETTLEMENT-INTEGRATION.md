@@ -615,18 +615,17 @@ If a `BillSettlement` row does not exist for a reversed allocation (e.g., the ev
 
 ## 24. Completion Report (Post-Implementation)
 
-To be completed after implementation commit is validated.
-
 | Item | Detail |
 |---|---|
-| Commit SHA | |
-| Files created | |
-| Migration name | |
-| Test evidence (unit) | |
-| Test evidence (integration) | |
-| Architecture test result | |
-| Full suite result | |
-| Live validation result | |
-| Deviations from package | |
-| Technical debt | |
-| Follow-up actions | |
+| Commit SHA | TBD (pending commit) |
+| Files created | `src/Masterdom.Infrastructure/Persistence/Settlement/BillSettlement.cs`; `src/Masterdom.Infrastructure/Persistence/Configurations/Settlement/BillSettlementConfiguration.cs`; `src/Masterdom.Infrastructure/EventHandlers/PaymentAllocatedIntegrationHandler.cs`; `src/Masterdom.Infrastructure/EventHandlers/PaymentReversedIntegrationHandler.cs`; `tests/Masterdom.Platform.Infrastructure.Tests/Persistence/Settlement/BillSettlementIntegrationTests.cs` |
+| Files modified | `src/Masterdom.Infrastructure/Persistence/MasterdomDbContext.cs` (added `DbSet<BillSettlement>`); `src/Masterdom.Infrastructure/PropertyFoundationDependencyInjection.cs` (factory-based `IEventRegistry` registration with handler wiring) |
+| Migration name | `20260825183029_AddBillSettlementsTable` (auto-generated) |
+| Migration path | `src/Masterdom.Infrastructure/Migrations/20260825183029_AddBillSettlementsTable.cs` |
+| Test evidence (settlement) | 7/7 SQLite integration tests pass: entity creation, field population, round-trip persistence, unique constraint enforcement, reversal round-trip, multi-settlement same bill, in-place reversal update |
+| Architecture test result | 2 pre-existing failures (unchanged) |
+| Full suite result | 0 Error(s) build; 1151/1183 pass; 32 pre-existing failures (30 Infrastructure Docker-required + 2 Architecture); 0 new failures |
+| Live validation result | Deferred — no live HTTP validation authorized for this session |
+| Deviations from package | (1) `IEventHandler<T>` does not exist; implemented non-generic `IEventHandler` with cast pattern — audit-identified correction applied. (2) `IServiceScopeFactory` DI pattern used instead of direct scoped dependency injection — audit-identified correction applied. (3) Handler checks existing settlement IDs before inserting (load-existing-then-insert-new) rather than batch-insert-catch-duplicate — prevents false idempotency failures on multi-allocation payments with repeated events. (4) Migration path corrected from package-specified `Persistence/Migrations/` to actual `Migrations/` — audit-identified correction applied. |
+| Technical debt | None introduced. The two-query pattern (load existing IDs + insert new) is intentional and correct for multi-allocation idempotency. |
+| Follow-up actions | (1) Pre-push audit (separate authorization required). (2) Docker-based migration run to apply `bill_settlements` table to live Postgres. (3) Live HTTP validation of settlement records after payment allocation. (4) BillStatus update integration (deferred per package scope boundary — requires separate package). |

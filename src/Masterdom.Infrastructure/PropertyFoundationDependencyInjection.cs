@@ -138,6 +138,7 @@ using Masterdom.Platform.CalculationEngine.Contracts;
 using Masterdom.Platform.Notifications;
 using Masterdom.Platform.Configuration;
 using Masterdom.Platform.BusinessContext;
+using Masterdom.Infrastructure.EventHandlers;
 using Masterdom.Platform.Events;
 using Masterdom.Platform.LanguageSupport;
 using Masterdom.Platform.Metadata;
@@ -265,7 +266,14 @@ public static class PropertyFoundationDependencyInjection
         services.AddSingleton<IWorkflowResolver, WorkflowResolver>();
 
         services.AddSingleton<IEventRepository, InMemoryEventRepository>();
-        services.AddSingleton<IEventRegistry, EventRegistry>();
+        services.AddSingleton<IEventRegistry>(sp =>
+        {
+            var registry = new EventRegistry();
+            var scopeFactory = sp.GetRequiredService<IServiceScopeFactory>();
+            registry.RegisterHandler(new PaymentAllocatedIntegrationHandler(scopeFactory));
+            registry.RegisterHandler(new PaymentReversedIntegrationHandler(scopeFactory));
+            return registry;
+        });
         services.AddSingleton<IEventHandlerResolver, EventHandlerResolver>();
         services.AddSingleton<IEventDispatcher, EventDispatcher>();
         services.AddSingleton<IEventStore, EventStore>();

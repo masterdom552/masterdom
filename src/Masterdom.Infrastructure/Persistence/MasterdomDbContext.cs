@@ -34,6 +34,7 @@ using Masterdom.Infrastructure.Persistence.Configuration;
 using Masterdom.Infrastructure.Persistence.FinancialLedger;
 using Masterdom.Infrastructure.Persistence.Metadata;
 using Masterdom.Infrastructure.Persistence.Rules;
+using Masterdom.Infrastructure.Persistence.Settlement;
 using Masterdom.Infrastructure.Persistence.Workflow;
 using Microsoft.EntityFrameworkCore;
 using BillAggregate = Masterdom.Modules.Billing.Domain.Entities.Billing.Bill;
@@ -110,6 +111,11 @@ public sealed class MasterdomDbContext : DbContext
     /// Gets the payments.
     /// </summary>
     public DbSet<PaymentAggregate> Payments => Set<PaymentAggregate>();
+
+    /// <summary>
+    /// Gets the bill settlements.
+    /// </summary>
+    public DbSet<BillSettlement> BillSettlements => Set<BillSettlement>();
 
     /// <summary>
     /// Gets the ledgers.
