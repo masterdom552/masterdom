@@ -64,11 +64,13 @@ public sealed class TenancyRepository : ITenancyRepository
 
         if (currentUser.IsInRole(MasterdomRoles.PropertyOwner) && currentUser.UserId.HasValue)
         {
-            var ownedPropertyIds = _dbContext.Properties
+            var ownedPropertyGuids = _dbContext.Properties
                 .Where(x => x.OwnerId == currentUser.UserId.Value)
-                .Select(x => x.Id);
+                .Select(x => x.Id.Value)
+                .ToList();
 
-            return query.Where(x => ownedPropertyIds.Contains(x.Property));
+            var ownedPropertyReferences = ownedPropertyGuids.Select(PropertyReference.Create).ToList();
+            return query.Where(x => ownedPropertyReferences.Contains(x.Property));
         }
 
         if (currentUser.IsInRole(MasterdomRoles.Manager))
@@ -79,7 +81,8 @@ public sealed class TenancyRepository : ITenancyRepository
                 return query.Where(_ => false);
             }
 
-            return query.Where(x => propertyScopes.Contains(x.Property));
+            var propertyReferences = propertyScopes.Select(PropertyReference.Create).ToArray();
+            return query.Where(x => propertyReferences.Contains(x.Property));
         }
 
         return query.Where(_ => false);

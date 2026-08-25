@@ -114,7 +114,8 @@ public sealed class PropertyRepository : IPropertyRepository
                 return query.Where(_ => false);
             }
 
-            return query.Where(x => propertyScopes.Contains(x.Id));
+            var propertyIds = propertyScopes.Select(id => new PropertyId(id)).ToArray();
+            return query.Where(x => propertyIds.Contains(x.Id));
         }
 
         return query.Where(_ => false);
