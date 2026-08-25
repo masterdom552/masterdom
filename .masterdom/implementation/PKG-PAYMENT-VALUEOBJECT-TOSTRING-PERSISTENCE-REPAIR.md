@@ -350,12 +350,66 @@ Each repair is a one-line addition per file. Rollback requires removing four one
 
 ---
 
-## 17. Hard Stop Before Implementation
+## 17. Implementation Results
 
-This package is a governance document only.
+### Repair applied
 
-**No implementation has occurred.**
+`public override string ToString() => Value;` added to all four defective types, positioned before `GetEqualityComponents()`, consistent with `BillStatus` structure.
 
-Implementation requires separate authorization. Do not apply any change from this package until explicitly authorized.
+### Production files changed
 
-Do not push this package commit unless separately authorized.
+| File | Change |
+|---|---|
+| `src/Masterdom.Modules.Payment/Domain/Entities/Payment/PaymentMethod.cs` | `ToString()` override added |
+| `src/Masterdom.Modules.Payment/Domain/Entities/Payment/PaymentStatus.cs` | `ToString()` override added |
+| `src/Masterdom.Modules.Payment/Domain/Entities/Payment/PaymentChannel.cs` | `ToString()` override added |
+| `src/Masterdom.Modules.Payment/Domain/Entities/Payment/PaymentSource.cs` | `ToString()` override added |
+
+### Test file added
+
+- `tests/Masterdom.Core.Tests/Payment/PaymentValueObjectToStringTests.cs` — 36 tests covering all 18 static values across the four types: individual `Assert.Equal` per static instance + `varchar(50)` length guard per value via `[Theory]`.
+
+### Build result
+
+`dotnet build Masterdom.slnx` — **0 errors**, 7032 pre-existing warnings (unchanged from 7028 baseline; 4-warning delta is pre-existing xUnit analyzer warnings in unrelated test files, not introduced by this repair).
+
+### Test results
+
+| Project | Passed | Failed |
+|---|---|---|
+| `Masterdom.Core.Tests` | 545 (+36 new) | 0 |
+| `Masterdom.Platform.Tests` | 250 | 0 |
+| `Masterdom.Platform.BusinessIntegration.Tests` | 9 | 0 |
+| `Masterdom.Architecture.Tests` | 139 | 2 (pre-existing) |
+| `Masterdom.Platform.Infrastructure.Tests` | 190 | 30 (pre-existing, require DB connection string) |
+
+Pre-existing failure count: 32 (30 Infrastructure + 2 Architecture). Matches baseline from prior repair packages. **Zero new failures introduced.**
+
+### Excluded abstractions confirmed unchanged
+
+- `ValueObject.cs` — unchanged
+- `ValueObjectValueConverter.cs` — unchanged
+- `PaymentConfiguration.cs` — unchanged
+- `PaymentReference.cs`, `PaymentAmount.cs`, `PaymentDate.cs` — unchanged
+
+### Migration confirmation
+
+No migration created. No schema change. No EF mapping change. All `varchar(50)` columns unchanged. All intended values fit the existing constraint.
+
+### Deployment validation
+
+Not accessed. Separate authorization required for live `POST /api/payments` re-validation and allocation workflow continuation.
+
+---
+
+## 18. Hard Stop After Implementation
+
+Implementation complete and locally validated.
+
+**No deployment was accessed. No Docker commands were run. No HTTP calls were made. No database mutations occurred. No push was performed.**
+
+Await separate authorization for:
+1. Pre-push audit and push
+2. Rebuild/redeploy (if required)
+3. Live `POST /api/payments` re-validation
+4. Payment allocation and retrieval workflow validation
