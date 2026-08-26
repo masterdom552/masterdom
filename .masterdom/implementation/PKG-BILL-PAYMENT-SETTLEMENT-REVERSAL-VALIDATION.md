@@ -735,20 +735,24 @@ Summarized from Section 19.2 Phase 1:
 
 ## 24. Completion / Report Placeholder
 
-> **Status:** Awaiting separate live validation authorization.
+> **Status:** LIVE VALIDATION COMPLETE — PASS
 >
-> Live validation has NOT been executed as of 2026-08-26.
->
-> When live validation is separately authorized and completed, record here:
->
-> - Authorization date:
-> - Execution date:
-> - `PUT /reverse` HTTP status:
-> - Payment post-reversal status:
-> - Settlement `is_reversed` final value:
-> - Settlement `reversed_at_utc` final value:
-> - Settlement `reversal_reason` final value:
-> - Total `bill_settlements` count after reversal:
-> - PAY-LIVE-001 status after validation (must be unchanged):
-> - Implementation commit (if any repair was required):
-> - Final verdict: PASS / FAIL
+> - Authorization date: 2026-08-26
+> - Execution date: 2026-08-26
+> - `PUT /reverse` HTTP status: **200 OK**
+> - Payment post-reversal status: **Reversed** (was: Allocated)
+> - Payment version count before: **2** / after: **3** (version 3 created: `"Payment reversed."`)
+> - Payment receipt before: `PMT-20260826120100-2` / after: `PMT-20260826120200-3`
+> - Payment `reversed_at_utc`: `2026-08-26T12:02:00+00:00`
+> - Payment `reversal_reason`: `Live validation - controlled reversal test PKG-BILL-PAYMENT-SETTLEMENT-REVERSAL-VALIDATION`
+> - Allocation `is_reversed` after: **true** — `allocation_id` `01a03cc9-b56b-75ac-a615-906d88b74599` preserved (unchanged)
+> - Settlement `is_reversed` before: `false` / after: **true**
+> - Settlement `reversed_at_utc` before: `null` / after: **`2026-08-26T12:02:00+00:00`**
+> - Settlement `reversal_reason` before: `null` / after: **`Live validation - controlled reversal test PKG-BILL-PAYMENT-SETTLEMENT-REVERSAL-VALIDATION`**
+> - Settlement `Id`, `allocation_id`, `bill_id`, `payment_id`, `amount`: all **unchanged** (in-place mutation confirmed)
+> - Total `bill_settlements` count after reversal: **1** (no duplicate created)
+> - Relational join (payment → allocation → settlement → bill): **intact**
+> - UNIQUE constraint `ix_bill_settlements_allocation_id`: **active** — no violation
+> - PAY-LIVE-001 status after validation: **Allocated** (unchanged, isolated correctly)
+> - Implementation commit: none required — implementation was correct as deployed
+> - Final verdict: **PASS**
