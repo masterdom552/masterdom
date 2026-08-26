@@ -3,10 +3,10 @@
     "sourceOfTruth": "capability-catalog",
     "capabilityCatalogPath": ".masterdom/capabilities/CAPABILITY_CATALOG.json",
     "activePackage": null,
-    "currentCapabilityId": "CAP-022",
-    "currentCapabilityName": "Intelligence",
-    "currentCapabilityStatus": "VERIFIED / CLOSED",
-    "currentState": "CAP-022 governance closed by PKG-CAP-022-AUTHORITY-ENFORCEMENT",
+    "currentCapabilityId": "CAP-023",
+    "currentCapabilityName": "Authentication",
+    "currentCapabilityStatus": "COMPLETE / GOVERNANCE CLOSED",
+    "currentState": "CAP-023 governance closed by PKG-CAP-023-GOVERNANCE-CLOSURE (2026-08-26); 5 implementation packages verified; 100 non-WAF tests pass; live login confirmed 2026-08-26",
     "completedPackages": [
         {
             "id": "PKG-001",
@@ -218,6 +218,83 @@
             "successor": null
         },
         {
+            "id": "CAP-023",
+            "title": "Authentication",
+            "status": "Closed",
+            "objective": "Implement the full authentication capability: login, JWT issuance, authority-level claim, password management, credential recovery, and EF Core relational query repair for authentication-adjacent repositories.",
+            "outcome": "Implementation Complete — all five implementation packages scope-complete; 100 non-WAF tests pass; live login confirmed 2026-08-26; CAP-023 governance closed by PKG-CAP-023-GOVERNANCE-CLOSURE",
+            "validation": "Architect Decision VERIFIED; 53/53 core unit tests, 29/29 infrastructure non-WAF tests, 18/18 SQLite relational tests pass; live POST /api/authentication/login HTTP 200 confirmed; 6 pre-existing WAF failures unchanged",
+            "acceptance": "Package Closed",
+            "remainingDebt": "RequestAuthorizationService.cs:248 EF Core translation defect in subsidy optimization authorization path (separate corrective package required). PropertyCapabilityAuthorizationService-gated endpoint not explicitly documented in live validation (test-proven, acknowledged).",
+            "successor": null
+        },
+        {
+            "id": "PKG-CAP-023-PHASE-1-AUTHENTICATION-CORE",
+            "title": "Authentication — Phase 1: Core Login and JWT Issuance",
+            "status": "Closed",
+            "objective": "Implement login command, JWT token issuance, POST /api/authentication/login endpoint, DI wiring.",
+            "outcome": "Implementation Complete",
+            "validation": "Build and targeted tests passed per package closure record",
+            "acceptance": "Package Closed",
+            "remainingDebt": "No package-blocking debt",
+            "successor": "PKG-CAP-023-PHASE-2-SERVER-DERIVED-AUTHORITY"
+        },
+        {
+            "id": "PKG-CAP-023-PHASE-2-SERVER-DERIVED-AUTHORITY",
+            "title": "Authentication — Phase 2: Server-Derived Authority Claims",
+            "status": "Closed",
+            "objective": "Implement masterdom:authority_level claim, ILoginAuthorityResolver, role/permission claims at login.",
+            "outcome": "Implementation Complete",
+            "validation": "Build, LoginAuthorityResolverTests, deployment rebuild, and unauthenticated-401 live check passed per package closure record",
+            "acceptance": "Package Closed",
+            "remainingDebt": "No package-blocking debt",
+            "successor": "PKG-CAP-023-PHASE-3-CREDENTIAL-RECOVERY"
+        },
+        {
+            "id": "PKG-CAP-023-PHASE-3-CREDENTIAL-RECOVERY",
+            "title": "Authentication — Phase 3: Credential Recovery (Password Reset)",
+            "status": "Closed",
+            "objective": "Implement ChangePasswordCommand, RequestPasswordResetCommand, CompletePasswordResetCommand, password reset flow.",
+            "outcome": "Implementation Complete",
+            "validation": "Build, unit tests, PasswordResetRepositoryTests passed per package closure record",
+            "acceptance": "Package Closed",
+            "remainingDebt": "Anonymous recovery deferred pending real delivery infrastructure",
+            "successor": "PKG-CAP-023-PHASE-4-DELEGATED-AUTHORITY-RELATIONAL-QUERY-REPAIR"
+        },
+        {
+            "id": "PKG-CAP-023-PHASE-4-DELEGATED-AUTHORITY-RELATIONAL-QUERY-REPAIR",
+            "title": "Authentication — Phase 4: Delegated Authority Relational Query Repair",
+            "status": "Closed",
+            "objective": "Repair EF Core LINQ-to-SQL translation defect in DelegatedAuthorityRepository, PropertyCapabilityAuthorizationService, RequestAuthorizationService (10 methods), BillingChargeCompositionReadService.",
+            "outcome": "Implementation Complete",
+            "validation": "Build, DelegatedAuthorityRepositoryRelationalTests, SecurityRelationalTests passed per package closure record; live proof prerequisites satisfied by PKG-BILL-PAYMENT-SETTLEMENT-REVERSAL-VALIDATION and PKG-CAP-023-GOVERNANCE-CLOSURE",
+            "acceptance": "Package Closed",
+            "remainingDebt": "RequestAuthorizationService.cs:248 (subsidy optimization path) explicitly out of scope — separate corrective package required",
+            "successor": "PKG-CAP-023-REPOSITORY-CONVERTED-PROPERTY-RELATIONAL-QUERY-REPAIR"
+        },
+        {
+            "id": "PKG-CAP-023-REPOSITORY-CONVERTED-PROPERTY-RELATIONAL-QUERY-REPAIR",
+            "title": "Authentication — Repository-Wide Converted-Property Relational Query Repair",
+            "status": "Closed",
+            "objective": "Repair EF Core LINQ-to-SQL translation defect in TenancyRepository, LeaseRepository, PropertyRepository; add 18 SQLite relational translation tests.",
+            "outcome": "Implementation Complete",
+            "validation": "18/18 new SQLite relational tests PASS (commit b3f2fe7); all production fixes committed; full suite 30 pre-existing WAF failures unchanged",
+            "acceptance": "Package Closed",
+            "remainingDebt": "RequestAuthorizationService.cs:248 (subsidy optimization path) explicitly deferred",
+            "successor": "PKG-CAP-023-GOVERNANCE-CLOSURE"
+        },
+        {
+            "id": "PKG-CAP-023-GOVERNANCE-CLOSURE",
+            "title": "Authentication — Governance Closure",
+            "status": "Closed",
+            "objective": "Validate all five CAP-023 implementation packages against committed source; resolve Phase 4 live validation prerequisites; mark CAP-023 COMPLETE.",
+            "outcome": "Validation Complete — OUTCOME A — all preconditions MET",
+            "validation": "100/100 non-WAF Authentication tests pass; live login HTTP 200 confirmed 2026-08-26; governance records synchronized",
+            "acceptance": "Package Closed",
+            "remainingDebt": "No package-blocking debt",
+            "successor": null
+        },
+        {
             "id": "CAP-017",
             "title": "Policy Framework — Cross-Module Policy Catalog Contracts and Consumer Integration",
             "status": "Closed",
@@ -286,6 +363,7 @@
         "Maintenance": "Complete",
         "Notifications": "Complete",
         "Intelligence": "Complete",
+        "Authentication": "Complete",
         "Policy Framework": "Complete",
         "Utility Rating": "Complete",
         "Metering": "Complete",

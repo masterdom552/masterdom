@@ -6,9 +6,9 @@
   "nextExecutableCapabilityId": null,
   "nextExecutableCapabilityName": null,
   "capabilityStatusCounts": {
-    "COMPLETE": 20,
+    "COMPLETE": 21,
     "PARTIAL": 1,
-    "NOT STARTED": 2,
+    "NOT STARTED": 1,
     "SUPERSEDED": 0
   },
   "dependencyGraph": [
@@ -917,7 +917,7 @@
       "capabilityId": "CAP-023",
       "name": "Authentication",
       "domain": "Platform",
-      "status": "NOT STARTED",
+      "status": "COMPLETE",
       "dependencies": [
         "CAP-001",
         "CAP-002",
@@ -928,17 +928,39 @@
       ],
       "repositoryEvidence": {
         "sourceFiles": [
-          "src/Masterdom.Modules.Authentication/Masterdom.Modules.Authentication.csproj",
-          "src/Masterdom.Modules.Authentication/Application/Services/AuthenticationCapabilityBehaviorService.cs"
+          "src/Masterdom.Modules.Authentication/Application/Handlers/LoginCommandHandler.cs",
+          "src/Masterdom.Modules.Authentication/Application/Handlers/ChangePasswordCommandHandler.cs",
+          "src/Masterdom.Modules.Authentication/Application/Handlers/CompletePasswordResetCommandHandler.cs",
+          "src/Masterdom.Modules.Authentication/Application/Handlers/RequestPasswordResetCommandHandler.cs",
+          "src/Masterdom.Modules.Authentication/Application/Services/JwtTokenIssuer.cs",
+          "src/Masterdom.Modules.Authentication/Application/Services/PasswordHasher.cs",
+          "src/Masterdom.Modules.Authentication/Application/Services/ResetTokenHasher.cs",
+          "src/Masterdom.Modules.Authentication/Application/Services/AuthenticationCapabilityBehaviorService.cs",
+          "src/Masterdom.Host/Api/AuthenticationEndpoints.cs"
         ],
         "tests": [
-          "tests/Masterdom.Platform.Infrastructure.Tests/Authentication"
+          "tests/Masterdom.Core.Tests/Authentication",
+          "tests/Masterdom.Core.Tests/Identity/CredentialTests.cs",
+          "tests/Masterdom.Platform.Infrastructure.Tests/Authentication",
+          "tests/Masterdom.Platform.Infrastructure.Tests/Security/LoginAuthorityResolverTests.cs",
+          "tests/Masterdom.Platform.Infrastructure.Tests/Security/PasswordResetRepositoryTests.cs",
+          "tests/Masterdom.Platform.Infrastructure.Tests/Bootstrap/BootstrapCredentialRecoveryServiceTests.cs",
+          "tests/Masterdom.Platform.Infrastructure.Tests/Persistence/Tenancy/TenancyRepositoryRelationalTests.cs",
+          "tests/Masterdom.Platform.Infrastructure.Tests/Persistence/Lease/LeaseRepositoryRelationalTests.cs",
+          "tests/Masterdom.Platform.Infrastructure.Tests/Persistence/Property/PropertyRepositoryRelationalTests.cs"
         ],
         "build": "dotnet build Masterdom.slnx"
       },
-      "implementationPackages": [],
+      "implementationPackages": [
+        "PKG-CAP-023-PHASE-1-AUTHENTICATION-CORE",
+        "PKG-CAP-023-PHASE-2-SERVER-DERIVED-AUTHORITY",
+        "PKG-CAP-023-PHASE-3-CREDENTIAL-RECOVERY",
+        "PKG-CAP-023-PHASE-4-DELEGATED-AUTHORITY-RELATIONAL-QUERY-REPAIR",
+        "PKG-CAP-023-REPOSITORY-CONVERTED-PROPERTY-RELATIONAL-QUERY-REPAIR",
+        "PKG-CAP-023-GOVERNANCE-CLOSURE"
+      ],
       "verificationStatus": "VERIFIED",
-      "verificationDateUtc": "2026-08-23"
+      "verificationDateUtc": "2026-08-26"
     }
   ]
 }
