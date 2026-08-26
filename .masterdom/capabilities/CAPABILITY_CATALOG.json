@@ -6,9 +6,9 @@
   "nextExecutableCapabilityId": null,
   "nextExecutableCapabilityName": null,
   "capabilityStatusCounts": {
-    "COMPLETE": 19,
+    "COMPLETE": 20,
     "PARTIAL": 1,
-    "NOT STARTED": 3,
+    "NOT STARTED": 2,
     "SUPERSEDED": 0
   },
   "dependencyGraph": [
@@ -859,7 +859,7 @@
       "capabilityId": "CAP-022",
       "name": "Intelligence",
       "domain": "Platform",
-      "status": "NOT STARTED",
+      "status": "COMPLETE",
       "dependencies": [
         "CAP-014",
         "CAP-018"
@@ -869,40 +869,47 @@
       ],
       "repositoryEvidence": {
         "sourceFiles": [
-          "src/Masterdom.Modules.Intelligence/Masterdom.Modules.Intelligence.csproj"
+          "src/Masterdom.Modules.Intelligence/Application/Handlers/GetPropertyPerformanceAnalyticsQueryHandler.cs",
+          "src/Masterdom.Modules.Intelligence/Application/Services/PropertyPerformanceAnalyticsService.cs",
+          "src/Masterdom.Host/Api/IntelligenceEndpoints.cs",
+          "src/Masterdom.Infrastructure/PropertyFoundationDependencyInjection.cs"
         ],
-        "tests": [],
+        "tests": [
+          "tests/Masterdom.Platform.Infrastructure.Tests/Intelligence/PropertyPerformanceAnalyticsTests.cs",
+          "tests/Masterdom.Platform.Infrastructure.Tests/Intelligence/IntelligenceRuntimeCompositionTests.cs"
+        ],
         "build": "dotnet build Masterdom.slnx"
       },
-      "implementationPackages": [],
+      "implementationPackages": [
+        "PKG-CAP-022-AUTHORITY-ENFORCEMENT"
+      ],
       "verificationStatus": "VERIFIED",
-      "reviewDecision": "Accepted",
+      "reviewDecision": "VERIFIED",
       "reviewAuthority": "Architect",
-      "verificationDateUtc": "2026-08-08",
+      "verificationDateUtc": "2026-08-26",
       "architectDecisions": {
         "D1_CapabilityPurpose": "APPROVED",
         "D2_ArchitecturalPrinciples": "APPROVED",
         "D3_FirstExecutableSlice": "APPROVED_WITH_SCOPE_CONSTRAINT",
         "approvedDate": "2026-08-23",
-        "implementationAuthorized": false,
-        "packageCreationAuthorized": false,
+        "implementationAuthorized": true,
+        "packageCreationAuthorized": true,
         "conditionalAuthorization": {
           "decision": "C — AUTHORIZED SUBJECT TO EXPLICIT PRECONDITIONS",
           "decisionDate": "2026-08-23",
-          "scope": "Limited to a future, narrowly-scoped authority-enforcement package. Does NOT authorize the existing uncommitted 14-file Intelligence implementation as-is, and does NOT constitute implementation or completion.",
-          "authorizedPackage": "PKG-CAP-022-AUTHORITY-ENFORCEMENT",
-          "authorizedPackageStatus": "future — not started",
+          "closedDate": "2026-08-26",
+          "closedByPackage": "PKG-CAP-022-AUTHORITY-ENFORCEMENT",
+          "closureOutcome": "ALL SEVEN PRECONDITIONS MET — CAP-022 COMPLETE",
           "authoritySource": "EffectiveAuthorityResolver (Masterdom.Core.Security), per ADR-0010; no new authorization mechanism",
-          "preconditions": [
-            "GetPropertyPerformanceAnalyticsQueryHandler must resolve the requesting user's effective authority for the requested propertyId",
-            "Access must be rejected when authority does not grant access to the requested property",
-            "Rejection must occur before Reporting data is fetched or returned",
-            "Enforcement must live in the Application-layer handler, not solely the HTTP endpoint",
-            "PropertyPerformanceAnalyticsService remains scoped to computation only",
-            "Authority resolution must fail closed on unresolvable or insufficient authority",
-            "Scope is limited to property-level performance analytics — no persistence, aggregate, or Reporting redesign",
-            "Tests must prove authorized-success, unauthorized-rejection, and correct 403 error mapping"
-          ]
+          "preconditionResults": {
+            "handlerResolvesEffectiveAuthority": "MET",
+            "accessRejectedWhenAuthorityInsufficient": "MET",
+            "rejectionBeforeReportingAccess": "MET",
+            "enforcementInApplicationLayer": "MET",
+            "analyticsServiceComputationOnly": "MET",
+            "failsClosedOnUnauthenticatedOrUnresolvable": "MET",
+            "testsProveRequiredBehaviors": "MET"
+          }
         }
       }
     },

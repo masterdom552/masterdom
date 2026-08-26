@@ -1,12 +1,12 @@
 {
-    "snapshotDateUtc": "2026-08-10",
+    "snapshotDateUtc": "2026-08-26",
     "sourceOfTruth": "capability-catalog",
     "capabilityCatalogPath": ".masterdom/capabilities/CAPABILITY_CATALOG.json",
     "activePackage": null,
-    "currentCapabilityId": "CAP-020",
-    "currentCapabilityName": "Subsidy Optimization",
+    "currentCapabilityId": "CAP-022",
+    "currentCapabilityName": "Intelligence",
     "currentCapabilityStatus": "VERIFIED / CLOSED",
-    "currentState": "Repository Investigation Required",
+    "currentState": "CAP-022 governance closed by PKG-CAP-022-AUTHORITY-ENFORCEMENT",
     "completedPackages": [
         {
             "id": "PKG-001",
@@ -198,12 +198,23 @@
         {
             "id": "CAP-022",
             "title": "Intelligence",
-            "status": "NOT STARTED",
+            "status": "Closed",
             "objective": "Establish the smallest executable Intelligence capability behavior supported by repository evidence while preserving existing architectural boundaries.",
-            "outcome": "Implementation Conditionally Authorized — Not Implemented",
-            "validation": "Architect Decision VERIFIED for D1/D2/D3 scope (capability purpose, architectural principles, first-slice candidate); implementation and package creation for the existing uncommitted 14-file slice remain NOT authorized as-is (implementationAuthorized: false, packageCreationAuthorized: false). A conditional authorization was recorded on 2026-08-23 limited to a future, narrowly-scoped PKG-CAP-022-AUTHORITY-ENFORCEMENT package (see CAPABILITY_CATALOG.json architectDecisions.conditionalAuthorization for decision, scope, and preconditions)",
-            "acceptance": "Not Closed — Conditionally Authorized, Not Implemented",
-            "remainingDebt": "PKG-CAP-022-AUTHORITY-ENFORCEMENT (future, not started) must be implemented and validated — wiring EffectiveAuthorityResolver into GetPropertyPerformanceAnalyticsQueryHandler with fail-closed, Application-layer, property-scoped enforcement — before CAP-022 can be considered complete; the existing uncommitted 14-file slice remains uncommitted, not authorized as-is, and its authority-enforcement gap remains unresolved",
+            "outcome": "Implementation Complete — all seven conditional-authorization preconditions met; CAP-022 governance closed by PKG-CAP-022-AUTHORITY-ENFORCEMENT (2026-08-26)",
+            "validation": "Architect Decision VERIFIED; all seven preconditions of the 2026-08-23 conditional authorization independently validated against committed source; 19/19 Intelligence tests pass; EffectiveAuthorityResolver enforcement confirmed in Application-layer handler; fail-closed behavior proven; rejection before Reporting access proven",
+            "acceptance": "Package Closed",
+            "remainingDebt": "No package-blocking debt. Separate deferred defect: RequestAuthorizationService.cs:248 EF Core translation defect in subsidy optimization authorization path (separate corrective package required).",
+            "successor": null
+        },
+        {
+            "id": "PKG-CAP-022-AUTHORITY-ENFORCEMENT",
+            "title": "Intelligence — Property Performance Analytics Authority Enforcement",
+            "status": "Closed",
+            "objective": "Validate that the committed GetPropertyPerformanceAnalyticsQueryHandler satisfies all seven preconditions of the 2026-08-23 conditional authorization; synchronize governance records to mark CAP-022 COMPLETE.",
+            "outcome": "Validation Complete — OUTCOME A — all seven preconditions MET",
+            "validation": "19/19 Intelligence tests passed; all preconditions verified against HEAD e8806ed; governance records synchronized",
+            "acceptance": "Package Closed",
+            "remainingDebt": "No package-blocking debt",
             "successor": null
         },
         {
@@ -274,7 +285,7 @@
         "CRM": "Not Started",
         "Maintenance": "Complete",
         "Notifications": "Complete",
-        "Intelligence": "Not Started",
+        "Intelligence": "Complete",
         "Policy Framework": "Complete",
         "Utility Rating": "Complete",
         "Metering": "Complete",
